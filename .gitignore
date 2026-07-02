@@ -1,0 +1,7 @@
+bin/
+obj/
+.vs/
+Publish/
+*.user
+dalamud.zip
+latest.zip

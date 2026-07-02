@@ -51,6 +51,22 @@ as one window or as separate floating panels.
 - **Party Callouts** — Optional sending of messages in party chat for Gazes and Chaos.
 - **Self Marked Spreads** — Optional Self marking for spread markers based on role.
 
+## Installation
+
+Snazzy P4 is distributed through my personal Dalamud plugin repository.
+
+1. In-game, open the Dalamud settings with `/xlsettings`.
+2. Go to the **Experimental** tab.
+3. Under **Custom Plugin Repositories**, paste this URL into an empty row and press the **+** button:
+
+   ```
+   https://raw.githubusercontent.com/snazzysosnazzy/SnazzyP4/main/pluginmaster.json
+   ```
+
+4. Press **Save and Close**.
+5. Open the plugin installer with `/xlplugins`, search for **Snazzy P4**, and install it.
+6. Open the plugin with `/snazzyp4`.
+
 ## How to Use
 
 1. Open by typing the command `/snazzyp4`
@@ -109,6 +125,12 @@ to yourself as a raider by choosing to use it. If you still do not care about an
 This hidden option, is unlocked through the `...` field at the bottom of settings, that turns the Kefka **Last Fake?** resolution buttons on. 
 Type "i_need_it" inside of the text box and hit `Confirm`. A final message will appear to double confirm that you want to use the feature.
 Hit `Confirm` at the bottom of the message if you still want it to be enabled.
+
+## Support
+
+If Snazzy P4 makes your P4 pulls a little less painful and you want to support development, you can buy me a coffee:
+
+![ko_fi](https://github.githubassets.com/assets/ko_fi-53a60c17e75c.svg)[ko-fi.com/**snazzysosnazzy**](https://ko-fi.com/snazzysosnazzy)
 
 ---
 
