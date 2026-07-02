@@ -65,7 +65,7 @@ jobs:
           $entry.DownloadLinkTesting = $link
           $entry.DownloadLinkUpdate = $link
           $entry.LastUpdate = [string][long](Get-Date -UFormat %s)
-          ,$pluginMaster | ConvertTo-Json -Depth 10 | Set-Content pluginmaster.json -Encoding UTF8
+          $pluginMaster | ConvertTo-Json -Depth 10 -AsArray | Set-Content pluginmaster.json -Encoding UTF8
 
       - name: Commit updated pluginmaster.json
         uses: EndBug/add-and-commit@v9
