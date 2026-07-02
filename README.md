@@ -4,7 +4,7 @@ A robust custom macro system for the Kefka UMAD/DMU Phase 4 mechanics. You tap t
 buttons for what you see in the fight, and the plugin turns them into short, readable
 callouts (spread/stack targets, gaze, chaos and Kefka) so you can cut the macro bloat.
 
-#Preface
+## Preface
 
 I made this plugin ultimately to cut down on macro bloat and make it easier to read/parse macro text. As well as creating
 a solution for the community that would persuade them to avoid ever adopting Auto-Markers for this phase.
