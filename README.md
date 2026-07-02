@@ -130,7 +130,7 @@ Hit `Confirm` at the bottom of the message if you still want it to be enabled.
 
 If Snazzy P4 makes your P4 pulls a little less painful and you want to support development, you can buy me a coffee:
 
-![ko_fi](https://github.githubassets.com/assets/ko_fi-53a60c17e75c.svg)[ko-fi.com/**snazzysosnazzy**](https://ko-fi.com/snazzysosnazzy)
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/snazzysosnazzy)
 
 ---
 
