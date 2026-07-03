@@ -154,8 +154,9 @@ public class Configuration : IPluginConfiguration
 
     /// <summary>
     /// Whether the Hide/Show control is a separate floating section rather than a toolbar button.
+    /// This is enabled by default.
     /// </summary>
-    public bool FloatingHideButton { get; set; }
+    public bool FloatingHideButton { get; set; } = true;
 
     /// <summary>
     /// Whether dragging any detached window moves them all together.
