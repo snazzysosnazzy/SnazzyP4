@@ -273,6 +273,13 @@ public class ConfigWindow : Window, IDisposable
                 Configuration.Save();
             }
 
+            var expandFromCenter = Configuration.CombineSetsExpandFromCenter;
+            if (ImGui.Checkbox("Expand outward from the divider (instead of left to right)", ref expandFromCenter))
+            {
+                Configuration.CombineSetsExpandFromCenter = expandFromCenter;
+                Configuration.Save();
+            }
+
             ImGui.Unindent();
         }
     }

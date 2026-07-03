@@ -371,16 +371,38 @@ public class Solver
     }
 
     /// <summary>
+    /// The horizontal alignment used when rendering a set's lines within its column.
+    /// </summary>
+    private enum SetAlignment
+    {
+        /// <summary>
+        /// Lines start at the left edge of the column.
+        /// </summary>
+        Left,
+
+        /// <summary>
+        /// Lines end at the right edge of the column.
+        /// </summary>
+        Right,
+
+        /// <summary>
+        /// Lines are centred within the column.
+        /// </summary>
+        Center,
+    }
+
+    /// <summary>
+    /// A single run of text within a resolution line.
+    /// A plain run uses the default text colour, a coloured run uses its own colour, and a disabled run uses the muted placeholder colour.
+    /// </summary>
+    private readonly record struct SetRun(string Text, Vector4 Color, bool HasColor, bool Disabled);
+
+    /// <summary>
     /// Draws the First Set resolution, which is the short picks with the first gaze and first chaos.
     /// </summary>
     public void DrawFirstSet(float scale)
     {
-        if (!configuration.EffectiveHideLabels(CurrentSection))
-        {
-            ImGui.TextUnformatted("< First Set >");
-        }
-
-        DrawSet(true, firstExdeathPressed, firstExdeathReal, 0);
+        RenderLines(BuildSetPanel("< First Set >", true, firstExdeathPressed, firstExdeathReal, 0), SetAlignment.Left, 0f);
     }
 
     /// <summary>
@@ -388,33 +410,38 @@ public class Solver
     /// </summary>
     public void DrawSecondSet(float scale)
     {
-        if (!configuration.EffectiveHideLabels(CurrentSection))
-        {
-            ImGui.TextUnformatted("< Second Set >");
-        }
-
-        DrawSet(false, secondExdeathPressed, secondExdeathReal, 1);
+        RenderLines(BuildSetPanel("< Second Set >", false, secondExdeathPressed, secondExdeathReal, 1), SetAlignment.Left, 0f);
     }
 
     /// <summary>
-    /// Draws the First Set and Second Set together in one panel, divided by a line, stacked vertically or laid out side by side.
+    /// Draws the First Set and Second Set together in one panel, divided by a line.
+    /// The sets stack vertically or sit side by side, and can optionally expand outward from the divider instead of the left edge.
     /// </summary>
     public void DrawCombinedSets(float scale)
     {
+        var firstLines = BuildSetPanel("< First Set >", true, firstExdeathPressed, firstExdeathReal, 0);
+        var secondLines = BuildSetPanel("< Second Set >", false, secondExdeathPressed, secondExdeathReal, 1);
+        var fromCenter = configuration.CombineSetsExpandFromCenter;
+
         if (!configuration.CombineSetsHorizontal)
         {
-            DrawFirstSet(scale);
+            // Stacked: expanding from the centre centres every line on the panel's midline.
+            var stackedAlignment = fromCenter ? SetAlignment.Center : SetAlignment.Left;
+            var stackedWidth = fromCenter ? Math.Max(MaxLineWidth(firstLines), MaxLineWidth(secondLines)) : 0f;
+            RenderLines(firstLines, stackedAlignment, stackedWidth);
             ImGui.Spacing();
             ImGui.Separator();
             ImGui.Spacing();
-            DrawSecondSet(scale);
+            RenderLines(secondLines, stackedAlignment, stackedWidth);
             return;
         }
 
+        // Side by side: expanding from the centre right-aligns the first set against the divider so both sets grow outward from it.
+        var firstWidth = MaxLineWidth(firstLines);
         var top = ImGui.GetCursorScreenPos().Y;
         using (ImRaii.Group())
         {
-            DrawFirstSet(scale);
+            RenderLines(firstLines, fromCenter ? SetAlignment.Right : SetAlignment.Left, firstWidth);
         }
 
         var firstMax = ImGui.GetItemRectMax();
@@ -423,7 +450,7 @@ public class Solver
         ImGui.SameLine(0f, 24f * scale);
         using (ImRaii.Group())
         {
-            DrawSecondSet(scale);
+            RenderLines(secondLines, SetAlignment.Left, 0f);
         }
 
         var bottom = Math.Max(firstMax.Y, ImGui.GetItemRectMax().Y);
@@ -435,17 +462,39 @@ public class Solver
     }
 
     /// <summary>
-    /// Draws the resolution text for one set.
+    /// Builds a set panel's lines, prefixing the set label unless labels are hidden.
+    /// </summary>
+    private List<List<SetRun>> BuildSetPanel(string label, bool isShort, bool gazeKnown, bool gazeReal, int chaosIndex)
+    {
+        var lines = new List<List<SetRun>>();
+        if (!configuration.EffectiveHideLabels(CurrentSection))
+        {
+            lines.Add(new List<SetRun> { PlainRun(label) });
+        }
+
+        lines.AddRange(BuildSetLines(isShort, gazeKnown, gazeReal, chaosIndex));
+        return lines;
+    }
+
+    /// <summary>
+    /// Builds the resolution lines for one set as coloured runs.
     /// The body comes from the short/long picks in this set, while the gaze comes from the matching Exdeath press order, so the first press drives the First Set gaze and the second press drives the Second Set gaze.
     /// </summary>
-    private void DrawSet(bool isShort, bool gazeKnown, bool gazeReal, int chaosIndex)
+    private List<List<SetRun>> BuildSetLines(bool isShort, bool gazeKnown, bool gazeReal, int chaosIndex)
     {
+        var lines = new List<List<SetRun>>();
+
         if (LayoutEditActive)
         {
-            DrawResolution(true, "STAND STILL");
-            ImGui.TextColored(GazeRealColor, "Gaze REAL / LOOK AWAY");
-            ImGui.TextColored(WaterColor, "WATER DONUT");
-            return;
+            lines.Add(BuildResolutionLine(true, "STAND STILL"));
+            if (!configuration.AccelerationSameLine)
+            {
+                lines.Add(new List<SetRun> { ColorRun("STAND STILL", AccelerationColor) });
+            }
+
+            lines.Add(new List<SetRun> { ColorRun("Gaze REAL / LOOK AWAY", GazeRealColor) });
+            lines.Add(new List<SetRun> { ColorRun("WATER DONUT", WaterColor) });
+            return lines;
         }
 
         var complete = phase == Phase.Done;
@@ -480,37 +529,47 @@ public class Solver
 
         if (bodySpread.HasValue)
         {
-            DrawResolution(bodySpread.Value, accelerationText);
+            lines.Add(BuildResolutionLine(bodySpread.Value, accelerationText));
+
+            // When the acceleration is not appended to the body line, it drops onto its own line.
+            if (accelerationText != null && !configuration.AccelerationSameLine)
+            {
+                lines.Add(new List<SetRun> { ColorRun(accelerationText, AccelerationColor) });
+            }
         }
         else if (accelerationText != null)
         {
-            ImGui.TextColored(AccelerationColor, accelerationText);
+            lines.Add(new List<SetRun> { ColorRun(accelerationText, AccelerationColor) });
         }
 
         if (gazeKnown)
         {
-            ImGui.TextColored(gazeReal ? GazeRealColor : GazeFakeColor,
-                gazeReal ? "Gaze REAL / LOOK AWAY" : "Gaze FAKE / LOOK");
+            lines.Add(new List<SetRun>
+            {
+                ColorRun(gazeReal ? "Gaze REAL / LOOK AWAY" : "Gaze FAKE / LOOK",
+                    gazeReal ? GazeRealColor : GazeFakeColor),
+            });
         }
 
-        var hasChaos = chaosIndex < chaosResolutions.Count;
-        if (hasChaos)
+        if (chaosIndex < chaosResolutions.Count)
         {
             var (chaosText, chaosColor) = chaosResolutions[chaosIndex];
-            ImGui.TextColored(chaosColor, chaosText);
+            lines.Add(new List<SetRun> { ColorRun(chaosText, chaosColor) });
         }
 
-        if (!anyPick && !gazeKnown && !complete && !hasChaos)
+        if (!anyPick && !gazeKnown && !complete && chaosIndex >= chaosResolutions.Count)
         {
-            ImGui.TextDisabled("--");
+            lines.Add(new List<SetRun> { DisabledRun("--") });
         }
+
+        return lines;
     }
 
     /// <summary>
-    /// Draws the spread or stack body line with the role-based target letter.
+    /// Builds one spread or stack body line with the role-based target letter, appending the Acceleration word when it shares the line.
     /// Support uses A for stack and D for spread, while DPS uses C for stack and B for spread.
     /// </summary>
-    private void DrawBody(bool spread)
+    private List<SetRun> BuildResolutionLine(bool spread, string? accelerationText)
     {
         var support = configuration.IsSupport;
         string letter;
@@ -526,36 +585,103 @@ public class Solver
             color = support ? configuration.ColorStackSupport : configuration.ColorStackDps;
         }
 
-        ImGui.TextUnformatted(spread ? "Spread on " : "Stack on ");
-        ImGui.SameLine(0, 0);
-        ImGui.TextColored(color, letter);
+        var line = new List<SetRun>
+        {
+            PlainRun(spread ? "Spread on " : "Stack on "),
+            ColorRun(letter, color),
+        };
+
+        if (accelerationText != null && configuration.AccelerationSameLine)
+        {
+            line.Add(PlainRun(" and "));
+            line.Add(ColorRun(accelerationText, AccelerationColor));
+        }
+
+        return line;
     }
 
     /// <summary>
-    /// Draws a set's spread or stack line and, when there is an Acceleration pick, either appends it on the same line or drops it onto its own line.
-    /// The joining " and " uses the normal text colour while the movement word keeps the Acceleration colour.
+    /// Renders a panel's lines, aligning each line within the given column width.
     /// </summary>
-    private void DrawResolution(bool spread, string? accelerationText)
+    private static void RenderLines(List<List<SetRun>> lines, SetAlignment alignment, float columnWidth)
     {
-        DrawBody(spread);
+        var baseX = ImGui.GetCursorPosX();
+        foreach (var line in lines)
+        {
+            if (alignment != SetAlignment.Left)
+            {
+                var offset = alignment == SetAlignment.Right
+                    ? columnWidth - LineWidth(line)
+                    : (columnWidth - LineWidth(line)) * 0.5f;
+                ImGui.SetCursorPosX(baseX + Math.Max(0f, offset));
+            }
 
-        if (accelerationText == null)
-        {
-            return;
-        }
+            for (var index = 0; index < line.Count; index++)
+            {
+                if (index > 0)
+                {
+                    ImGui.SameLine(0, 0);
+                }
 
-        if (configuration.AccelerationSameLine)
-        {
-            ImGui.SameLine(0, 0);
-            ImGui.TextUnformatted(" and ");
-            ImGui.SameLine(0, 0);
-            ImGui.TextColored(AccelerationColor, accelerationText);
-        }
-        else
-        {
-            ImGui.TextColored(AccelerationColor, accelerationText);
+                var run = line[index];
+                if (run.Disabled)
+                {
+                    ImGui.TextDisabled(run.Text);
+                }
+                else if (run.HasColor)
+                {
+                    ImGui.TextColored(run.Color, run.Text);
+                }
+                else
+                {
+                    ImGui.TextUnformatted(run.Text);
+                }
+            }
         }
     }
+
+    /// <summary>
+    /// Measures the pixel width of a line by summing its runs.
+    /// </summary>
+    private static float LineWidth(List<SetRun> line)
+    {
+        var width = 0f;
+        foreach (var run in line)
+        {
+            width += ImGui.CalcTextSize(run.Text).X;
+        }
+
+        return width;
+    }
+
+    /// <summary>
+    /// Measures the widest line in a panel.
+    /// </summary>
+    private static float MaxLineWidth(List<List<SetRun>> lines)
+    {
+        var max = 0f;
+        foreach (var line in lines)
+        {
+            max = Math.Max(max, LineWidth(line));
+        }
+
+        return max;
+    }
+
+    /// <summary>
+    /// Creates a run drawn in the default text colour.
+    /// </summary>
+    private static SetRun PlainRun(string text) => new(text, default, false, false);
+
+    /// <summary>
+    /// Creates a run drawn in a specific colour.
+    /// </summary>
+    private static SetRun ColorRun(string text, Vector4 color) => new(text, color, true, false);
+
+    /// <summary>
+    /// Creates a run drawn in the muted placeholder colour.
+    /// </summary>
+    private static SetRun DisabledRun(string text) => new(text, default, false, true);
 
     /// <summary>
     /// Determines whether a selection resolves to a spread.

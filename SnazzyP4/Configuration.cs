@@ -190,6 +190,13 @@ public class Configuration : IPluginConfiguration
     public bool CombineSetsHorizontal { get; set; }
 
     /// <summary>
+    /// Whether the combined set panel expands outward from the dividing line instead of growing from the left edge.
+    /// Side by side, this right-aligns the first set against the divider; stacked, it centres every line.
+    /// This only applies when the sets are combined.
+    /// </summary>
+    public bool CombineSetsExpandFromCenter { get; set; }
+
+    /// <summary>
     /// Whether dragging any detached window moves them all together.
     /// This is a transient interaction and is never carried across sessions.
     /// </summary>
