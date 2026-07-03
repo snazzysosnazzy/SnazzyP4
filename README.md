@@ -115,9 +115,6 @@ panels while keeping the **First Set**, **Second Set** and **Kefka** text panels
 The commands respect the same rules as the buttons — a pick that isn't valid yet (for example
 a short/long before its Exdeath) is simply ignored, exactly like a greyed-out button.
 
-The hidden Last Fake feature has its own controller commands, listed in the Hidden Settings
-section below.
-
 ## Configuration Settings
 
 Open with the **Settings** button or `/snazzyp4 config`.
