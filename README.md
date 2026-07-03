@@ -128,12 +128,13 @@ This hidden option, is unlocked through the `...` field at the bottom of setting
 Type "i_need_it" inside of the text box and hit `Confirm`. A final message will appear to double confirm that you want to use the feature.
 Hit `Confirm` at the bottom of the message if you still want it to be enabled.
 
-**How it works:** enabling this does *not* resolve anything for you. It adds a small
-**Last Fake?** toggle button next to each of the Thunder and Blizzard resolution lines in
-the Kefka panel, for the last set. You still have to work out the fake/real math yourself,
-then press the button to flip that line between **REAL** and **FAKE**. Nothing changes on
-its own — the text only updates when *you* press a button, so it stays fully manual input;
-it is just laid out for you instead of doing the math in your head.
+**How it works:** this *does* resolve the Thunder/Blizzard fake/real for you — but only
+from your button input, never by reading combat data. It adds a small **Last Fake?** toggle
+button next to each of the Thunder and Blizzard resolution lines in the Kefka panel, for the
+last set. You press the button to mark whether that line is the fake, and the resolution
+text flips between **REAL** and **FAKE** accordingly. Nothing happens on its own — it only
+updates when *you* press a button, so it still requires your input; it just does the flip
+for you instead of you doing it in your head.
 
 ## Support
 
