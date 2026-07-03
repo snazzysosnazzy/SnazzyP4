@@ -248,6 +248,33 @@ public class ConfigWindow : Window, IDisposable
             Configuration.FloatingResetButton = floatingReset;
             Configuration.Save();
         }
+
+        var accelerationSameLine = Configuration.AccelerationSameLine;
+        if (ImGui.Checkbox("Acceleration text on same line as Stack/Spread", ref accelerationSameLine))
+        {
+            Configuration.AccelerationSameLine = accelerationSameLine;
+            Configuration.Save();
+        }
+
+        var combineSets = Configuration.CombineSets;
+        if (ImGui.Checkbox("Combine First and Second set into one panel", ref combineSets))
+        {
+            Configuration.CombineSets = combineSets;
+            Configuration.Save();
+        }
+
+        if (Configuration.CombineSets)
+        {
+            ImGui.Indent();
+            var combineHorizontal = Configuration.CombineSetsHorizontal;
+            if (ImGui.Checkbox("Horizontal orientation (side by side instead of stacked)", ref combineHorizontal))
+            {
+                Configuration.CombineSetsHorizontal = combineHorizontal;
+                Configuration.Save();
+            }
+
+            ImGui.Unindent();
+        }
     }
 
     /// <summary>
@@ -306,6 +333,11 @@ public class ConfigWindow : Window, IDisposable
 
         foreach (var section in plugin.Sections)
         {
+            if (!plugin.SectionEnabled(section.Id))
+            {
+                continue;
+            }
+
             if (!ImGui.CollapsingHeader($"{section.Name}##sec_{section.Id}"))
             {
                 continue;

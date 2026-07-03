@@ -173,6 +173,23 @@ public class Configuration : IPluginConfiguration
     public bool HideMacroButtons { get; set; }
 
     /// <summary>
+    /// Whether the Acceleration callout is appended to the spread or stack line instead of sitting on its own line.
+    /// When on, a set reads like "Spread on X and MOVE" with the "and" in the normal text colour and the movement word in the Acceleration colour.
+    /// </summary>
+    public bool AccelerationSameLine { get; set; }
+
+    /// <summary>
+    /// Whether the First Set and Second Set are drawn together in one combined panel with a divider between them.
+    /// </summary>
+    public bool CombineSets { get; set; }
+
+    /// <summary>
+    /// Whether the combined First and Second set panel lays its two sets out side by side instead of stacked.
+    /// This only applies when the sets are combined.
+    /// </summary>
+    public bool CombineSetsHorizontal { get; set; }
+
+    /// <summary>
     /// Whether dragging any detached window moves them all together.
     /// This is a transient interaction and is never carried across sessions.
     /// </summary>
@@ -226,6 +243,7 @@ public class Configuration : IPluginConfiguration
         ["d:ThunderButtons"] = 0.0f,
         ["d:FirstSet"] = 0.7f,
         ["d:SecondSet"] = 0.7f,
+        ["d:CombinedSets"] = 0.7f,
         ["d:ThunderText"] = 0.7f,
         ["d:LastFakeToggles"] = 1.0f,
         ["d:LastFakeThunder"] = 1.0f,
@@ -269,6 +287,7 @@ public class Configuration : IPluginConfiguration
         ["ThunderButtons"] = new Vector2(49f, 303f),
         ["FirstSet"] = new Vector2(356f, 151f),
         ["SecondSet"] = new Vector2(352f, 270f),
+        ["CombinedSets"] = new Vector2(356f, 151f),
         ["ThunderText"] = new Vector2(355f, 393f),
         ["Reset"] = new Vector2(58f, 463f),
         ["Hide"] = new Vector2(167f, 462f),

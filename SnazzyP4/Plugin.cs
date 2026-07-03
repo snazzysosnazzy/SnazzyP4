@@ -146,6 +146,7 @@ public sealed class Plugin : IDalamudPlugin
             new("Exdeath", "Exdeath", new Vector2(8, 52), Solver.DrawExdeath, HasButtons: true),
             new("FirstSet", "First Set (text)", new Vector2(8, 330), Solver.DrawFirstSet),
             new("SecondSet", "Second Set (text)", new Vector2(210, 330), Solver.DrawSecondSet),
+            new("CombinedSets", "First + Second Set (combined text)", new Vector2(8, 330), Solver.DrawCombinedSets),
             new("FireWaterButtons", "Chaos", new Vector2(340, 52), Solver.DrawFireWaterButtons, HasButtons: true),
             new("ThunderButtons", "Kefka", new Vector2(560, 52), Solver.DrawThunderButtons, HasButtons: true),
             new("ThunderText", "Kefka (text)", new Vector2(560, 240), Solver.DrawThunderText),
@@ -507,6 +508,8 @@ public sealed class Plugin : IDalamudPlugin
                                  && !Configuration.ToggleButtonsIndividualPanels,
             "LastFakeThunder" or "LastFakeBlizzard" => Configuration.ShowLastFake && Configuration.DetachToggleButtons
                                  && Configuration.ToggleButtonsIndividualPanels,
+            "FirstSet" or "SecondSet" => !Configuration.CombineSets,
+            "CombinedSets" => Configuration.CombineSets,
             _ => true,
         };
     }

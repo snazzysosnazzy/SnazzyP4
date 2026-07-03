@@ -244,6 +244,8 @@ public class Solver
         {
             "FirstSet" => SetHasContent(true, firstExdeathPressed, 0),
             "SecondSet" => SetHasContent(false, secondExdeathPressed, 1),
+            "CombinedSets" => SetHasContent(true, firstExdeathPressed, 0)
+                              || SetHasContent(false, secondExdeathPressed, 1),
             "ThunderText" => thunderPressed || blizzardPressed,
             _ => true,
         };
@@ -373,7 +375,11 @@ public class Solver
     /// </summary>
     public void DrawFirstSet(float scale)
     {
-        ImGui.TextUnformatted("< First Set >");
+        if (!configuration.EffectiveHideLabels(CurrentSection))
+        {
+            ImGui.TextUnformatted("< First Set >");
+        }
+
         DrawSet(true, firstExdeathPressed, firstExdeathReal, 0);
     }
 
@@ -382,8 +388,50 @@ public class Solver
     /// </summary>
     public void DrawSecondSet(float scale)
     {
-        ImGui.TextUnformatted("< Second Set >");
+        if (!configuration.EffectiveHideLabels(CurrentSection))
+        {
+            ImGui.TextUnformatted("< Second Set >");
+        }
+
         DrawSet(false, secondExdeathPressed, secondExdeathReal, 1);
+    }
+
+    /// <summary>
+    /// Draws the First Set and Second Set together in one panel, divided by a line, stacked vertically or laid out side by side.
+    /// </summary>
+    public void DrawCombinedSets(float scale)
+    {
+        if (!configuration.CombineSetsHorizontal)
+        {
+            DrawFirstSet(scale);
+            ImGui.Spacing();
+            ImGui.Separator();
+            ImGui.Spacing();
+            DrawSecondSet(scale);
+            return;
+        }
+
+        var top = ImGui.GetCursorScreenPos().Y;
+        using (ImRaii.Group())
+        {
+            DrawFirstSet(scale);
+        }
+
+        var firstMax = ImGui.GetItemRectMax();
+        var dividerX = firstMax.X + 8f * scale;
+
+        ImGui.SameLine(0f, 24f * scale);
+        using (ImRaii.Group())
+        {
+            DrawSecondSet(scale);
+        }
+
+        var bottom = Math.Max(firstMax.Y, ImGui.GetItemRectMax().Y);
+        ImGui.GetWindowDrawList().AddLine(
+            new Vector2(dividerX, top),
+            new Vector2(dividerX, bottom),
+            ImGui.GetColorU32(ImGuiCol.Separator),
+            Math.Max(1f, 1.5f * scale));
     }
 
     /// <summary>
@@ -394,8 +442,7 @@ public class Solver
     {
         if (LayoutEditActive)
         {
-            DrawBody(true);
-            ImGui.TextColored(AccelerationColor, "STAND STILL");
+            DrawResolution(true, "STAND STILL");
             ImGui.TextColored(GazeRealColor, "Gaze REAL / LOOK AWAY");
             ImGui.TextColored(WaterColor, "WATER DONUT");
             return;
@@ -403,9 +450,10 @@ public class Solver
 
         var complete = phase == Phase.Done;
         var anyPick = false;
-        var hasSpread = false;
-        var hasStack = false;
+        bool? bodySpread = null;
+        string? accelerationText = null;
 
+        // A set holds at most one body pick (Lightning or Drop) and at most one Acceleration.
         foreach (var selection in selections)
         {
             if (selection.IsShort != isShort)
@@ -414,31 +462,29 @@ public class Solver
             }
 
             anyPick = true;
-            var mechanic = MechanicText(selection.Kind, selection.IsReal);
-            if (mechanic == "Spread")
+            if (selection.Kind == MechanicKind.Acceleration)
             {
-                hasSpread = true;
-                DrawBody(true);
+                accelerationText = MechanicText(selection.Kind, selection.IsReal);
             }
-            else if (mechanic == "Stack")
+            else
             {
-                hasStack = true;
-                DrawBody(false);
+                bodySpread = MechanicText(selection.Kind, selection.IsReal) == "Spread";
             }
         }
 
         // Once the whole sequence resolves, a set with no Spread and no Stack always defaults to Stack.
-        if (complete && !hasSpread && !hasStack)
+        if (complete && bodySpread is null)
         {
-            DrawBody(false);
+            bodySpread = false;
         }
 
-        foreach (var selection in selections)
+        if (bodySpread.HasValue)
         {
-            if (selection.IsShort == isShort && selection.Kind == MechanicKind.Acceleration)
-            {
-                ImGui.TextColored(AccelerationColor, MechanicText(selection.Kind, selection.IsReal));
-            }
+            DrawResolution(bodySpread.Value, accelerationText);
+        }
+        else if (accelerationText != null)
+        {
+            ImGui.TextColored(AccelerationColor, accelerationText);
         }
 
         if (gazeKnown)
@@ -483,6 +529,32 @@ public class Solver
         ImGui.TextUnformatted(spread ? "Spread on " : "Stack on ");
         ImGui.SameLine(0, 0);
         ImGui.TextColored(color, letter);
+    }
+
+    /// <summary>
+    /// Draws a set's spread or stack line and, when there is an Acceleration pick, either appends it on the same line or drops it onto its own line.
+    /// The joining " and " uses the normal text colour while the movement word keeps the Acceleration colour.
+    /// </summary>
+    private void DrawResolution(bool spread, string? accelerationText)
+    {
+        DrawBody(spread);
+
+        if (accelerationText == null)
+        {
+            return;
+        }
+
+        if (configuration.AccelerationSameLine)
+        {
+            ImGui.SameLine(0, 0);
+            ImGui.TextUnformatted(" and ");
+            ImGui.SameLine(0, 0);
+            ImGui.TextColored(AccelerationColor, accelerationText);
+        }
+        else
+        {
+            ImGui.TextColored(AccelerationColor, accelerationText);
+        }
     }
 
     /// <summary>
