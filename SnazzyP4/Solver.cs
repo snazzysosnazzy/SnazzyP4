@@ -182,6 +182,12 @@ public class Solver
     public float CombinedDividerOffsetX;
 
     /// <summary>
+    /// The vertical distance from the combined panel's window origin to its divider, measured on the last frame it was drawn stacked.
+    /// The detached window uses this to keep the divider pinned while the two sets grow up and down from it.
+    /// </summary>
+    public float CombinedDividerOffsetY;
+
+    /// <summary>
     /// Creates a solver bound to the plugin configuration.
     /// </summary>
     public Solver(Configuration configuration)
@@ -429,16 +435,27 @@ public class Solver
         var secondLines = BuildSetPanel("< Second Set >", false, secondExdeathPressed, secondExdeathReal, 1);
         var fromCenter = configuration.CombineSetsExpandFromCenter;
 
+        var dividerColor = ImGui.GetColorU32(configuration.CombineDividerColor);
+        var dividerThickness = Math.Max(1f, configuration.CombineDividerThickness * scale);
+
         if (!configuration.CombineSetsHorizontal)
         {
             // Stacked: expanding from the centre centres every line on the panel's midline.
+            var stackedWidth = Math.Max(MaxLineWidth(firstLines), MaxLineWidth(secondLines));
             var stackedAlignment = fromCenter ? SetAlignment.Center : SetAlignment.Left;
-            var stackedWidth = fromCenter ? Math.Max(MaxLineWidth(firstLines), MaxLineWidth(secondLines)) : 0f;
-            RenderLines(firstLines, stackedAlignment, stackedWidth);
+            RenderLines(firstLines, stackedAlignment, fromCenter ? stackedWidth : 0f);
+
             ImGui.Spacing();
-            ImGui.Separator();
+            var dividerScreen = ImGui.GetCursorScreenPos();
+            CombinedDividerOffsetY = dividerScreen.Y - ImGui.GetWindowPos().Y;
+            ImGui.GetWindowDrawList().AddLine(
+                new Vector2(dividerScreen.X, dividerScreen.Y),
+                new Vector2(dividerScreen.X + stackedWidth, dividerScreen.Y),
+                dividerColor, dividerThickness);
+            ImGui.Dummy(new Vector2(stackedWidth, dividerThickness));
             ImGui.Spacing();
-            RenderLines(secondLines, stackedAlignment, stackedWidth);
+
+            RenderLines(secondLines, stackedAlignment, fromCenter ? stackedWidth : 0f);
             return;
         }
 
@@ -466,8 +483,8 @@ public class Solver
         ImGui.GetWindowDrawList().AddLine(
             new Vector2(dividerX, top),
             new Vector2(dividerX, bottom),
-            ImGui.GetColorU32(ImGuiCol.Separator),
-            Math.Max(1f, 1.5f * scale));
+            dividerColor,
+            dividerThickness);
     }
 
     /// <summary>

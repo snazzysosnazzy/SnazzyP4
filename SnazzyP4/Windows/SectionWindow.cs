@@ -58,7 +58,6 @@ public class SectionWindow : Window, IDisposable
     private bool AnchorDividerActive(Configuration configuration)
         => definition.Id == "CombinedSets"
            && configuration.CombineSets
-           && configuration.CombineSetsHorizontal
            && configuration.CombineSetsAnchorDivider;
 
     /// <summary>
@@ -101,7 +100,11 @@ public class SectionWindow : Window, IDisposable
 
             configuration.SetDetachedPosition(definition.Id, divider);
             plugin.DetachedPositionDirty.Remove(definition.Id);
-            Position = new Vector2(divider.X - plugin.Solver.CombinedDividerOffsetX, divider.Y);
+
+            // Side by side the divider is vertical so its X is pinned; stacked the divider is horizontal so its Y is pinned.
+            Position = configuration.CombineSetsHorizontal
+                ? new Vector2(divider.X - plugin.Solver.CombinedDividerOffsetX, divider.Y)
+                : new Vector2(divider.X, divider.Y - plugin.Solver.CombinedDividerOffsetY);
             PositionCondition = ImGuiCond.Always;
             return;
         }

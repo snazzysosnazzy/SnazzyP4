@@ -44,6 +44,11 @@ public class ConfigWindow : Window, IDisposable
     private bool scrollToPrompt;
 
     /// <summary>
+    /// The most recent settings profile import or export status message.
+    /// </summary>
+    private string profileStatus = string.Empty;
+
+    /// <summary>
     /// Creates the settings window bound to the plugin.
     /// </summary>
     public ConfigWindow(Plugin plugin)
@@ -71,33 +76,144 @@ public class ConfigWindow : Window, IDisposable
     public override void Draw()
     {
         DrawTitleAndCredit();
+
+        using var tabs = ImRaii.TabBar("##snazzyp4_settings_tabs");
+        if (!tabs)
+        {
+            return;
+        }
+
+        using (var tab = ImRaii.TabItem("General"))
+        {
+            if (tab)
+            {
+                DrawGeneralTab();
+            }
+        }
+
+        using (var tab = ImRaii.TabItem("Appearance"))
+        {
+            if (tab)
+            {
+                DrawAppearance();
+            }
+        }
+
+        using (var tab = ImRaii.TabItem("Colors"))
+        {
+            if (tab)
+            {
+                DrawColorSettings();
+            }
+        }
+
+        using (var tab = ImRaii.TabItem("Layout"))
+        {
+            if (tab)
+            {
+                DrawLayout();
+            }
+        }
+
+        using (var tab = ImRaii.TabItem("Controller"))
+        {
+            if (tab)
+            {
+                DrawControllerSettings();
+            }
+        }
+
+        using (var tab = ImRaii.TabItem("Sections"))
+        {
+            if (tab)
+            {
+                DrawSections();
+            }
+        }
+
+        using (var tab = ImRaii.TabItem("Hidden"))
+        {
+            if (tab)
+            {
+                DrawHiddenTab();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Draws the General tab with scale, role, party chat, settings profiles and the reset buttons.
+    /// </summary>
+    private void DrawGeneralTab()
+    {
         DrawUiScale();
         ImGui.Separator();
-
         DrawRole();
         ImGui.Separator();
-
         DrawPartyChat();
         ImGui.Separator();
-
-        DrawLayout();
+        DrawProfileImportExport();
         ImGui.Separator();
-
-        DrawAppearance();
-        ImGui.Separator();
-
-        DrawColorSettings();
-        ImGui.Separator();
-
-        DrawControllerSettings();
-        ImGui.Separator();
-
-        DrawSections();
         DrawResetButtons();
-        DrawLastFakeSettings();
+    }
 
-        ImGui.Separator();
+    /// <summary>
+    /// Draws the Hidden tab with the unlock flow and, once unlocked, the Last Fake toggle options.
+    /// </summary>
+    private void DrawHiddenTab()
+    {
         DrawHiddenSettings();
+        DrawLastFakeSettings();
+    }
+
+    /// <summary>
+    /// Draws the settings profile import and export controls, which move the whole configuration through the clipboard.
+    /// </summary>
+    private void DrawProfileImportExport()
+    {
+        ImGui.TextUnformatted("Settings profile");
+        ImGui.TextDisabled("Copy your whole setup to share it, or paste one in.");
+
+        if (ImGui.Button("Copy settings to clipboard"))
+        {
+            ImGui.SetClipboardText(Newtonsoft.Json.JsonConvert.SerializeObject(Configuration, Newtonsoft.Json.Formatting.Indented));
+            profileStatus = "Copied settings to the clipboard.";
+        }
+
+        ImGui.SameLine();
+        if (ImGui.Button("Paste settings from clipboard"))
+        {
+            ApplyProfileFromClipboard();
+        }
+
+        if (!string.IsNullOrEmpty(profileStatus))
+        {
+            ImGui.TextDisabled(profileStatus);
+        }
+    }
+
+    /// <summary>
+    /// Reads a settings profile from the clipboard and applies it, reporting whether it succeeded.
+    /// </summary>
+    private void ApplyProfileFromClipboard()
+    {
+        try
+        {
+            var imported = Newtonsoft.Json.JsonConvert.DeserializeObject<Configuration>(ImGui.GetClipboardText());
+            if (imported == null)
+            {
+                profileStatus = "Clipboard did not contain valid settings.";
+                return;
+            }
+
+            Configuration.CopyFrom(imported);
+            Configuration.Save();
+            plugin.MarkAllPositionsDirty();
+            profileStatus = "Imported settings from the clipboard.";
+        }
+        catch (Exception)
+        {
+            profileStatus = "Clipboard did not contain valid settings.";
+        }
     }
 
     /// <summary>
@@ -294,7 +410,23 @@ public class ConfigWindow : Window, IDisposable
                 Configuration.Save();
             }
 
+            DrawFloatSlider("Divider thickness##combdiv", () => Configuration.CombineDividerThickness,
+                value => Configuration.CombineDividerThickness = value, 0.5f, 6f);
+            DrawColorPicker("Divider colour##combdivcol", () => Configuration.CombineDividerColor,
+                value => Configuration.CombineDividerColor = value);
+
             ImGui.Unindent();
+        }
+
+        if (Configuration.Detached)
+        {
+            ImGui.Separator();
+            if (ImGui.Button("Bring all windows on-screen"))
+            {
+                plugin.RecenterDetachedWindows();
+            }
+
+            ImGui.TextDisabled("Clamps every detached window back inside the screen.");
         }
     }
 
@@ -611,17 +743,7 @@ public class ConfigWindow : Window, IDisposable
     /// </summary>
     private void DrawControllerSettings()
     {
-        if (!ImGui.CollapsingHeader("Controller Settings"))
-        {
-            return;
-        }
-
-        ImGui.Indent();
-
         // The hide-macro-buttons toggle is the setting controller players actually want, so it is spaced out and highlighted here after a tester missed it entirely.
-        ImGui.Spacing();
-        ImGui.Separator();
-        ImGui.Spacing();
         ImGui.TextColored(new Vector4(1f, 0.84f, 0f, 1f),
             "Controller players: enable this to hide the on-screen macro buttons.");
         ImGui.Spacing();
@@ -672,8 +794,6 @@ public class ConfigWindow : Window, IDisposable
             DrawMacroRow("/snazzyp4 LastBlizzardReal");
             DrawMacroRow("/snazzyp4 LastBlizzardFake");
         }
-
-        ImGui.Unindent();
     }
 
     /// <summary>
@@ -695,12 +815,32 @@ public class ConfigWindow : Window, IDisposable
     /// </summary>
     private void DrawColorSettings()
     {
-        if (!ImGui.CollapsingHeader("Color Accessibility Settings"))
+        ImGui.TextUnformatted("Colour presets");
+        if (ImGui.Button("Default"))
         {
-            return;
+            ApplyColorPreset("default");
         }
 
-        ImGui.Indent();
+        ImGui.SameLine();
+        if (ImGui.Button("Deuteranopia"))
+        {
+            ApplyColorPreset("deuteranopia");
+        }
+
+        ImGui.SameLine();
+        if (ImGui.Button("Protanopia"))
+        {
+            ApplyColorPreset("protanopia");
+        }
+
+        ImGui.SameLine();
+        if (ImGui.Button("Tritanopia"))
+        {
+            ApplyColorPreset("tritanopia");
+        }
+
+        ImGui.TextDisabled("Presets are colourblind-friendly starting points; fine-tune below.");
+        ImGui.Separator();
 
         DrawColorPicker("Spread on target (Support)##colSpreadSup", () => Configuration.ColorSpreadSupport, value => Configuration.ColorSpreadSupport = value);
         DrawColorPicker("Stack on target (Support)##colStackSup", () => Configuration.ColorStackSupport, value => Configuration.ColorStackSupport = value);
@@ -718,31 +858,84 @@ public class ConfigWindow : Window, IDisposable
 
         if (ImGui.Button("Reset colors to defaults"))
         {
-            ResetColorsToDefaults();
+            ApplyColorPreset("default");
         }
-
-        ImGui.Unindent();
     }
 
     /// <summary>
-    /// Resets every configurable colour to its default value.
+    /// Applies a colour preset to every configurable colour.
+    /// The default preset restores the shipped colours, while the colourblind presets pick hues that stay distinguishable for that deficiency.
     /// </summary>
-    private void ResetColorsToDefaults()
+    private void ApplyColorPreset(string preset)
     {
-        var defaults = new Configuration();
-        Configuration.ColorSpreadSupport = defaults.ColorSpreadSupport;
-        Configuration.ColorStackSupport = defaults.ColorStackSupport;
-        Configuration.ColorSpreadDps = defaults.ColorSpreadDps;
-        Configuration.ColorStackDps = defaults.ColorStackDps;
-        Configuration.ColorAcceleration = defaults.ColorAcceleration;
-        Configuration.ColorGazeReal = defaults.ColorGazeReal;
-        Configuration.ColorGazeFake = defaults.ColorGazeFake;
-        Configuration.ColorFire = defaults.ColorFire;
-        Configuration.ColorWater = defaults.ColorWater;
-        Configuration.ColorThunder = defaults.ColorThunder;
-        Configuration.ColorBlizzard = defaults.ColorBlizzard;
-        Configuration.ColorToggleReal = defaults.ColorToggleReal;
-        Configuration.ColorToggleFake = defaults.ColorToggleFake;
+        if (preset == "default")
+        {
+            var defaults = new Configuration();
+            Configuration.ColorSpreadSupport = defaults.ColorSpreadSupport;
+            Configuration.ColorStackSupport = defaults.ColorStackSupport;
+            Configuration.ColorSpreadDps = defaults.ColorSpreadDps;
+            Configuration.ColorStackDps = defaults.ColorStackDps;
+            Configuration.ColorAcceleration = defaults.ColorAcceleration;
+            Configuration.ColorGazeReal = defaults.ColorGazeReal;
+            Configuration.ColorGazeFake = defaults.ColorGazeFake;
+            Configuration.ColorFire = defaults.ColorFire;
+            Configuration.ColorWater = defaults.ColorWater;
+            Configuration.ColorThunder = defaults.ColorThunder;
+            Configuration.ColorBlizzard = defaults.ColorBlizzard;
+            Configuration.ColorToggleReal = defaults.ColorToggleReal;
+            Configuration.ColorToggleFake = defaults.ColorToggleFake;
+            Configuration.Save();
+            return;
+        }
+
+        // Palette entries drawn from colourblind-safe hue sets.
+        var skyBlue = new Vector4(0.35f, 0.70f, 0.90f, 1f);
+        var blue = new Vector4(0.00f, 0.45f, 0.70f, 1f);
+        var orange = new Vector4(0.90f, 0.60f, 0.00f, 1f);
+        var vermillion = new Vector4(0.85f, 0.37f, 0.00f, 1f);
+        var yellow = new Vector4(0.95f, 0.90f, 0.25f, 1f);
+        var purple = new Vector4(0.80f, 0.60f, 0.70f, 1f);
+        var green = new Vector4(0.00f, 0.72f, 0.36f, 1f);
+        var red = new Vector4(0.88f, 0.16f, 0.18f, 1f);
+        var cyan = new Vector4(0.20f, 0.78f, 0.82f, 1f);
+        var magenta = new Vector4(0.85f, 0.28f, 0.72f, 1f);
+
+        if (preset == "tritanopia")
+        {
+            // Blue-yellow deficiency: lean on red, green, cyan and magenta.
+            Configuration.ColorSpreadSupport = magenta;
+            Configuration.ColorStackSupport = red;
+            Configuration.ColorSpreadDps = magenta;
+            Configuration.ColorStackDps = cyan;
+            Configuration.ColorAcceleration = red;
+            Configuration.ColorGazeReal = green;
+            Configuration.ColorGazeFake = red;
+            Configuration.ColorFire = red;
+            Configuration.ColorWater = cyan;
+            Configuration.ColorThunder = magenta;
+            Configuration.ColorBlizzard = cyan;
+            Configuration.ColorToggleReal = green;
+            Configuration.ColorToggleFake = red;
+        }
+        else
+        {
+            // Red-green deficiency (deuteranopia and protanopia): lean on blue, orange and yellow, keeping the "real" states blue and the "fake" states orange.
+            var fake = preset == "protanopia" ? orange : vermillion;
+            Configuration.ColorSpreadSupport = purple;
+            Configuration.ColorStackSupport = orange;
+            Configuration.ColorSpreadDps = yellow;
+            Configuration.ColorStackDps = blue;
+            Configuration.ColorAcceleration = fake;
+            Configuration.ColorGazeReal = skyBlue;
+            Configuration.ColorGazeFake = orange;
+            Configuration.ColorFire = fake;
+            Configuration.ColorWater = blue;
+            Configuration.ColorThunder = purple;
+            Configuration.ColorBlizzard = skyBlue;
+            Configuration.ColorToggleReal = skyBlue;
+            Configuration.ColorToggleFake = fake;
+        }
+
         Configuration.Save();
     }
 

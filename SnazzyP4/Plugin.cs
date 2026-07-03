@@ -529,4 +529,34 @@ public sealed class Plugin : IDalamudPlugin
 
         return false;
     }
+
+    /// <summary>
+    /// Clamps every detached window position back inside the main viewport so windows dragged or imported off-screen come back into view.
+    /// </summary>
+    public void RecenterDetachedWindows()
+    {
+        var viewport = ImGui.GetMainViewport();
+        var min = viewport.WorkPos;
+        var max = Vector2.Max(min, viewport.WorkPos + viewport.WorkSize - new Vector2(80f, 40f));
+        foreach (var section in Sections)
+        {
+            var position = Configuration.GetDetachedPosition(section.Id, section.DefaultOffset);
+            Configuration.SetDetachedPosition(section.Id, Vector2.Clamp(position, min, max));
+            DetachedPositionDirty.Add(section.Id);
+        }
+
+        Configuration.Save();
+    }
+
+    /// <summary>
+    /// Marks every detached window position dirty so each window re-reads its saved position on the next frame.
+    /// This is used after importing a settings profile so the windows jump to the imported positions.
+    /// </summary>
+    public void MarkAllPositionsDirty()
+    {
+        foreach (var section in Sections)
+        {
+            DetachedPositionDirty.Add(section.Id);
+        }
+    }
 }

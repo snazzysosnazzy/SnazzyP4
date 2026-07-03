@@ -197,11 +197,21 @@ public class Configuration : IPluginConfiguration
     public bool CombineSetsExpandFromCenter { get; set; }
 
     /// <summary>
-    /// Whether the side-by-side combined panel keeps its divider pinned at a fixed position, growing the first set to the left of it and the second set to the right, while the text itself stays left-aligned.
+    /// Whether the combined panel keeps its divider pinned at a fixed position, growing each set outward from it while the text stays left-aligned.
     /// The divider position is the section's detached position, so it can be set by dragging or the position sliders.
-    /// This only applies when the sets are combined and laid out side by side.
+    /// This only applies when the sets are combined.
     /// </summary>
     public bool CombineSetsAnchorDivider { get; set; }
+
+    /// <summary>
+    /// The thickness in pixels of the combined panel's divider line.
+    /// </summary>
+    public float CombineDividerThickness { get; set; } = 1.5f;
+
+    /// <summary>
+    /// The colour of the combined panel's divider line.
+    /// </summary>
+    public Vector4 CombineDividerColor { get; set; } = new(0.6f, 0.6f, 0.6f, 1f);
 
     /// <summary>
     /// Whether dragging any detached window moves them all together.
@@ -484,18 +494,26 @@ public class Configuration : IPluginConfiguration
     /// </summary>
     public void RestoreDefaults()
     {
-        var defaults = new Configuration();
+        CopyFrom(new Configuration());
+        Save();
+    }
+
+    /// <summary>
+    /// Copies every writable setting from another configuration, except the schema version and the transient edit-interaction flags.
+    /// This is used both by the restore-defaults flow and by importing a shared settings profile.
+    /// </summary>
+    public void CopyFrom(Configuration source)
+    {
         foreach (var property in typeof(Configuration).GetProperties(BindingFlags.Public | BindingFlags.Instance))
         {
-            if (!property.CanRead || !property.CanWrite || property.Name == nameof(Version))
+            if (!property.CanRead || !property.CanWrite
+                || property.Name is nameof(Version) or nameof(EditMode) or nameof(MoveAllActive))
             {
                 continue;
             }
 
-            property.SetValue(this, property.GetValue(defaults));
+            property.SetValue(this, property.GetValue(source));
         }
-
-        Save();
     }
 
     /// <summary>
