@@ -167,6 +167,12 @@ public class Configuration : IPluginConfiguration
     public bool FloatingResetButton { get; set; } = true;
 
     /// <summary>
+    /// Whether the macro button sections are hidden so only the resolution text panels remain.
+    /// This is for controller players who drive the plugin through the slash commands instead of clicking.
+    /// </summary>
+    public bool HideMacroButtons { get; set; }
+
+    /// <summary>
     /// Whether dragging any detached window moves them all together.
     /// This is a transient interaction and is never carried across sessions.
     /// </summary>

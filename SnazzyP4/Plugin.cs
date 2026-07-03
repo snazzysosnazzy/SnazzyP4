@@ -170,7 +170,7 @@ public sealed class Plugin : IDalamudPlugin
 
         CommandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
         {
-            HelpMessage = "Toggle the Snazzy P4 window. Use '/snazzyp4 config' to open settings."
+            HelpMessage = "Toggle the Snazzy P4 window. '/snazzyp4 config' opens settings; per-button commands for controllers are listed under Settings, Controller Settings."
         });
 
         // UpdateWindows runs before the window system draws so the detached windows track the hub state.
@@ -318,18 +318,89 @@ public sealed class Plugin : IDalamudPlugin
     }
 
     /// <summary>
-    /// Handles the slash command, opening settings for the config argument and toggling the main window otherwise.
+    /// Handles the slash command.
+    /// With no argument it toggles the main window, "config" opens the settings, and every button argument performs the same action as clicking that button so controller players can drive the plugin from macros.
     /// </summary>
     private void OnCommand(string command, string arguments)
     {
         var normalized = arguments.Trim().ToLowerInvariant();
-        if (normalized is "config" or "settings" or "cfg")
+        switch (normalized)
         {
-            ConfigWindow.Toggle();
-        }
-        else
-        {
-            MainWindow.Toggle();
+            case "config":
+            case "settings":
+            case "cfg":
+                ConfigWindow.Toggle();
+                break;
+            case "exdeathreal":
+                Solver.CommandExdeath(true);
+                break;
+            case "exdeathfake":
+                Solver.CommandExdeath(false);
+                break;
+            case "lightningshort":
+                Solver.CommandLightning(true);
+                break;
+            case "lightninglong":
+                Solver.CommandLightning(false);
+                break;
+            case "dropshort":
+                Solver.CommandDrop(true);
+                break;
+            case "droplong":
+                Solver.CommandDrop(false);
+                break;
+            case "accelerationshort":
+                Solver.CommandAcceleration(true);
+                break;
+            case "accelerationlong":
+                Solver.CommandAcceleration(false);
+                break;
+            case "infernoreal":
+                Solver.CommandInferno(true);
+                break;
+            case "infernofake":
+                Solver.CommandInferno(false);
+                break;
+            case "tsunamireal":
+                Solver.CommandTsunami(true);
+                break;
+            case "tsunamifake":
+                Solver.CommandTsunami(false);
+                break;
+            case "thunderreal":
+                Solver.CommandThunder(true);
+                break;
+            case "thunderfake":
+                Solver.CommandThunder(false);
+                break;
+            case "blizzardreal":
+                Solver.CommandBlizzard(true);
+                break;
+            case "blizzardfake":
+                Solver.CommandBlizzard(false);
+                break;
+            case "reset":
+                Solver.ResetAll();
+                break;
+            case "hide":
+                Configuration.Hidden = !Configuration.Hidden;
+                Configuration.Save();
+                break;
+            case "lastthunderreal" when Configuration.ShowLastFake:
+                Solver.CommandLastThunder(false);
+                break;
+            case "lastthunderfake" when Configuration.ShowLastFake:
+                Solver.CommandLastThunder(true);
+                break;
+            case "lastblizzardreal" when Configuration.ShowLastFake:
+                Solver.CommandLastBlizzard(false);
+                break;
+            case "lastblizzardfake" when Configuration.ShowLastFake:
+                Solver.CommandLastBlizzard(true);
+                break;
+            default:
+                MainWindow.Toggle();
+                break;
         }
     }
 
@@ -421,10 +492,15 @@ public sealed class Plugin : IDalamudPlugin
 
     /// <summary>
     /// Determines whether a section participates in the current configuration.
-    /// The detached Last Fake toggle sections only exist when their settings enable them.
+    /// The detached Last Fake toggle sections only exist when their settings enable them, and every button section is hidden while the controller macro-button option is on.
     /// </summary>
     public bool SectionEnabled(string id)
     {
+        if (Configuration.HideMacroButtons && IsButtonSection(id))
+        {
+            return false;
+        }
+
         return id switch
         {
             "LastFakeToggles" => Configuration.ShowLastFake && Configuration.DetachToggleButtons
@@ -433,5 +509,21 @@ public sealed class Plugin : IDalamudPlugin
                                  && Configuration.ToggleButtonsIndividualPanels,
             _ => true,
         };
+    }
+
+    /// <summary>
+    /// Determines whether a section is a button section rather than a text panel.
+    /// </summary>
+    private bool IsButtonSection(string id)
+    {
+        foreach (var section in Sections)
+        {
+            if (section.Id == id)
+            {
+                return section.HasButtons;
+            }
+        }
+
+        return false;
     }
 }

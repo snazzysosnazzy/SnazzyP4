@@ -91,6 +91,37 @@ That's it — the buttons grey out when they no longer apply, so you can't mis-e
 - **Detached** mode makes each panel its own window. **Move All** (detached only) drags
   every window together.
 
+## Controller Players
+
+Controller players can't click the panel buttons, so every button also has a slash command
+that does the exact same thing. Put each one into its own in-game macro and bind it.
+
+In **Settings → Controller Settings** you'll find a **Copy** button for every command, plus a
+**Hide macro buttons** option that removes the Exdeath / Chaos / Kefka / Reset / Hide button
+panels while keeping the **First Set**, **Second Set** and **Kefka** text panels on screen.
+
+```
+/snazzyp4 ExDeathReal        /snazzyp4 ExDeathFake
+/snazzyp4 LightningShort     /snazzyp4 LightningLong
+/snazzyp4 DropShort          /snazzyp4 DropLong
+/snazzyp4 AccelerationShort  /snazzyp4 AccelerationLong
+/snazzyp4 InfernoReal        /snazzyp4 InfernoFake
+/snazzyp4 TsunamiReal        /snazzyp4 TsunamiFake
+/snazzyp4 ThunderReal        /snazzyp4 ThunderFake
+/snazzyp4 BlizzardReal       /snazzyp4 BlizzardFake
+/snazzyp4 Reset              /snazzyp4 Hide
+```
+
+If the hidden **Last Fake** feature is unlocked, these are also available:
+
+```
+/snazzyp4 LastThunderReal    /snazzyp4 LastThunderFake
+/snazzyp4 LastBlizzardReal   /snazzyp4 LastBlizzardFake
+```
+
+The commands respect the same rules as the buttons — a pick that isn't valid yet (for example
+a short/long before its Exdeath) is simply ignored, exactly like a greyed-out button.
+
 ## Configuration Settings
 
 Open with the **Settings** button or `/snazzyp4 config`.

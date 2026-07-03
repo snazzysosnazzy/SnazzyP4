@@ -642,7 +642,8 @@ public class Solver
     public void DrawThunderText(float scale)
     {
         var labelsHidden = configuration.EffectiveHideLabels(CurrentSection);
-        var inlineToggles = configuration.ShowLastFake && !configuration.DetachToggleButtons;
+        var inlineToggles = configuration.ShowLastFake && !configuration.DetachToggleButtons
+                            && !configuration.HideMacroButtons;
         var startX = ImGui.GetCursorPosX();
         var toggleColumn = Math.Max(ImGui.CalcTextSize("THUNDER FAKE").X, ImGui.CalcTextSize("BLIZZARD FAKE").X)
                            + ImGui.CalcTextSize("  ").X;
@@ -1003,4 +1004,75 @@ public class Solver
             Plugin.ExecuteGameCommand("/mk off <me>");
         }
     }
+
+    /// <summary>
+    /// Presses an Exdeath button from a slash command, mirroring the icon button.
+    /// </summary>
+    public void CommandExdeath(bool real) => OnExdeath(real);
+
+    /// <summary>
+    /// Presses a Lightning short or long button from a slash command, ignoring the press when the slot is not currently pickable.
+    /// </summary>
+    public void CommandLightning(bool isShort) => CommandShortLong(MechanicKind.Lightning, isShort);
+
+    /// <summary>
+    /// Presses a Drop short or long button from a slash command, ignoring the press when the slot is not currently pickable.
+    /// </summary>
+    public void CommandDrop(bool isShort) => CommandShortLong(MechanicKind.Drop, isShort);
+
+    /// <summary>
+    /// Presses an Acceleration short or long button from a slash command, ignoring the press when the slot is not currently pickable.
+    /// </summary>
+    public void CommandAcceleration(bool isShort) => CommandShortLong(MechanicKind.Acceleration, isShort);
+
+    /// <summary>
+    /// Applies a short/long pick from a slash command only when the matching button would be enabled.
+    /// </summary>
+    private void CommandShortLong(MechanicKind kind, bool isShort)
+    {
+        if (ShortLongEnabled(kind, isShort))
+        {
+            OnShortLong(kind, isShort);
+        }
+    }
+
+    /// <summary>
+    /// Presses an Inferno button from a slash command, mirroring the real and fake icon buttons.
+    /// </summary>
+    public void CommandInferno(bool real) => OnChaos(
+        real ? "FIRE TWISTER" : "FIRE DONUT", FireColor, real ? "INFERNO REAL - TWISTER" : "INFERNO FAKE - DONUT");
+
+    /// <summary>
+    /// Presses a Tsunami button from a slash command, mirroring the real and fake icon buttons.
+    /// </summary>
+    public void CommandTsunami(bool real) => OnChaos(
+        real ? "WATER DONUT" : "WATER TWISTER", WaterColor, real ? "TSUNAMI REAL - DONUT" : "TSUNAMI FAKE - TWISTER");
+
+    /// <summary>
+    /// Presses a Thunder button from a slash command, mirroring the real and fake icon buttons.
+    /// </summary>
+    public void CommandThunder(bool real)
+    {
+        thunderPressed = true;
+        thunderReal = real;
+    }
+
+    /// <summary>
+    /// Presses a Blizzard button from a slash command, mirroring the real and fake icon buttons.
+    /// </summary>
+    public void CommandBlizzard(bool real)
+    {
+        blizzardPressed = true;
+        blizzardReal = real;
+    }
+
+    /// <summary>
+    /// Sets the Thunder Last Fake toggle from a slash command, where fake marks the last as fake.
+    /// </summary>
+    public void CommandLastThunder(bool fake) => thunderLastFake = fake;
+
+    /// <summary>
+    /// Sets the Blizzard Last Fake toggle from a slash command, where fake marks the last as fake.
+    /// </summary>
+    public void CommandLastBlizzard(bool fake) => blizzardLastFake = fake;
 }

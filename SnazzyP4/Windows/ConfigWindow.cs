@@ -89,6 +89,9 @@ public class ConfigWindow : Window, IDisposable
         DrawColorSettings();
         ImGui.Separator();
 
+        DrawControllerSettings();
+        ImGui.Separator();
+
         DrawSections();
         DrawResetButtons();
         DrawLastFakeSettings();
@@ -547,6 +550,79 @@ public class ConfigWindow : Window, IDisposable
         }
 
         ImGui.Unindent();
+    }
+
+    /// <summary>
+    /// Draws the collapsed-by-default controller section with the hide-macro-buttons option and the copyable command list.
+    /// The Last Fake commands are only listed when that hidden feature is unlocked.
+    /// </summary>
+    private void DrawControllerSettings()
+    {
+        if (!ImGui.CollapsingHeader("Controller Settings"))
+        {
+            return;
+        }
+
+        ImGui.Indent();
+
+        var hideMacroButtons = Configuration.HideMacroButtons;
+        if (ImGui.Checkbox("Hide macro buttons (keep only the text panels)", ref hideMacroButtons))
+        {
+            Configuration.HideMacroButtons = hideMacroButtons;
+            Configuration.Save();
+        }
+
+        ImGui.TextWrapped("Controller players cannot click the buttons. Put each command below into its own game macro and bind it, then hide the macro buttons above to keep only the resolution text.");
+        ImGui.Spacing();
+
+        DrawMacroRow("/snazzyp4 ExDeathReal");
+        DrawMacroRow("/snazzyp4 ExDeathFake");
+        ImGui.Spacing();
+        DrawMacroRow("/snazzyp4 LightningShort");
+        DrawMacroRow("/snazzyp4 LightningLong");
+        DrawMacroRow("/snazzyp4 DropShort");
+        DrawMacroRow("/snazzyp4 DropLong");
+        DrawMacroRow("/snazzyp4 AccelerationShort");
+        DrawMacroRow("/snazzyp4 AccelerationLong");
+        ImGui.Spacing();
+        DrawMacroRow("/snazzyp4 InfernoReal");
+        DrawMacroRow("/snazzyp4 InfernoFake");
+        DrawMacroRow("/snazzyp4 TsunamiReal");
+        DrawMacroRow("/snazzyp4 TsunamiFake");
+        ImGui.Spacing();
+        DrawMacroRow("/snazzyp4 ThunderReal");
+        DrawMacroRow("/snazzyp4 ThunderFake");
+        DrawMacroRow("/snazzyp4 BlizzardReal");
+        DrawMacroRow("/snazzyp4 BlizzardFake");
+        ImGui.Spacing();
+        DrawMacroRow("/snazzyp4 Reset");
+        DrawMacroRow("/snazzyp4 Hide");
+
+        if (Configuration.ShowLastFake)
+        {
+            ImGui.Spacing();
+            ImGui.TextDisabled("Last Fake (hidden feature):");
+            DrawMacroRow("/snazzyp4 LastThunderReal");
+            DrawMacroRow("/snazzyp4 LastThunderFake");
+            DrawMacroRow("/snazzyp4 LastBlizzardReal");
+            DrawMacroRow("/snazzyp4 LastBlizzardFake");
+        }
+
+        ImGui.Unindent();
+    }
+
+    /// <summary>
+    /// Draws one command row with a copy button that places the command on the clipboard.
+    /// </summary>
+    private static void DrawMacroRow(string command)
+    {
+        if (ImGui.Button($"Copy##{command}"))
+        {
+            ImGui.SetClipboardText(command);
+        }
+
+        ImGui.SameLine();
+        ImGui.TextUnformatted(command);
     }
 
     /// <summary>
