@@ -19,9 +19,9 @@ public class ConfigWindow : Window, IDisposable
         "Listen. This plugin was designed to ultimately reduce macro bloat and macro " +
         "resolvement text to be more readable. I never wanted this plugin to resolve " +
         "anything automatically for you and I have tried my best to stay true to that. " +
-        "But I get it, this phase is hard. So if you REALLY require this due to laziness " +
-        "or just being bad, then by all means do what you have to do; I am not going to " +
-        "tell you how to play the game. With that said: Do you wish to proceed?";
+        "But I get it, this phase is hard. So if you REALLY require this then by all means " +
+        "do what you have to do; I am not going to tell you how to play the game. " +
+        "With that said: Do you wish to proceed?";
 
     /// <summary>
     /// The owning plugin.

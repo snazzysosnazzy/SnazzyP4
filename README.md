@@ -120,7 +120,7 @@ I never wanted this plugin to resolve anything automatically for you and I have 
 In other words: I'd rather you didn't. It's there if you truly need it, but the plugin
 is meant to *reduce* what you have to think about, not resolve the fight for you.
 
-But I get it, this phase is hard. So if you REALLY require this due to laziness or just being bad, then by all means do what you have to do; I am not going to tell you how to play the game.
+But I get it, this phase is hard. So if you REALLY require this then by all means do what you have to do; I am not going to tell you how to play the game.
 I hope you can decide to respect my wishes and to not enable this setting. I do not believe anyone actually needs it, and I think you are doing a disservice
 to yourself as a raider by choosing to use it. If you still do not care about any of this - go ahead and access the setting.
 
