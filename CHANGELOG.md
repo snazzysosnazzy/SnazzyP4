@@ -3,6 +3,12 @@
 All notable changes to Snazzy P4 are listed here. Versions match the `vX.Y.Z.W`
 release tags.
 
+## v1.0.0.10
+
+- **Chat channel selector** — the gaze and chaos announcements can now be sent to
+  a channel of your choice (Party, Say, Yell, Shout, Alliance, or **Echo** so only
+  you see it, which is handy for testing).
+
 ## v1.0.0.9
 
 - **Tabbed settings** — the settings window is now organised into General,

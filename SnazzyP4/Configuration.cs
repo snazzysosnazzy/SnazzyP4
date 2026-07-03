@@ -137,6 +137,11 @@ public class Configuration : IPluginConfiguration
     public string PartyChaosCustomText { get; set; } = string.Empty;
 
     /// <summary>
+    /// The chat command prefix used for the gaze and chaos announcements, such as "/p" for party or "/echo" for a self-only test.
+    /// </summary>
+    public string PartyChatChannel { get; set; } = "/p";
+
+    /// <summary>
     /// Whether each section is drawn as its own floating window instead of inside the single hub window.
     /// This is enabled by default.
     /// </summary>

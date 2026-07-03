@@ -300,7 +300,9 @@ public class ConfigWindow : Window, IDisposable
     private void DrawPartyChat()
     {
         ImGui.TextUnformatted("Party chat messages");
-        ImGui.TextDisabled("Sends a /p message on your behalf when a mechanic is\ndetermined. Issues input on your behalf - use at your own risk.");
+        ImGui.TextDisabled("Sends a chat message on your behalf in the selected channel when a\nmechanic is determined. Issues input on your behalf - use at your own risk.");
+
+        DrawChannelSelector();
 
         DrawPartyMechanic(
             "Announce Gaze in party chat", "gaze",
@@ -313,6 +315,51 @@ public class ConfigWindow : Window, IDisposable
             () => Configuration.PartyChaosEnabled, value => Configuration.PartyChaosEnabled = value,
             () => Configuration.PartyChaosCustom, value => Configuration.PartyChaosCustom = value,
             () => Configuration.PartyChaosCustomText, value => Configuration.PartyChaosCustomText = value);
+    }
+
+    /// <summary>
+    /// The chat channels the announcements can be sent to, paired with their command prefix.
+    /// </summary>
+    private static readonly (string Label, string Prefix)[] PartyChatChannels =
+    {
+        ("Party (/p)", "/p"),
+        ("Say (/s)", "/s"),
+        ("Yell (/y)", "/y"),
+        ("Shout (/sh)", "/sh"),
+        ("Alliance (/a)", "/a"),
+        ("Echo - only you see it (/echo)", "/echo"),
+    };
+
+    /// <summary>
+    /// Draws the dropdown that selects which chat channel the gaze and chaos announcements are sent to.
+    /// </summary>
+    private void DrawChannelSelector()
+    {
+        var preview = Configuration.PartyChatChannel;
+        foreach (var (label, prefix) in PartyChatChannels)
+        {
+            if (prefix == Configuration.PartyChatChannel)
+            {
+                preview = label;
+                break;
+            }
+        }
+
+        ImGui.SetNextItemWidth(260f);
+        using var combo = ImRaii.Combo("Channel##partychannel", preview);
+        if (!combo)
+        {
+            return;
+        }
+
+        foreach (var (label, prefix) in PartyChatChannels)
+        {
+            if (ImGui.Selectable(label, Configuration.PartyChatChannel == prefix))
+            {
+                Configuration.PartyChatChannel = prefix;
+                Configuration.Save();
+            }
+        }
     }
 
     /// <summary>

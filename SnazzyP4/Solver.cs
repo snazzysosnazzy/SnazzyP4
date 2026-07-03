@@ -1161,7 +1161,7 @@ public class Solver
             message = (first ? "(1st) " : "[2nd] ") + (real ? "GAZE REAL - DON'T LOOK" : "GAZE FAKE - LOOK");
         }
 
-        Plugin.ExecuteGameCommand("/p " + message);
+        Plugin.ExecuteGameCommand(configuration.PartyChatChannel + " " + message);
     }
 
     /// <summary>
@@ -1184,7 +1184,7 @@ public class Solver
             message = (first ? "(1st) " : "[2nd] ") + body;
         }
 
-        Plugin.ExecuteGameCommand("/p " + message);
+        Plugin.ExecuteGameCommand(configuration.PartyChatChannel + " " + message);
     }
 
     /// <summary>
