@@ -45,7 +45,8 @@ as one window or as separate floating panels.
 - **Chaos** — Inferno / Tsunami macros and resolution text.
 - **Kefka** — Thunder / Blizzard buttons macros and resolution text.
 - **Organized Sets** — Separate First/Second set text windows that organize the resolution text in chronological order
-                       in which they will occur. This includes the following (In this exact order):
+                       in which they will occur (or optionally combined into one panel, stacked or side by side).
+					   This includes the following (In this exact order):
 					       1. Spread / Stack
                            2. Move / Stand Still
                            3. Gaze
@@ -119,20 +120,31 @@ a short/long before its Exdeath) is simply ignored, exactly like a greyed-out bu
 
 ## Configuration Settings
 
-Open with the **Settings** button or `/snazzyp4 config`.
+Open with the **Settings** button or `/snazzyp4 config`. Settings are grouped into tabs:
 
-- **Role** — Support or DPS. Changes the spread/stack target letters and colours.
-- **UI Scale** — global size; each section also has its own scale.
-- **Auto-place marker** — optionally place `/mk` markers on yourself for spreads.
-- **Party chat messages** — optionally announce gaze/chaos in party chat.
-- **Layout** — Show toolbar, Detached windows, Edit layout, Move All, Floating Hide button.
+- **General** — Role (Support / DPS), UI scale, auto-place `/mk` markers, party-chat
+  announcements for gaze/chaos, **settings profiles** (copy your whole setup to the
+  clipboard or paste one in — handy for sharing a layout), and the reset buttons
+  (**Reset layout to defaults** / **Restore ALL settings to defaults**).
 - **Appearance** — Use Universal Settings (one look for everything) or per-section
-  background opacity / hide title bar / hide labels / button opacity. Values are kept
-  **separately for windowed and detached mode**, and only the current mode's controls
-  are shown.
-- **Color Accessibility Settings** — recolour every element (collapsed by default).
-- **Sections** — per-section position, scale and (when not universal) appearance.
-- **Reset layout to defaults** / **Restore ALL settings to defaults**.
+  background opacity / hide title bar / hide labels / button opacity, plus **click-through
+  (display-only)** mode. Values are kept **separately for windowed and detached mode**, and
+  only the current mode's controls are shown.
+- **Colors** — recolour every element, with one-click **colourblind palette presets**
+  (Deuteranopia / Protanopia / Tritanopia) as starting points you can fine-tune.
+- **Layout** — show toolbar, detached windows, edit layout, Move All, floating **Hide** and
+  **Reset** buttons, put **Acceleration on the same line** as Spread/Stack
+  (`Spread on X and MOVE`), **combine the First and Second sets** into one panel (stacked or
+  side by side, with a pinnable, customisable divider), and **bring all windows on-screen**.
+- **Controller** — hide the macro buttons and copy the per-button slash commands
+  (see [Controller Players](#controller-players)).
+- **Sections** — per-section position, scale and (when not universal) appearance for the
+  current mode.
+- **Hidden** — the unlock field for the optional Last Fake resolver (see below).
+
+By default Snazzy P4 runs in **detached** mode — each panel is its own floating window — at a
+compact scale. Use **Edit Layout** (drag any panel) or the **Sections** tab to arrange them,
+and **Bring all windows on-screen** in the Layout tab if anything ends up off-screen.
 
 ## Hidden Settings
 
