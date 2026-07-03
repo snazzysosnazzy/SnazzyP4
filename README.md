@@ -128,6 +128,13 @@ This hidden option, is unlocked through the `...` field at the bottom of setting
 Type "i_need_it" inside of the text box and hit `Confirm`. A final message will appear to double confirm that you want to use the feature.
 Hit `Confirm` at the bottom of the message if you still want it to be enabled.
 
+**How it works:** enabling this does *not* resolve anything for you. It adds a small
+**Last Fake?** toggle button next to each of the Thunder and Blizzard resolution lines in
+the Kefka panel, for the last set. You still have to work out the fake/real math yourself,
+then press the button to flip that line between **REAL** and **FAKE**. Nothing changes on
+its own — the text only updates when *you* press a button, so it stays fully manual input;
+it is just laid out for you instead of doing the math in your head.
+
 ## Support
 
 If Snazzy P4 makes your P4 pulls a little less painful and you want to support development, you can buy me a coffee:
