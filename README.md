@@ -112,15 +112,11 @@ panels while keeping the **First Set**, **Second Set** and **Kefka** text panels
 /snazzyp4 Reset              /snazzyp4 Hide
 ```
 
-If the hidden **Last Fake** feature is unlocked, these are also available:
-
-```
-/snazzyp4 LastThunderReal    /snazzyp4 LastThunderFake
-/snazzyp4 LastBlizzardReal   /snazzyp4 LastBlizzardFake
-```
-
 The commands respect the same rules as the buttons — a pick that isn't valid yet (for example
 a short/long before its Exdeath) is simply ignored, exactly like a greyed-out button.
+
+The hidden Last Fake feature has its own controller commands, listed in the Hidden Settings
+section below.
 
 ## Configuration Settings
 
@@ -166,6 +162,15 @@ last set. You press the button to mark whether that line is the fake, and the re
 text flips between **REAL** and **FAKE** accordingly. Nothing happens on its own — it only
 updates when *you* press a button, so it still requires your input; it just does the flip
 for you instead of you doing it in your head.
+
+**Controller commands:** once this feature is unlocked, the Last Fake toggles also get slash
+commands (with Copy buttons in Settings → Controller Settings), so controller players can
+flip them from macros just like the other buttons:
+
+```
+/snazzyp4 LastThunderReal    /snazzyp4 LastThunderFake
+/snazzyp4 LastBlizzardReal   /snazzyp4 LastBlizzardFake
+```
 
 ## Support
 
