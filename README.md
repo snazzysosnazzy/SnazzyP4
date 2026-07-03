@@ -96,9 +96,11 @@ That's it — the buttons grey out when they no longer apply, so you can't mis-e
 Controller players can't click the panel buttons, so every button also has a slash command
 that does the exact same thing. Put each one into its own in-game macro and bind it.
 
-In **Settings → Controller Settings** you'll find a **Copy** button for every command, plus a
-**Hide macro buttons** option that removes the Exdeath / Chaos / Kefka / Reset / Hide button
-panels while keeping the **First Set**, **Second Set** and **Kefka** text panels on screen.
+**Recommended:** since you won't be clicking anything, turn on **Hide macro buttons** in
+**Settings → Controller Settings**. It removes the Exdeath / Chaos / Kefka / Reset / Hide
+button panels from the normal UI and keeps only the **First Set**, **Second Set** and
+**Kefka** resolution text on screen. That same section also has a **Copy** button for every
+command below.
 
 ```
 /snazzyp4 ExDeathReal        /snazzyp4 ExDeathFake

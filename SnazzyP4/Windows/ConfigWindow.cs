@@ -565,12 +565,24 @@ public class ConfigWindow : Window, IDisposable
 
         ImGui.Indent();
 
+        // The hide-macro-buttons toggle is the setting controller players actually want, so it is spaced out and highlighted here after a tester missed it entirely.
+        ImGui.Spacing();
+        ImGui.Separator();
+        ImGui.Spacing();
+        ImGui.TextColored(new Vector4(1f, 0.84f, 0f, 1f),
+            "Controller players: enable this to hide the on-screen macro buttons.");
+        ImGui.Spacing();
+
         var hideMacroButtons = Configuration.HideMacroButtons;
         if (ImGui.Checkbox("Hide macro buttons (keep only the text panels)", ref hideMacroButtons))
         {
             Configuration.HideMacroButtons = hideMacroButtons;
             Configuration.Save();
         }
+
+        ImGui.Spacing();
+        ImGui.Separator();
+        ImGui.Spacing();
 
         ImGui.TextWrapped("Controller players cannot click the buttons. Put each command below into its own game macro and bind it, then hide the macro buttons above to keep only the resolution text.");
         ImGui.Spacing();
