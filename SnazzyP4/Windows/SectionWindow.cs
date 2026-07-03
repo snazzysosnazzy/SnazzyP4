@@ -53,6 +53,15 @@ public class SectionWindow : Window, IDisposable
     public string Id => definition.Id;
 
     /// <summary>
+    /// Whether this is the combined set window with its divider pinned to a fixed position.
+    /// </summary>
+    private bool AnchorDividerActive(Configuration configuration)
+        => definition.Id == "CombinedSets"
+           && configuration.CombineSets
+           && configuration.CombineSetsHorizontal
+           && configuration.CombineSetsAnchorDivider;
+
+    /// <summary>
     /// Whether this section contains interactive buttons rather than a pure text panel.
     /// </summary>
     public bool HasButtons => definition.HasButtons;
@@ -76,6 +85,26 @@ public class SectionWindow : Window, IDisposable
 
         // The window is never moved by ImGui's native title-bar drag; individual Edit Layout drags and Move All group drags reposition it manually so that a press anywhere on it counts, since its buttons are disabled.
         Flags |= ImGuiWindowFlags.NoMove;
+
+        // When the combined panel pins its divider, the saved position is the divider point and the window origin is derived from it each frame so the divider stays put while the sets grow outward.
+        if (AnchorDividerActive(configuration))
+        {
+            var divider = configuration.GetDetachedPosition(definition.Id, definition.DefaultOffset);
+            if (configuration.EditMode && editDragging)
+            {
+                divider += ImGui.GetIO().MouseDelta;
+            }
+            else if (configuration.MoveAllActive && plugin.GroupMove != Vector2.Zero)
+            {
+                divider += plugin.GroupMove;
+            }
+
+            configuration.SetDetachedPosition(definition.Id, divider);
+            plugin.DetachedPositionDirty.Remove(definition.Id);
+            Position = new Vector2(divider.X - plugin.Solver.CombinedDividerOffsetX, divider.Y);
+            PositionCondition = ImGuiCond.Always;
+            return;
+        }
 
         // Force the saved position on first appearance or when a position slider changed it, follow the individual drag in Edit Layout, follow the group during Move All, otherwise leave the position untouched.
         if (!positionKnown || plugin.DetachedPositionDirty.Remove(definition.Id))
@@ -109,7 +138,11 @@ public class SectionWindow : Window, IDisposable
         positionKnown = true;
 
         // Keeping the saved detached position in sync lets the settings sliders track dragging, and it is persisted on mouse release.
-        configuration.SetDetachedPosition(definition.Id, lastPosition);
+        // While the divider is pinned the saved position is the divider point, managed in PreDraw, so it is not overwritten with the window origin here.
+        if (!AnchorDividerActive(configuration))
+        {
+            configuration.SetDetachedPosition(definition.Id, lastPosition);
+        }
 
         var sectionScale = configuration.GetSectionScale(definition.Id);
         ImGui.SetWindowFontScale(configuration.UiScale * sectionScale);

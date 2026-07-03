@@ -273,10 +273,24 @@ public class ConfigWindow : Window, IDisposable
                 Configuration.Save();
             }
 
-            var expandFromCenter = Configuration.CombineSetsExpandFromCenter;
-            if (ImGui.Checkbox("Expand outward from the divider (instead of left to right)", ref expandFromCenter))
+            if (Configuration.CombineSetsHorizontal)
             {
-                Configuration.CombineSetsExpandFromCenter = expandFromCenter;
+                ImGui.Indent();
+                var anchorDivider = Configuration.CombineSetsAnchorDivider;
+                if (ImGui.Checkbox("Pin the divider in place (sets grow outward from it, text stays left-aligned)", ref anchorDivider))
+                {
+                    Configuration.CombineSetsAnchorDivider = anchorDivider;
+                    Configuration.Save();
+                }
+
+                ImGui.TextDisabled("Drag the panel or use the CombinedSets X/Y sliders to move the divider.");
+                ImGui.Unindent();
+            }
+
+            var mirror = Configuration.CombineSetsExpandFromCenter;
+            if (ImGui.Checkbox("Mirror the sets (right-align the first set against the divider)", ref mirror))
+            {
+                Configuration.CombineSetsExpandFromCenter = mirror;
                 Configuration.Save();
             }
 

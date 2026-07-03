@@ -190,11 +190,18 @@ public class Configuration : IPluginConfiguration
     public bool CombineSetsHorizontal { get; set; }
 
     /// <summary>
-    /// Whether the combined set panel expands outward from the dividing line instead of growing from the left edge.
-    /// Side by side, this right-aligns the first set against the divider; stacked, it centres every line.
+    /// Whether the combined set panel right-aligns the first set against the divider so the two sets mirror each other.
+    /// Side by side, this right-aligns the first set; stacked, it centres every line.
     /// This only applies when the sets are combined.
     /// </summary>
     public bool CombineSetsExpandFromCenter { get; set; }
+
+    /// <summary>
+    /// Whether the side-by-side combined panel keeps its divider pinned at a fixed position, growing the first set to the left of it and the second set to the right, while the text itself stays left-aligned.
+    /// The divider position is the section's detached position, so it can be set by dragging or the position sliders.
+    /// This only applies when the sets are combined and laid out side by side.
+    /// </summary>
+    public bool CombineSetsAnchorDivider { get; set; }
 
     /// <summary>
     /// Whether dragging any detached window moves them all together.

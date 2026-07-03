@@ -176,6 +176,12 @@ public class Solver
     public float CurrentFontScale = 1f;
 
     /// <summary>
+    /// The horizontal distance from the combined panel's window origin to its divider, measured on the last frame it was drawn side by side.
+    /// The detached window uses this to keep the divider pinned at a fixed position while the two sets grow outward from it.
+    /// </summary>
+    public float CombinedDividerOffsetX;
+
+    /// <summary>
     /// Creates a solver bound to the plugin configuration.
     /// </summary>
     public Solver(Configuration configuration)
@@ -446,6 +452,9 @@ public class Solver
 
         var firstMax = ImGui.GetItemRectMax();
         var dividerX = firstMax.X + 8f * scale;
+
+        // Record where the divider sits relative to the window so the detached window can pin it in place.
+        CombinedDividerOffsetX = dividerX - ImGui.GetWindowPos().X;
 
         ImGui.SameLine(0f, 24f * scale);
         using (ImRaii.Group())
