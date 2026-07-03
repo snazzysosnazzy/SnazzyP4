@@ -249,11 +249,15 @@ public class MainWindow : Window, IDisposable
             ImGui.SameLine();
         }
 
-        using (ImRaii.Disabled(plugin.LayoutEditActive))
+        // The Reset control only docks to the toolbar when it is not floating as its own section.
+        if (!Configuration.FloatingResetButton)
         {
-            if (ImGui.Button("Reset Solver"))
+            using (ImRaii.Disabled(plugin.LayoutEditActive))
             {
-                plugin.Solver.ResetAll();
+                if (ImGui.Button("Reset"))
+                {
+                    plugin.Solver.ResetAll();
+                }
             }
         }
     }
@@ -276,9 +280,23 @@ public class MainWindow : Window, IDisposable
 
         foreach (var section in plugin.Sections)
         {
-            // The Hide button is drawn only in floating mode; all other sections hide when the display is hidden.
+            // The Hide and Reset controls are only drawn here while floating; all other sections hide when the display is hidden.
             var isHide = section.Id == "Hide";
-            var draw = isHide ? Configuration.FloatingHideButton : !Configuration.Hidden;
+            var isReset = section.Id == "Reset";
+            bool draw;
+            if (isHide)
+            {
+                draw = Configuration.FloatingHideButton;
+            }
+            else if (isReset)
+            {
+                draw = !Configuration.Hidden && Configuration.FloatingResetButton;
+            }
+            else
+            {
+                draw = !Configuration.Hidden;
+            }
+
             if (!draw)
             {
                 continue;

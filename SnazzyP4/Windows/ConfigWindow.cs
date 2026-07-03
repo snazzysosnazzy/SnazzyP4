@@ -233,9 +233,16 @@ public class ConfigWindow : Window, IDisposable
         }
 
         var floatingHide = Configuration.FloatingHideButton;
-        if (ImGui.Checkbox("Floating Hide button (detached, like Reset)", ref floatingHide))
+        if (ImGui.Checkbox("Floating Hide button (floats as its own panel, otherwise docks to the toolbar)", ref floatingHide))
         {
             Configuration.FloatingHideButton = floatingHide;
+            Configuration.Save();
+        }
+
+        var floatingReset = Configuration.FloatingResetButton;
+        if (ImGui.Checkbox("Floating Reset button (floats as its own panel, otherwise docks to the toolbar)", ref floatingReset))
+        {
+            Configuration.FloatingResetButton = floatingReset;
             Configuration.Save();
         }
     }

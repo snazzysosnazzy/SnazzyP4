@@ -238,13 +238,23 @@ public sealed class Plugin : IDalamudPlugin
 
         Solver.UpdateAutoMarkers();
 
-        // The Hide control stays visible even when hidden and only when it is the floating variant, while every other section hides when the display is hidden or empty.
+        // The Hide control stays visible even when hidden and only when it is the floating variant, the Reset control only shows while floating, and every other section hides when the display is hidden or empty.
         var baseShow = Configuration.Detached && MainWindow.IsOpen;
         foreach (var sectionWindow in sectionWindows)
         {
-            var show = sectionWindow.Id == "Hide"
-                ? baseShow && Configuration.FloatingHideButton
-                : baseShow && !Configuration.Hidden;
+            bool show;
+            if (sectionWindow.Id == "Hide")
+            {
+                show = baseShow && Configuration.FloatingHideButton;
+            }
+            else if (sectionWindow.Id == "Reset")
+            {
+                show = baseShow && !Configuration.Hidden && Configuration.FloatingResetButton;
+            }
+            else
+            {
+                show = baseShow && !Configuration.Hidden;
+            }
 
             if (show && !SectionEnabled(sectionWindow.Id))
             {

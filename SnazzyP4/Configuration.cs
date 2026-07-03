@@ -21,13 +21,13 @@ public class Configuration : IPluginConfiguration
     /// <summary>
     /// The user-facing scale multiplier applied on top of Dalamud's global scale.
     /// </summary>
-    public float UiScale { get; set; } = 1.0f;
+    public float UiScale { get; set; } = 0.5f;
 
     /// <summary>
     /// Whether the player is playing a Support role.
     /// Support resolves to the Ignore1/Bind1 markers and the A (stack) and D (spread) target letters, while DPS uses Ignore2/Bind2 and the C and B letters.
     /// </summary>
-    public bool IsSupport { get; set; } = true;
+    public bool IsSupport { get; set; }
 
     /// <summary>
     /// Whether the plugin should place the spread marker on the player automatically once a spread is determined.
@@ -138,8 +138,9 @@ public class Configuration : IPluginConfiguration
 
     /// <summary>
     /// Whether each section is drawn as its own floating window instead of inside the single hub window.
+    /// This is enabled by default.
     /// </summary>
-    public bool Detached { get; set; }
+    public bool Detached { get; set; } = true;
 
     /// <summary>
     /// Whether the layout is being edited, allowing sections to be dragged.
@@ -157,6 +158,13 @@ public class Configuration : IPluginConfiguration
     /// This is enabled by default.
     /// </summary>
     public bool FloatingHideButton { get; set; } = true;
+
+    /// <summary>
+    /// Whether the Reset control is a separate floating section rather than a toolbar button.
+    /// When this is off, the Reset control docks to the toolbar instead of floating.
+    /// This is enabled by default.
+    /// </summary>
+    public bool FloatingResetButton { get; set; } = true;
 
     /// <summary>
     /// Whether dragging any detached window moves them all together.
@@ -178,7 +186,7 @@ public class Configuration : IPluginConfiguration
     /// Whether the universal appearance values apply to everything.
     /// When this is off, the per-section overrides are used instead.
     /// </summary>
-    public bool UseUniversalSettings { get; set; } = true;
+    public bool UseUniversalSettings { get; set; }
 
     /// <summary>
     /// The universal window background opacity from zero to one.
@@ -203,8 +211,21 @@ public class Configuration : IPluginConfiguration
 
     /// <summary>
     /// The per-section, per-mode background opacity overrides.
+    /// The defaults make the detached button panels transparent and the text panels semi-opaque.
     /// </summary>
-    public Dictionary<string, float> SectionBackgroundAlpha { get; set; } = new();
+    public Dictionary<string, float> SectionBackgroundAlpha { get; set; } = new()
+    {
+        ["d:Exdeath"] = 0.0f,
+        ["d:FireWaterButtons"] = 0.0f,
+        ["d:ThunderButtons"] = 0.0f,
+        ["d:FirstSet"] = 0.7f,
+        ["d:SecondSet"] = 0.7f,
+        ["d:ThunderText"] = 0.7f,
+        ["d:LastFakeToggles"] = 1.0f,
+        ["d:LastFakeThunder"] = 1.0f,
+        ["d:Reset"] = 0.0f,
+        ["d:Hide"] = 0.0f,
+    };
 
     /// <summary>
     /// The per-section, per-mode hide-title-bar overrides.
@@ -233,8 +254,19 @@ public class Configuration : IPluginConfiguration
 
     /// <summary>
     /// The per-section screen positions used to place the detached windows.
+    /// The defaults lay the sections out in the shipped arrangement.
     /// </summary>
-    public Dictionary<string, Vector2> DetachedPositions { get; set; } = new();
+    public Dictionary<string, Vector2> DetachedPositions { get; set; } = new()
+    {
+        ["Exdeath"] = new Vector2(196f, 126f),
+        ["FireWaterButtons"] = new Vector2(52f, 148f),
+        ["ThunderButtons"] = new Vector2(49f, 303f),
+        ["FirstSet"] = new Vector2(356f, 151f),
+        ["SecondSet"] = new Vector2(352f, 270f),
+        ["ThunderText"] = new Vector2(355f, 393f),
+        ["Reset"] = new Vector2(58f, 463f),
+        ["Hide"] = new Vector2(167f, 462f),
+    };
 
     /// <summary>
     /// The colour of the Spread callout letter for the Support role.
