@@ -51,7 +51,8 @@ as one window or as separate floating panels.
                            2. Move / Stand Still
                            3. Gaze
                            4. Twister / Donut
-- **Party Callouts** — Optional sending of messages in party chat for Gazes and Chaos.
+- **Chat Callouts** — Optional announcements for Gazes and Chaos, sent to a chat channel of
+                      your choice (party, linkshell, free company, echo for testing, and more).
 - **Self Marked Spreads** — Optional Self marking for spread markers based on role.
 
 ## Installation
@@ -176,6 +177,10 @@ last set. You press the button to mark whether that line is the fake, and the re
 text flips between **REAL** and **FAKE** accordingly. Nothing happens on its own — it only
 updates when *you* press a button, so it still requires your input; it just does the flip
 for you instead of you doing it in your head.
+
+**Appearance:** once unlocked, the Hidden tab gains a **Last Fake toggles** section where you
+can show the toggles as plain checkboxes or as custom REAL/FAKE buttons (with your own text,
+size and opacity), and optionally pull them out into their own detached panel(s).
 
 **Controller commands:** once this feature is unlocked, the Last Fake toggles also get slash
 commands (with Copy buttons in Settings → Controller Settings), so controller players can
