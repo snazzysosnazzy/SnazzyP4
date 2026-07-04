@@ -3,6 +3,13 @@
 All notable changes to Snazzy P4 are listed here. Versions match the `vX.Y.Z.W`
 release tags.
 
+## v1.0.0.11
+
+- The chat announcements moved to their own **Chat** settings tab (renamed from
+  "Party chat messages" to **Chat Messages**).
+- Added more channels: **Tell** (current target), **Free Company**, **Linkshells
+  1-8** and **Cross-world Linkshells 1-8**.
+
 ## v1.0.0.10
 
 - **Chat channel selector** — the gaze and chaos announcements can now be sent to

@@ -122,11 +122,13 @@ a short/long before its Exdeath) is simply ignored, exactly like a greyed-out bu
 
 Open with the **Settings** button or `/snazzyp4 config`. Settings are grouped into tabs:
 
-- **General** — Role (Support / DPS), UI scale, auto-place `/mk` markers, party-chat
-  announcements for gaze/chaos (with a **channel selector** — Party / Say / Yell / Shout /
-  Alliance / Echo), **settings profiles** (copy your whole setup to the
-  clipboard or paste one in — handy for sharing a layout), and the reset buttons
-  (**Reset layout to defaults** / **Restore ALL settings to defaults**).
+- **General** — Role (Support / DPS), UI scale, auto-place `/mk` markers, **settings
+  profiles** (copy your whole setup to the clipboard or paste one in — handy for sharing a
+  layout), and the reset buttons (**Reset layout to defaults** / **Restore ALL settings to
+  defaults**).
+- **Chat** — announce gaze / chaos in a chat channel of your choice (Party, Say, Yell,
+  Shout, Alliance, Tell, Free Company, Linkshells, Cross-world Linkshells, or **Echo** for a
+  self-only test), with optional custom message text.
 - **Appearance** — Use Universal Settings (one look for everything) or per-section
   background opacity / hide title bar / hide labels / button opacity, plus **click-through
   (display-only)** mode. Values are kept **separately for windowed and detached mode**, and

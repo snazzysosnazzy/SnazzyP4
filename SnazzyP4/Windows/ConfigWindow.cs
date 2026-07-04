@@ -91,6 +91,14 @@ public class ConfigWindow : Window, IDisposable
             }
         }
 
+        using (var tab = ImRaii.TabItem("Chat"))
+        {
+            if (tab)
+            {
+                DrawChatMessages();
+            }
+        }
+
         using (var tab = ImRaii.TabItem("Appearance"))
         {
             if (tab)
@@ -148,8 +156,6 @@ public class ConfigWindow : Window, IDisposable
         DrawUiScale();
         ImGui.Separator();
         DrawRole();
-        ImGui.Separator();
-        DrawPartyChat();
         ImGui.Separator();
         DrawProfileImportExport();
         ImGui.Separator();
@@ -295,23 +301,23 @@ public class ConfigWindow : Window, IDisposable
     }
 
     /// <summary>
-    /// Draws the party-chat announcement options for gaze and chaos.
+    /// Draws the Chat Messages tab with the channel selector and the gaze and chaos announcement options.
     /// </summary>
-    private void DrawPartyChat()
+    private void DrawChatMessages()
     {
-        ImGui.TextUnformatted("Party chat messages");
+        ImGui.TextUnformatted("Chat Messages");
         ImGui.TextDisabled("Sends a chat message on your behalf in the selected channel when a\nmechanic is determined. Issues input on your behalf - use at your own risk.");
 
         DrawChannelSelector();
 
         DrawPartyMechanic(
-            "Announce Gaze in party chat", "gaze",
+            "Announce Gaze", "gaze",
             () => Configuration.PartyGazeEnabled, value => Configuration.PartyGazeEnabled = value,
             () => Configuration.PartyGazeCustom, value => Configuration.PartyGazeCustom = value,
             () => Configuration.PartyGazeCustomText, value => Configuration.PartyGazeCustomText = value);
 
         DrawPartyMechanic(
-            "Announce Chaos (Inferno/Tsunami) in party chat", "chaos",
+            "Announce Chaos (Inferno/Tsunami)", "chaos",
             () => Configuration.PartyChaosEnabled, value => Configuration.PartyChaosEnabled = value,
             () => Configuration.PartyChaosCustom, value => Configuration.PartyChaosCustom = value,
             () => Configuration.PartyChaosCustomText, value => Configuration.PartyChaosCustomText = value);
@@ -320,13 +326,31 @@ public class ConfigWindow : Window, IDisposable
     /// <summary>
     /// The chat channels the announcements can be sent to, paired with their command prefix.
     /// </summary>
-    private static readonly (string Label, string Prefix)[] PartyChatChannels =
+    private static readonly (string Label, string Prefix)[] ChatChannels =
     {
         ("Party (/p)", "/p"),
         ("Say (/s)", "/s"),
         ("Yell (/y)", "/y"),
         ("Shout (/sh)", "/sh"),
         ("Alliance (/a)", "/a"),
+        ("Tell - current target (/tell <t>)", "/tell <t>"),
+        ("Free Company (/fc)", "/fc"),
+        ("Linkshell 1 (/l1)", "/l1"),
+        ("Linkshell 2 (/l2)", "/l2"),
+        ("Linkshell 3 (/l3)", "/l3"),
+        ("Linkshell 4 (/l4)", "/l4"),
+        ("Linkshell 5 (/l5)", "/l5"),
+        ("Linkshell 6 (/l6)", "/l6"),
+        ("Linkshell 7 (/l7)", "/l7"),
+        ("Linkshell 8 (/l8)", "/l8"),
+        ("Cross-world Linkshell 1 (/cwl1)", "/cwl1"),
+        ("Cross-world Linkshell 2 (/cwl2)", "/cwl2"),
+        ("Cross-world Linkshell 3 (/cwl3)", "/cwl3"),
+        ("Cross-world Linkshell 4 (/cwl4)", "/cwl4"),
+        ("Cross-world Linkshell 5 (/cwl5)", "/cwl5"),
+        ("Cross-world Linkshell 6 (/cwl6)", "/cwl6"),
+        ("Cross-world Linkshell 7 (/cwl7)", "/cwl7"),
+        ("Cross-world Linkshell 8 (/cwl8)", "/cwl8"),
         ("Echo - only you see it (/echo)", "/echo"),
     };
 
@@ -336,7 +360,7 @@ public class ConfigWindow : Window, IDisposable
     private void DrawChannelSelector()
     {
         var preview = Configuration.PartyChatChannel;
-        foreach (var (label, prefix) in PartyChatChannels)
+        foreach (var (label, prefix) in ChatChannels)
         {
             if (prefix == Configuration.PartyChatChannel)
             {
@@ -352,7 +376,7 @@ public class ConfigWindow : Window, IDisposable
             return;
         }
 
-        foreach (var (label, prefix) in PartyChatChannels)
+        foreach (var (label, prefix) in ChatChannels)
         {
             if (ImGui.Selectable(label, Configuration.PartyChatChannel == prefix))
             {
