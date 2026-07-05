@@ -810,6 +810,20 @@ public class Solver
     }
 
     /// <summary>
+    /// Draws the Undo button, which steps back the last button press and is disabled while editing the layout or when there is nothing to undo.
+    /// </summary>
+    public void DrawUndo(float scale)
+    {
+        using (ImRaii.Disabled(LayoutEditActive || !CanUndo))
+        {
+            if (ImGui.Button(configuration.GetText(TextLabels.UndoButton), new Vector2(90, 34) * scale))
+            {
+                Undo();
+            }
+        }
+    }
+
+    /// <summary>
     /// Draws the Hide/Show button, which is disabled while the layout is being edited.
     /// </summary>
     public void DrawHideToggle(float scale)

@@ -912,6 +912,13 @@ public class ConfigWindow : Window, IDisposable
             Configuration.Save();
         }
 
+        var floatingUndo = Configuration.FloatingUndoButton;
+        if (ImGui.Checkbox("Floating Undo button (floats as its own panel, otherwise docks to the toolbar)", ref floatingUndo))
+        {
+            Configuration.FloatingUndoButton = floatingUndo;
+            Configuration.Save();
+        }
+
         var accelerationSameLine = Configuration.AccelerationSameLine;
         if (ImGui.Checkbox("Acceleration text on same line as Stack/Spread", ref accelerationSameLine))
         {

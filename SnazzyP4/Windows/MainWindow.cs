@@ -250,15 +250,19 @@ public class MainWindow : Window, IDisposable
             ImGui.SameLine();
         }
 
-        using (ImRaii.Disabled(plugin.LayoutEditActive || !plugin.Solver.CanUndo))
+        // The Undo control only docks to the toolbar when it is not floating as its own section.
+        if (!Configuration.FloatingUndoButton)
         {
-            if (ImGui.Button("Undo"))
+            using (ImRaii.Disabled(plugin.LayoutEditActive || !plugin.Solver.CanUndo))
             {
-                plugin.Solver.Undo();
+                if (ImGui.Button("Undo"))
+                {
+                    plugin.Solver.Undo();
+                }
             }
-        }
 
-        ImGui.SameLine();
+            ImGui.SameLine();
+        }
 
         // The Reset control only docks to the toolbar when it is not floating as its own section.
         if (!Configuration.FloatingResetButton)
@@ -291,9 +295,10 @@ public class MainWindow : Window, IDisposable
 
         foreach (var section in plugin.Sections)
         {
-            // The Hide and Reset controls are only drawn here while floating; all other sections hide when the display is hidden.
+            // The Hide, Reset and Undo controls are only drawn here while floating; all other sections hide when the display is hidden.
             var isHide = section.Id == "Hide";
             var isReset = section.Id == "Reset";
+            var isUndo = section.Id == "Undo";
             bool draw;
             if (isHide)
             {
@@ -302,6 +307,10 @@ public class MainWindow : Window, IDisposable
             else if (isReset)
             {
                 draw = !Configuration.Hidden && Configuration.FloatingResetButton;
+            }
+            else if (isUndo)
+            {
+                draw = !Configuration.Hidden && Configuration.FloatingUndoButton;
             }
             else
             {

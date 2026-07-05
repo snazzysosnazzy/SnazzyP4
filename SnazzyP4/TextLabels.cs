@@ -92,6 +92,9 @@ public static class TextLabels
     /// <summary>The Reset button text.</summary>
     public const string ResetButton = "ResetButton";
 
+    /// <summary>The Undo button text.</summary>
+    public const string UndoButton = "UndoButton";
+
     /// <summary>The Hide button text.</summary>
     public const string HideButton = "HideButton";
 
@@ -148,6 +151,7 @@ public static class TextLabels
         (KefkaButtonsHeader, "Kefka", "Kefka buttons header", "Headers"),
 
         (ResetButton, "RESET", "Reset button", "Buttons"),
+        (UndoButton, "UNDO", "Undo button", "Buttons"),
         (HideButton, "HIDE", "Hide button", "Buttons"),
         (ShowButton, "SHOW", "Show button", "Buttons"),
 

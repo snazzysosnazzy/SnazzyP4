@@ -180,6 +180,7 @@ public sealed class Plugin : IDalamudPlugin
             new("LastFakeBlizzard", "Last Fake (Blizzard)", new Vector2(700, 360), Solver.DrawLastFakeBlizzardToggle, HasButtons: true),
             new("AnnounceLastFake", "Announce Last Fake button", new Vector2(700, 300), Solver.DrawAnnounceLastFakeButton, HasButtons: true),
             new("Reset", "Reset button", new Vector2(560, 430), Solver.DrawReset, HasButtons: true),
+            new("Undo", "Undo button", new Vector2(360, 430), Solver.DrawUndo, HasButtons: true),
             new("Hide", "Hide / Show", new Vector2(460, 430), Solver.DrawHideToggle, HasButtons: true),
         };
 
@@ -281,6 +282,10 @@ public sealed class Plugin : IDalamudPlugin
             else if (sectionWindow.Id == "Reset")
             {
                 show = baseShow && !Configuration.Hidden && Configuration.FloatingResetButton;
+            }
+            else if (sectionWindow.Id == "Undo")
+            {
+                show = baseShow && !Configuration.Hidden && Configuration.FloatingUndoButton;
             }
             else
             {

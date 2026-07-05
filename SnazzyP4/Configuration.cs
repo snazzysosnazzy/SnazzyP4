@@ -224,6 +224,13 @@ public class Configuration : IPluginConfiguration
     public bool FloatingResetButton { get; set; } = true;
 
     /// <summary>
+    /// Whether the Undo control is a separate floating section rather than a toolbar button.
+    /// When this is off, the Undo control docks to the toolbar instead of floating.
+    /// This is enabled by default.
+    /// </summary>
+    public bool FloatingUndoButton { get; set; } = true;
+
+    /// <summary>
     /// Whether the macro button sections are hidden so only the resolution text panels remain.
     /// This is for controller players who drive the plugin through the slash commands instead of clicking.
     /// </summary>
@@ -232,8 +239,9 @@ public class Configuration : IPluginConfiguration
     /// <summary>
     /// Whether the Acceleration callout is appended to the spread or stack line instead of sitting on its own line.
     /// When on, a set reads like "Spread on X and MOVE" with the "and" in the normal text colour and the movement word in the Acceleration colour.
+    /// This is enabled by default.
     /// </summary>
-    public bool AccelerationSameLine { get; set; }
+    public bool AccelerationSameLine { get; set; } = true;
 
     /// <summary>
     /// Whether the First Set and Second Set are drawn together in one combined panel with a divider between them.

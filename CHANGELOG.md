@@ -3,6 +3,15 @@
 All notable changes to Snazzy P4 are listed here. Versions match the `vX.Y.Z.W`
 release tags.
 
+## v1.0.0.18
+
+- **Floating Undo button** — the Undo button can now float as its own panel like Hide and
+  Reset. A new **Floating Undo button** setting sits next to the Floating Hide/Reset options,
+  and all three **float by default** (turn one off to dock that button onto the toolbar).
+- **Acceleration on the same line by default** — the **Acceleration text on same line as
+  Stack/Spread** setting is now **on out of the box** (e.g. "Spread on X and MOVE"). Turn it
+  off to put Acceleration back on its own line.
+
 ## v1.0.0.17
 
 - **Master announcements toggle** — an **Enable chat announcements** checkbox at the top of the

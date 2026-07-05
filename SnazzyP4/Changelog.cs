@@ -18,6 +18,11 @@ public static class Changelog
     /// </summary>
     public static readonly Entry[] Entries =
     {
+        new("1.0.0.18", new[]
+        {
+            "The Undo button can now float as its own panel, just like Hide and Reset. A new \"Floating Undo button\" setting sits next to the Floating Hide/Reset options, and all three float by default (turn one off to dock that button back onto the toolbar).",
+            "Acceleration text now shares the same line as the Stack/Spread callout by default (for example \"Spread on X and MOVE\"), so the setting \"Acceleration text on same line as Stack/Spread\" is now on out of the box - turn it off to put Acceleration back on its own line.",
+        }),
         new("1.0.0.17", new[]
         {
             "Chat tab: a master \"Enable chat announcements\" toggle sits at the top and is OFF by default. While it is off, nothing is sent to chat no matter which per-mechanic announcements are turned on - turn it on once you have your announcements set up.",
