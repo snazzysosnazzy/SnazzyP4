@@ -879,6 +879,43 @@ public class Solver
     /// </summary>
     public void DrawThunderText(float scale)
     {
+        var showDocked = configuration.ShowLastFake && configuration.LastFakeAnnounceEnabled
+                         && configuration.LastFakeAnnounceDocked;
+        var side = configuration.LastFakeAnnounceDockSide;
+
+        if (showDocked && side == "top")
+        {
+            DrawAnnounceLastFakeButton(scale);
+        }
+
+        if (showDocked && side == "left")
+        {
+            DrawAnnounceLastFakeButton(scale);
+            ImGui.SameLine();
+        }
+
+        using (ImRaii.Group())
+        {
+            DrawThunderContent();
+        }
+
+        if (showDocked && side == "right")
+        {
+            ImGui.SameLine();
+            DrawAnnounceLastFakeButton(scale);
+        }
+
+        if (showDocked && side == "bottom")
+        {
+            DrawAnnounceLastFakeButton(scale);
+        }
+    }
+
+    /// <summary>
+    /// Draws the Kefka panel content (header and resolution lines), excluding the optional docked ANNOUNCE button.
+    /// </summary>
+    private void DrawThunderContent()
+    {
         var labelsHidden = configuration.EffectiveHideLabels(CurrentSection);
         var inlineToggles = configuration.ShowLastFake && !configuration.DetachToggleButtons
                             && !configuration.HideMacroButtons;
@@ -896,11 +933,6 @@ public class Solver
                 ImGui.SameLine(startX + toggleColumn);
                 ImGui.TextUnformatted(configuration.GetText(TextLabels.LastFakeHeader));
             }
-        }
-
-        if (configuration.ShowLastFake && configuration.LastFakeAnnounceEnabled && configuration.LastFakeAnnounceDocked)
-        {
-            DrawAnnounceLastFakeButton(scale);
         }
 
         // While editing the layout, the panel shows sample lines and, when the inline toggles are enabled, the toggle buttons so they populate the panel and can be positioned.
@@ -1221,7 +1253,15 @@ public class Solver
         {
             foreach (var slot in leaf.Slots)
             {
-                if (!slot.Enabled || (onlySlot != null && slot.Id != onlySlot))
+                if (!slot.Enabled)
+                {
+                    continue;
+                }
+
+                // The pressed-mechanic filter (Chaos) applies only to built-in mechanic slots;
+                // the title and any custom slots always fire when enabled.
+                var isMechanic = slot.Id != "title" && !slot.IsCustom;
+                if (onlySlot != null && isMechanic && slot.Id != onlySlot)
                 {
                     continue;
                 }

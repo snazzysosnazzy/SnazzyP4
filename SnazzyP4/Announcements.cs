@@ -20,6 +20,13 @@ public class AnnouncementSlot
 
     /// <summary>The custom messages, sent in order; empty entries are ignored.</summary>
     public List<string> Messages { get; set; } = new();
+
+    /// <summary>
+    /// Whether this is a user-added custom slot (as opposed to a built-in mechanic or the title).
+    /// Custom slots have no default message, are never removed by <see cref="AnnouncementData.EnsureSlots"/>,
+    /// and always fire regardless of which mechanic was pressed.
+    /// </summary>
+    public bool IsCustom { get; set; }
 }
 
 /// <summary>
@@ -79,24 +86,36 @@ public class ChannelAnnouncements
 /// </summary>
 public static class AnnouncementData
 {
-    /// <summary>The ordered Exdeath announcement slot ids.</summary>
-    public static readonly string[] ExdeathSlots = { "gaze", "spread", "drop", "accel" };
+    /// <summary>The ordered Exdeath announcement slot ids (the built-in title plus the four mechanics).</summary>
+    public static readonly string[] ExdeathSlots = { "title", "gaze", "spread", "drop", "accel" };
 
-    /// <summary>The ordered Chaos announcement slot ids.</summary>
-    public static readonly string[] ChaosSlots = { "inferno", "tsunami" };
+    /// <summary>The ordered Chaos announcement slot ids (the built-in title plus the two mechanics).</summary>
+    public static readonly string[] ChaosSlots = { "title", "inferno", "tsunami" };
 
     /// <summary>
     /// Returns the display label for a slot id.
     /// </summary>
     public static string SlotLabel(string id) => id switch
     {
+        "title" => "Title",
         "gaze" => "Gaze",
         "spread" => "Spread",
         "drop" => "Water Drop",
         "accel" => "Acceleration",
         "inferno" => "Inferno",
         "tsunami" => "Tsunami",
-        _ => id,
+        _ => "Custom message",
+    };
+
+    /// <summary>
+    /// Creates a new, empty user-added custom slot with a unique id.
+    /// </summary>
+    public static AnnouncementSlot NewCustomSlot() => new()
+    {
+        Id = "custom_" + Guid.NewGuid().ToString("N"),
+        IsCustom = true,
+        UseCustomMessage = true,
+        Messages = new List<string> { string.Empty },
     };
 
     /// <summary>
@@ -105,6 +124,13 @@ public static class AnnouncementData
     public static string DefaultMessage(string categoryId, string slotId, bool isFirst, bool isReal)
     {
         var set = isFirst ? "1st" : "2nd";
+        if (slotId == "title")
+        {
+            return categoryId == "exdeath"
+                ? $"---------- {set} Set ----------"
+                : $"---------- {set} Chaos ----------";
+        }
+
         if (categoryId == "exdeath")
         {
             return slotId switch
@@ -130,8 +156,9 @@ public static class AnnouncementData
     /// </summary>
     public static void EnsureSlots(AnnouncementLeaf leaf, string[] slotIds)
     {
-        foreach (var id in slotIds)
+        for (var ci = 0; ci < slotIds.Length; ci++)
         {
+            var id = slotIds[ci];
             var exists = false;
             foreach (var slot in leaf.Slots)
             {
@@ -142,12 +169,29 @@ public static class AnnouncementData
                 }
             }
 
-            if (!exists)
+            if (exists)
             {
-                leaf.Slots.Add(new AnnouncementSlot { Id = id });
+                continue;
             }
+
+            // Insert a missing built-in slot ahead of the first existing built-in with a higher
+            // canonical index, so newly added slots (such as the title) land in their natural order
+            // without disturbing custom slots or the user's own reordering.
+            var insertAt = leaf.Slots.Count;
+            for (var i = 0; i < leaf.Slots.Count; i++)
+            {
+                var idx = Array.IndexOf(slotIds, leaf.Slots[i].Id);
+                if (idx > ci)
+                {
+                    insertAt = i;
+                    break;
+                }
+            }
+
+            leaf.Slots.Insert(insertAt, new AnnouncementSlot { Id = id });
         }
 
-        leaf.Slots.RemoveAll(slot => Array.IndexOf(slotIds, slot.Id) < 0);
+        // Remove only stale built-in slots; user-added custom slots are always kept.
+        leaf.Slots.RemoveAll(slot => !slot.IsCustom && Array.IndexOf(slotIds, slot.Id) < 0);
     }
 }

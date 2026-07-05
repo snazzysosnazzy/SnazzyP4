@@ -25,6 +25,12 @@ public class Configuration : IPluginConfiguration
     public string LastSeenVersion { get; set; } = string.Empty;
 
     /// <summary>
+    /// When true, the update/changelog notice is never shown automatically after a version change.
+    /// The changelog remains available on demand from the title-bar button.
+    /// </summary>
+    public bool SuppressUpdateNotices { get; set; }
+
+    /// <summary>
     /// The user-facing scale multiplier applied on top of Dalamud's global scale.
     /// </summary>
     public float UiScale { get; set; } = 0.5f;
@@ -145,6 +151,11 @@ public class Configuration : IPluginConfiguration
     /// Whether the ANNOUNCE button is docked inside the Kefka text panel rather than floating as its own button.
     /// </summary>
     public bool LastFakeAnnounceDocked { get; set; }
+
+    /// <summary>
+    /// Which side of the Kefka text panel the docked ANNOUNCE button anchors to: "top", "bottom", "left" or "right".
+    /// </summary>
+    public string LastFakeAnnounceDockSide { get; set; } = "top";
 
     /// <summary>
     /// The chat channel the Last Fake ANNOUNCE button sends to.

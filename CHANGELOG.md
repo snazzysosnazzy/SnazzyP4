@@ -3,6 +3,22 @@
 All notable changes to Snazzy P4 are listed here. Versions match the `vX.Y.Z.W`
 release tags.
 
+## v1.0.0.16
+
+- **Dock ANNOUNCE to any side** — when the Last Fake ANNOUNCE button is docked, a new
+  **Dock side** dropdown anchors it to the **Top**, **Bottom**, **Left** or **Right** of the
+  Kefka panel.
+- **Announce Title** — each announcement set now has a title line, defaulting to
+  `---------- 1st Set ----------` / `---------- 2nd Set ----------` (Exdeath) and
+  `---------- 1st Chaos ----------` / `---------- 2nd Chaos ----------` (Chaos). Off until
+  enabled, reorderable and customisable like any slot.
+- **Custom message entries** — a **+ Add custom message** button adds your own extra
+  messages into the ordered list alongside the mechanics, each reorderable and removable.
+  Titles and custom messages always fire when enabled (Chaos still fires only the pressed mechanic).
+- **Never show version update messages** — a gold toggle at the top of the **General** tab
+  (and a matching button on the update popup) stops the changelog appearing after each
+  release. The full changelog stays available from the title-bar button.
+
 ## v1.0.0.15
 
 - **Extended chat announcements** — the Chat tab replaces the old Gaze/Chaos toggles

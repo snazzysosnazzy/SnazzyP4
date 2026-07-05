@@ -128,17 +128,19 @@ a short/long before its Exdeath) is simply ignored, exactly like a greyed-out bu
 
 Open with the **Settings** button or `/snazzyp4 config`. Settings are grouped into tabs:
 
-- **General** — Role (Support / DPS), UI scale, auto-place `/mk` markers with a **choice of
-  head marker per role and set** (attack / bind / ignore / shapes, always placed on yourself),
-  **settings profiles** (copy your whole setup to the clipboard or paste one in — handy for
-  sharing a layout), and the reset buttons (**Reset layout to defaults** / **Restore ALL
-  settings to defaults**).
+- **General** — a gold **Never show version update messages** toggle (stops the changelog
+  popup after each update), Role (Support / DPS), UI scale, auto-place `/mk` markers with a
+  **choice of head marker per role and set** (attack / bind / ignore / shapes, always placed
+  on yourself), **settings profiles** (copy your whole setup to the clipboard or paste one in
+  — handy for sharing a layout), and the reset buttons (**Reset layout to defaults** /
+  **Restore ALL settings to defaults**).
 - **Chat** — a full announcement system. **Announce Exdeath** fires when you press an Exdeath
   Real/Fake button and **Announce Chaos** when you press a chaos button, each split by
   First/Second set and Real/Fake. Choose **ordered-list** mode (reorderable per-mechanic
-  toggles with custom, reorderable message lists) or **simple text box** mode (one chat line
-  per message). Settings are kept **per channel** (Party, Say, Linkshells, Echo for testing,
-  and more) with a **Copy settings to...** option.
+  toggles with custom, reorderable message lists, an optional **Announce Title** line, and a
+  **+ Add custom message** button for your own extra entries) or **simple text box** mode (one
+  chat line per message). Settings are kept **per channel** (Party, Say, Linkshells, Echo for
+  testing, and more) with a **Copy settings to...** option.
 - **Appearance** — Use Universal Settings (one look for everything) or per-section
   background opacity / hide title bar / hide labels / button opacity, plus **click-through
   (display-only)** mode. Values are kept **separately for windowed and detached mode**, and
@@ -195,7 +197,8 @@ can show the toggles as plain checkboxes or as custom REAL/FAKE buttons (with yo
 size and opacity), and optionally pull them out into their own detached panel(s).
 
 **Announce Last Fake:** the same section can add an **ANNOUNCE** button (floating, or dockable
-to the Kefka panel) that posts the current Kefka values to a chat channel. Put `{KefkaThunder}`
+to any side of the Kefka panel — top, bottom, left or right) that posts the current Kefka
+values to a chat channel. Put `{KefkaThunder}`
 and `{KefkaBlizzard}` in your message and they are replaced with the current value (REAL/FAKE,
 both customisable; `?` if that mechanic hasn't been pressed).
 

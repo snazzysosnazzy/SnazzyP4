@@ -491,6 +491,13 @@ public sealed class Plugin : IDalamudPlugin
         UpdateFromVersion = Configuration.LastSeenVersion;
         Configuration.LastSeenVersion = Version;
         Configuration.Save();
+
+        // Advance the seen version even when suppressed, so the notice does not queue up for a later boot.
+        if (Configuration.SuppressUpdateNotices)
+        {
+            return;
+        }
+
         UpdateWindow.IsOpen = true;
     }
 

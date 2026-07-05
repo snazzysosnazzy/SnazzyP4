@@ -176,6 +176,8 @@ public class ConfigWindow : Window, IDisposable
     /// </summary>
     private void DrawGeneralTab()
     {
+        DrawSuppressUpdateNotices();
+        ImGui.Separator();
         DrawUiScale();
         ImGui.Separator();
         DrawRole();
@@ -183,6 +185,24 @@ public class ConfigWindow : Window, IDisposable
         DrawProfileImportExport();
         ImGui.Separator();
         DrawResetButtons();
+    }
+
+    /// <summary>
+    /// Draws the gold, top-of-tab toggle that stops the update/changelog notice from appearing after each new release.
+    /// </summary>
+    private void DrawSuppressUpdateNotices()
+    {
+        var suppress = Configuration.SuppressUpdateNotices;
+        using (ImRaii.PushColor(ImGuiCol.Text, new Vector4(1f, 0.84f, 0f, 1f)))
+        {
+            if (ImGui.Checkbox("Never show version update messages", ref suppress))
+            {
+                Configuration.SuppressUpdateNotices = suppress;
+                Configuration.Save();
+            }
+        }
+
+        ImGui.TextDisabled("Stops the changelog popup after each update. The changelog stays available from the title-bar button.");
     }
 
     /// <summary>
@@ -556,6 +576,7 @@ public class ConfigWindow : Window, IDisposable
         AnnouncementData.EnsureSlots(leaf, slotIds);
         var moveFrom = -1;
         var moveTo = -1;
+        var removeIndex = -1;
 
         for (var index = 0; index < leaf.Slots.Count; index++)
         {
@@ -577,14 +598,29 @@ public class ConfigWindow : Window, IDisposable
 
                 ImGui.SameLine();
                 var enabled = slot.Enabled;
-                if (ImGui.Checkbox($"Announce {AnnouncementData.SlotLabel(slot.Id)}", ref enabled))
+                var label = slot.IsCustom ? "Announce (custom message)" : $"Announce {AnnouncementData.SlotLabel(slot.Id)}";
+                if (ImGui.Checkbox(label, ref enabled))
                 {
                     slot.Enabled = enabled;
                     Configuration.Save();
                 }
 
+                if (slot.IsCustom)
+                {
+                    ImGui.SameLine();
+                    if (ImGui.SmallButton("Remove"))
+                    {
+                        removeIndex = index;
+                    }
+                }
+
                 ImGui.Indent();
-                if (ImGui.CollapsingHeader("Message settings##msgset"))
+                if (slot.IsCustom)
+                {
+                    // Custom slots are always custom text; show their message list directly.
+                    DrawMessageList(slot);
+                }
+                else if (ImGui.CollapsingHeader("Message settings##msgset"))
                 {
                     var custom = slot.UseCustomMessage;
                     if (ImGui.Checkbox("Enable custom message", ref custom))
@@ -612,11 +648,23 @@ public class ConfigWindow : Window, IDisposable
             }
         }
 
+        if (ImGui.Button($"+ Add custom message##addcustom_{key}"))
+        {
+            leaf.Slots.Add(AnnouncementData.NewCustomSlot());
+            Configuration.Save();
+        }
+
         if (moveFrom >= 0)
         {
             var moved = leaf.Slots[moveFrom];
             leaf.Slots.RemoveAt(moveFrom);
             leaf.Slots.Insert(moveTo, moved);
+            Configuration.Save();
+        }
+
+        if (removeIndex >= 0)
+        {
+            leaf.Slots.RemoveAt(removeIndex);
             Configuration.Save();
         }
     }
@@ -720,6 +768,50 @@ public class ConfigWindow : Window, IDisposable
         ("Cross-world Linkshell 8 (/cwl8)", "/cwl8"),
         ("Echo - only you see it (/echo)", "/echo"),
     };
+
+    /// <summary>
+    /// The sides the docked ANNOUNCE button can anchor to, paired with their stored value.
+    /// </summary>
+    private static readonly (string Label, string Value)[] DockSides =
+    {
+        ("Top", "top"),
+        ("Bottom", "bottom"),
+        ("Left", "left"),
+        ("Right", "right"),
+    };
+
+    /// <summary>
+    /// Draws the dropdown that selects which side of the Kefka panel the docked ANNOUNCE button anchors to.
+    /// </summary>
+    private void DrawDockSideCombo()
+    {
+        var current = Configuration.LastFakeAnnounceDockSide;
+        var preview = current;
+        foreach (var (label, value) in DockSides)
+        {
+            if (value == current)
+            {
+                preview = label;
+                break;
+            }
+        }
+
+        ImGui.SetNextItemWidth(160f);
+        using var combo = ImRaii.Combo("Dock side##lastfakedockside", preview);
+        if (!combo)
+        {
+            return;
+        }
+
+        foreach (var (label, value) in DockSides)
+        {
+            if (ImGui.Selectable(label, current == value))
+            {
+                Configuration.LastFakeAnnounceDockSide = value;
+                Configuration.Save();
+            }
+        }
+    }
 
     /// <summary>
     /// Draws the dropdown that selects which chat channel the announcements are sent to.
@@ -1101,6 +1193,13 @@ public class ConfigWindow : Window, IDisposable
         {
             Configuration.LastFakeAnnounceDocked = docked;
             Configuration.Save();
+        }
+
+        if (Configuration.LastFakeAnnounceDocked)
+        {
+            ImGui.Indent();
+            DrawDockSideCombo();
+            ImGui.Unindent();
         }
 
         DrawChannelCombo("Channel##lastfakeannounce", () => Configuration.LastFakeAnnounceChannel, value => Configuration.LastFakeAnnounceChannel = value);

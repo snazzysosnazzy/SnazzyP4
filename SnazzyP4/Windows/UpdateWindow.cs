@@ -69,5 +69,13 @@ public class UpdateWindow : Window, IDisposable
         {
             plugin.ToggleChangelog();
         }
+
+        ImGui.SameLine();
+        if (ImGui.Button("Never show version update messages"))
+        {
+            plugin.Configuration.SuppressUpdateNotices = true;
+            plugin.Configuration.Save();
+            IsOpen = false;
+        }
     }
 }

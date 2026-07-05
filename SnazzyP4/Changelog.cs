@@ -18,6 +18,13 @@ public static class Changelog
     /// </summary>
     public static readonly Entry[] Entries =
     {
+        new("1.0.0.16", new[]
+        {
+            "Announce Last Fake: the docked ANNOUNCE button can now anchor to any side of the Kefka panel - a new \"Dock side\" dropdown (Top / Bottom / Left / Right) appears when docking is on.",
+            "Chat announcements (ordered mode): every set now has an \"Announce Title\" line, defaulting to \"---------- 1st Set ----------\" / \"---------- 2nd Set ----------\" for Exdeath and \"---------- 1st Chaos ----------\" / \"---------- 2nd Chaos ----------\" for Chaos. Like any slot it is off until you enable it and can be reordered or customised.",
+            "Chat announcements (ordered mode): a \"+ Add custom message\" button lets you add your own extra messages into the list alongside the mechanics, each reorderable and removable. The title and custom messages always fire when enabled (Chaos still only fires the mechanic you pressed).",
+            "General tab: a gold \"Never show version update messages\" toggle stops the changelog popup from appearing after each update, and the update popup itself now has a matching button. The full changelog is always still available from the title-bar button.",
+        }),
         new("1.0.0.15", new[]
         {
             "Extended chat announcements (Chat tab): the old \"Announce Gaze / Chaos\" toggles are replaced with a full announcement system. \"Announce Exdeath\" fires the moment you press an Exdeath Real/Fake button; \"Announce Chaos\" fires when you press a chaos button. Each is organised into First/Second set and then Real/Fake.",
