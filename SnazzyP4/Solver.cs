@@ -603,12 +603,12 @@ public class Solver
         Vector4 color;
         if (spread)
         {
-            letter = support ? "D" : "B";
+            letter = configuration.GetText(support ? TextLabels.SpreadLetterSupport : TextLabels.SpreadLetterDps);
             color = support ? configuration.ColorSpreadSupport : configuration.ColorSpreadDps;
         }
         else
         {
-            letter = support ? "A" : "C";
+            letter = configuration.GetText(support ? TextLabels.StackLetterSupport : TextLabels.StackLetterDps);
             color = support ? configuration.ColorStackSupport : configuration.ColorStackDps;
         }
 
@@ -744,15 +744,28 @@ public class Solver
         var support = configuration.IsSupport;
         if (!shortMarkerSent && SetHasSpread(true))
         {
-            Plugin.ExecuteGameCommand($"/mk {(support ? "ignore1" : "ignore2")} <me>");
+            PlaceMarker(support ? configuration.MarkerFirstSetSupport : configuration.MarkerFirstSetDps);
             shortMarkerSent = true;
         }
 
         if (!longMarkerSent && SetHasSpread(false))
         {
-            Plugin.ExecuteGameCommand($"/mk {(support ? "bind1" : "bind2")} <me>");
+            PlaceMarker(support ? configuration.MarkerSecondSetSupport : configuration.MarkerSecondSetDps);
             longMarkerSent = true;
         }
+    }
+
+    /// <summary>
+    /// Places a configured head marker on the player, skipping it when no marker is configured.
+    /// </summary>
+    private void PlaceMarker(string marker)
+    {
+        if (string.IsNullOrWhiteSpace(marker))
+        {
+            return;
+        }
+
+        Plugin.ExecuteGameCommand($"/mk {marker} <me>");
     }
 
     /// <summary>

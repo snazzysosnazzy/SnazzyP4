@@ -98,6 +98,18 @@ public static class TextLabels
     /// <summary>The Show button text.</summary>
     public const string ShowButton = "ShowButton";
 
+    /// <summary>The Support spread target letter.</summary>
+    public const string SpreadLetterSupport = "SpreadLetterSupport";
+
+    /// <summary>The Support stack target letter.</summary>
+    public const string StackLetterSupport = "StackLetterSupport";
+
+    /// <summary>The DPS spread target letter.</summary>
+    public const string SpreadLetterDps = "SpreadLetterDps";
+
+    /// <summary>The DPS stack target letter.</summary>
+    public const string StackLetterDps = "StackLetterDps";
+
     /// <summary>
     /// Every customisable text entry with its id, default value, settings label and group.
     /// </summary>
@@ -138,6 +150,11 @@ public static class TextLabels
         (ResetButton, "RESET", "Reset button", "Buttons"),
         (HideButton, "HIDE", "Hide button", "Buttons"),
         (ShowButton, "SHOW", "Show button", "Buttons"),
+
+        (SpreadLetterSupport, "D", "Spread letter - Support", "Target letters"),
+        (StackLetterSupport, "A", "Stack letter - Support", "Target letters"),
+        (SpreadLetterDps, "B", "Spread letter - DPS", "Target letters"),
+        (StackLetterDps, "C", "Stack letter - DPS", "Target letters"),
     };
 
     /// <summary>

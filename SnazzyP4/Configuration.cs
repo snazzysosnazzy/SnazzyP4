@@ -35,6 +35,30 @@ public class Configuration : IPluginConfiguration
     public bool AutoMarker { get; set; } = true;
 
     /// <summary>
+    /// The head marker placed for the first (short) set spread while playing a Support role.
+    /// An empty value places no marker.
+    /// </summary>
+    public string MarkerFirstSetSupport { get; set; } = "ignore1";
+
+    /// <summary>
+    /// The head marker placed for the first (short) set spread while playing a DPS role.
+    /// An empty value places no marker.
+    /// </summary>
+    public string MarkerFirstSetDps { get; set; } = "ignore2";
+
+    /// <summary>
+    /// The head marker placed for the second (long) set spread while playing a Support role.
+    /// An empty value places no marker.
+    /// </summary>
+    public string MarkerSecondSetSupport { get; set; } = "bind1";
+
+    /// <summary>
+    /// The head marker placed for the second (long) set spread while playing a DPS role.
+    /// An empty value places no marker.
+    /// </summary>
+    public string MarkerSecondSetDps { get; set; } = "bind2";
+
+    /// <summary>
     /// Whether header and label text is hidden universally, while keeping the First Set and Second Set labels.
     /// </summary>
     public bool HideLabels { get; set; }

@@ -123,10 +123,11 @@ a short/long before its Exdeath) is simply ignored, exactly like a greyed-out bu
 
 Open with the **Settings** button or `/snazzyp4 config`. Settings are grouped into tabs:
 
-- **General** — Role (Support / DPS), UI scale, auto-place `/mk` markers, **settings
-  profiles** (copy your whole setup to the clipboard or paste one in — handy for sharing a
-  layout), and the reset buttons (**Reset layout to defaults** / **Restore ALL settings to
-  defaults**).
+- **General** — Role (Support / DPS), UI scale, auto-place `/mk` markers with a **choice of
+  head marker per role and set** (attack / bind / ignore / shapes, always placed on yourself),
+  **settings profiles** (copy your whole setup to the clipboard or paste one in — handy for
+  sharing a layout), and the reset buttons (**Reset layout to defaults** / **Restore ALL
+  settings to defaults**).
 - **Chat** — announce gaze / chaos in a chat channel of your choice (Party, Say, Yell,
   Shout, Alliance, Tell, Free Company, Linkshells, Cross-world Linkshells, or **Echo** for a
   self-only test), with optional custom message text.
@@ -137,8 +138,8 @@ Open with the **Settings** button or `/snazzyp4 config`. Settings are grouped in
 - **Colors** — recolour every element, with one-click **colourblind palette presets**
   (Deuteranopia / Protanopia / Tritanopia) as starting points you can fine-tune.
 - **Text** — rename any panel label, section header, resolution callout (spread/stack, gaze,
-  acceleration, chaos, Thunder/Blizzard) or button to your own custom text; blank keeps the
-  default.
+  acceleration, chaos, Thunder/Blizzard), the **A/B/C/D target letters** or any button to your
+  own custom text; blank keeps the default.
 - **Layout** — show toolbar, detached windows, edit layout, Move All, floating **Hide** and
   **Reset** buttons, put **Acceleration on the same line** as Spread/Stack
   (`Spread on X and MOVE`), **combine the First and Second sets** into one panel (stacked or

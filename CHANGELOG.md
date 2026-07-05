@@ -3,6 +3,14 @@
 All notable changes to Snazzy P4 are listed here. Versions match the `vX.Y.Z.W`
 release tags.
 
+## v1.0.0.13
+
+- **Customisable auto-markers** — choose which head marker is placed for each
+  role and set (attack 1-8, bind 1-3, ignore 1-2, the shapes, or none). Shown
+  under Auto-place marker in the General tab. The marker is always self-placed.
+- **Customisable target letters** — the A/B/C/D spread/stack letters shown in the
+  resolutions can now be renamed in the Text tab (per role).
+
 ## v1.0.0.12
 
 - **Custom text** — a new **Text** settings tab lets you rename every panel label,

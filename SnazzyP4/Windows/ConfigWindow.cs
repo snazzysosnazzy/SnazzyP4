@@ -306,6 +306,87 @@ public class ConfigWindow : Window, IDisposable
         }
 
         ImGui.TextDisabled("Sends the /mk command to the game for you when a spread\nis determined. This issues input on your behalf - use at your\nown risk. Turn off to only Copy/Place manually.");
+
+        if (Configuration.AutoMarker)
+        {
+            DrawMarkerSettings();
+        }
+    }
+
+    /// <summary>
+    /// The head markers that can be auto-placed, paired with their /mk command token; an empty token places nothing.
+    /// </summary>
+    private static readonly (string Label, string Token)[] Markers =
+    {
+        ("(none)", ""),
+        ("Attack 1", "attack1"),
+        ("Attack 2", "attack2"),
+        ("Attack 3", "attack3"),
+        ("Attack 4", "attack4"),
+        ("Attack 5", "attack5"),
+        ("Attack 6", "attack6"),
+        ("Attack 7", "attack7"),
+        ("Attack 8", "attack8"),
+        ("Bind 1", "bind1"),
+        ("Bind 2", "bind2"),
+        ("Bind 3", "bind3"),
+        ("Ignore 1 (prohibited)", "ignore1"),
+        ("Ignore 2 (prohibited)", "ignore2"),
+        ("Square", "square"),
+        ("Circle", "circle"),
+        ("Cross", "cross"),
+        ("Triangle", "triangle"),
+    };
+
+    /// <summary>
+    /// Draws the customisable marker dropdowns for each role and set plus the marker target field.
+    /// </summary>
+    private void DrawMarkerSettings()
+    {
+        ImGui.Indent();
+        ImGui.TextUnformatted("Markers");
+        ImGui.TextDisabled("Only your own role's two markers are used; both roles are shown so a\nshared config covers everyone.");
+
+        DrawMarkerDropdown("First set - Support", () => Configuration.MarkerFirstSetSupport, value => Configuration.MarkerFirstSetSupport = value);
+        DrawMarkerDropdown("Second set - Support", () => Configuration.MarkerSecondSetSupport, value => Configuration.MarkerSecondSetSupport = value);
+        DrawMarkerDropdown("First set - DPS", () => Configuration.MarkerFirstSetDps, value => Configuration.MarkerFirstSetDps = value);
+        DrawMarkerDropdown("Second set - DPS", () => Configuration.MarkerSecondSetDps, value => Configuration.MarkerSecondSetDps = value);
+
+        ImGui.TextDisabled("The marker is always placed on yourself (<me>).");
+        ImGui.Unindent();
+    }
+
+    /// <summary>
+    /// Draws one marker dropdown bound to a getter and setter.
+    /// </summary>
+    private void DrawMarkerDropdown(string label, Func<string> getToken, Action<string> setToken)
+    {
+        var current = getToken();
+        var preview = current;
+        foreach (var (markerLabel, token) in Markers)
+        {
+            if (token == current)
+            {
+                preview = markerLabel;
+                break;
+            }
+        }
+
+        ImGui.SetNextItemWidth(200f);
+        using var combo = ImRaii.Combo($"{label}##mk_{label}", preview);
+        if (!combo)
+        {
+            return;
+        }
+
+        foreach (var (markerLabel, token) in Markers)
+        {
+            if (ImGui.Selectable(markerLabel, current == token))
+            {
+                setToken(token);
+                Configuration.Save();
+            }
+        }
     }
 
     /// <summary>
