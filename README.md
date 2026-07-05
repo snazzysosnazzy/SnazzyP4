@@ -1,3 +1,9 @@
+## Planned Updates
+
+1. Alternative mode: Combination macros. Cuts number of macros in half by doing "combination" button presses. Further cuts down buttons
+2. Alternative mode; Simple macros. Cuts numbers of macros down the simplest number needed.
+3. Extended chat messages per macro instead of just Gaze/Chaos.
+
 # Snazzy P4
 
 A robust custom macro system for the Kefka UMAD/DMU Phase 4 mechanics. You tap the
