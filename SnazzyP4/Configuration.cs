@@ -262,6 +262,12 @@ public class Configuration : IPluginConfiguration
     public bool ClickThrough { get; set; }
 
     /// <summary>
+    /// The custom text overrides for panel labels, headers, callouts and buttons, keyed by the ids in <see cref="TextLabels"/>.
+    /// An id that is absent or empty uses the default text.
+    /// </summary>
+    public Dictionary<string, string> CustomText { get; set; } = new();
+
+    /// <summary>
     /// The per-section, per-mode background opacity overrides.
     /// The defaults make the detached button panels transparent and the text panels semi-opaque.
     /// </summary>
@@ -386,6 +392,37 @@ public class Configuration : IPluginConfiguration
     /// The colour of a Last Fake toggle in the FAKE state.
     /// </summary>
     public Vector4 ColorToggleFake { get; set; } = new(0.80f, 0.22f, 0.22f, 1f);
+
+    /// <summary>
+    /// Gets the effective display text for a text id, falling back to its registered default.
+    /// </summary>
+    public string GetText(string id)
+        => CustomText.TryGetValue(id, out var value) && !string.IsNullOrEmpty(value) ? value : TextLabels.Default(id);
+
+    /// <summary>
+    /// Gets the raw custom override for a text id, or an empty string when there is none.
+    /// </summary>
+    public string GetRawText(string id) => CustomText.TryGetValue(id, out var value) ? value : string.Empty;
+
+    /// <summary>
+    /// Stores a custom text override, or removes it when the value is empty so the default is used again.
+    /// </summary>
+    public void SetText(string id, string value)
+    {
+        if (string.IsNullOrEmpty(value))
+        {
+            CustomText.Remove(id);
+        }
+        else
+        {
+            CustomText[id] = value;
+        }
+    }
+
+    /// <summary>
+    /// Clears every custom text override so all labels return to their defaults.
+    /// </summary>
+    public void ResetText() => CustomText.Clear();
 
     /// <summary>
     /// Builds the dictionary key for a per-section value in the current layout mode.

@@ -136,6 +136,9 @@ Open with the **Settings** button or `/snazzyp4 config`. Settings are grouped in
   only the current mode's controls are shown.
 - **Colors** — recolour every element, with one-click **colourblind palette presets**
   (Deuteranopia / Protanopia / Tritanopia) as starting points you can fine-tune.
+- **Text** — rename any panel label, section header, resolution callout (spread/stack, gaze,
+  acceleration, chaos, Thunder/Blizzard) or button to your own custom text; blank keeps the
+  default.
 - **Layout** — show toolbar, detached windows, edit layout, Move All, floating **Hide** and
   **Reset** buttons, put **Acceleration on the same line** as Spread/Stack
   (`Spread on X and MOVE`), **combine the First and Second sets** into one panel (stacked or

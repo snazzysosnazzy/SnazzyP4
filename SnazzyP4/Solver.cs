@@ -296,15 +296,15 @@ public class Solver
 
         if (!labelsHidden)
         {
-            ImGui.TextUnformatted(OnSecondExdeath ? "2nd Exdeath" : "1st Exdeath");
+            ImGui.TextUnformatted(configuration.GetText(OnSecondExdeath ? TextLabels.ExdeathSecondHeader : TextLabels.ExdeathFirstHeader));
         }
 
         if (!labelsHidden)
         {
             var headerStartX = ImGui.GetCursorPosX();
-            ImGui.TextUnformatted("Real");
+            ImGui.TextUnformatted(configuration.GetText(TextLabels.RealColumnHeader));
             ImGui.SameLine(headerStartX + columnStride);
-            ImGui.TextUnformatted("Fake");
+            ImGui.TextUnformatted(configuration.GetText(TextLabels.FakeColumnHeader));
         }
 
         if (IconButton("##RealExdeath", "RealExdeath.png", exdeathEnabled, scale))
@@ -324,9 +324,9 @@ public class Solver
         if (!labelsHidden)
         {
             var headerStartX = ImGui.GetCursorPosX();
-            ImGui.TextUnformatted("SHORT");
+            ImGui.TextUnformatted(configuration.GetText(TextLabels.ShortColumnHeader));
             ImGui.SameLine(headerStartX + columnStride);
-            ImGui.TextUnformatted("LONG");
+            ImGui.TextUnformatted(configuration.GetText(TextLabels.LongColumnHeader));
         }
 
         DrawShortLongRow("Lightning.png", MechanicKind.Lightning, scale);
@@ -414,7 +414,7 @@ public class Solver
     /// </summary>
     public void DrawFirstSet(float scale)
     {
-        RenderLines(BuildSetPanel("< First Set >", true, firstExdeathPressed, firstExdeathReal, 0), SetAlignment.Left, 0f);
+        RenderLines(BuildSetPanel(configuration.GetText(TextLabels.FirstSetLabel), true, firstExdeathPressed, firstExdeathReal, 0), SetAlignment.Left, 0f);
     }
 
     /// <summary>
@@ -422,7 +422,7 @@ public class Solver
     /// </summary>
     public void DrawSecondSet(float scale)
     {
-        RenderLines(BuildSetPanel("< Second Set >", false, secondExdeathPressed, secondExdeathReal, 1), SetAlignment.Left, 0f);
+        RenderLines(BuildSetPanel(configuration.GetText(TextLabels.SecondSetLabel), false, secondExdeathPressed, secondExdeathReal, 1), SetAlignment.Left, 0f);
     }
 
     /// <summary>
@@ -431,8 +431,8 @@ public class Solver
     /// </summary>
     public void DrawCombinedSets(float scale)
     {
-        var firstLines = BuildSetPanel("< First Set >", true, firstExdeathPressed, firstExdeathReal, 0);
-        var secondLines = BuildSetPanel("< Second Set >", false, secondExdeathPressed, secondExdeathReal, 1);
+        var firstLines = BuildSetPanel(configuration.GetText(TextLabels.FirstSetLabel), true, firstExdeathPressed, firstExdeathReal, 0);
+        var secondLines = BuildSetPanel(configuration.GetText(TextLabels.SecondSetLabel), false, secondExdeathPressed, secondExdeathReal, 1);
         var fromCenter = configuration.CombineSetsExpandFromCenter;
 
         var dividerColor = ImGui.GetColorU32(configuration.CombineDividerColor);
@@ -512,14 +512,15 @@ public class Solver
 
         if (LayoutEditActive)
         {
-            lines.Add(BuildResolutionLine(true, "STAND STILL"));
+            var standStill = configuration.GetText(TextLabels.StandStill);
+            lines.Add(BuildResolutionLine(true, standStill));
             if (!configuration.AccelerationSameLine)
             {
-                lines.Add(new List<SetRun> { ColorRun("STAND STILL", AccelerationColor) });
+                lines.Add(new List<SetRun> { ColorRun(standStill, AccelerationColor) });
             }
 
-            lines.Add(new List<SetRun> { ColorRun("Gaze REAL / LOOK AWAY", GazeRealColor) });
-            lines.Add(new List<SetRun> { ColorRun("WATER DONUT", WaterColor) });
+            lines.Add(new List<SetRun> { ColorRun(configuration.GetText(TextLabels.GazeReal), GazeRealColor) });
+            lines.Add(new List<SetRun> { ColorRun(configuration.GetText(TextLabels.TsunamiReal), WaterColor) });
             return lines;
         }
 
@@ -539,7 +540,7 @@ public class Solver
             anyPick = true;
             if (selection.Kind == MechanicKind.Acceleration)
             {
-                accelerationText = MechanicText(selection.Kind, selection.IsReal);
+                accelerationText = configuration.GetText(selection.IsReal ? TextLabels.StandStill : TextLabels.Move);
             }
             else
             {
@@ -572,7 +573,7 @@ public class Solver
         {
             lines.Add(new List<SetRun>
             {
-                ColorRun(gazeReal ? "Gaze REAL / LOOK AWAY" : "Gaze FAKE / LOOK",
+                ColorRun(gazeReal ? configuration.GetText(TextLabels.GazeReal) : configuration.GetText(TextLabels.GazeFake),
                     gazeReal ? GazeRealColor : GazeFakeColor),
             });
         }
@@ -613,13 +614,13 @@ public class Solver
 
         var line = new List<SetRun>
         {
-            PlainRun(spread ? "Spread on " : "Stack on "),
+            PlainRun(configuration.GetText(spread ? TextLabels.SpreadPrefix : TextLabels.StackPrefix)),
             ColorRun(letter, color),
         };
 
         if (accelerationText != null && configuration.AccelerationSameLine)
         {
-            line.Add(PlainRun(" and "));
+            line.Add(PlainRun(configuration.GetText(TextLabels.AndJoiner)));
             line.Add(ColorRun(accelerationText, AccelerationColor));
         }
 
@@ -761,7 +762,7 @@ public class Solver
     {
         using (ImRaii.Disabled(LayoutEditActive))
         {
-            if (ImGui.Button("RESET", new Vector2(90, 34) * scale))
+            if (ImGui.Button(configuration.GetText(TextLabels.ResetButton), new Vector2(90, 34) * scale))
             {
                 ResetAll();
             }
@@ -775,7 +776,7 @@ public class Solver
     {
         using (ImRaii.Disabled(LayoutEditActive))
         {
-            if (ImGui.Button(configuration.Hidden ? "SHOW" : "HIDE", new Vector2(90, 34) * scale))
+            if (ImGui.Button(configuration.GetText(configuration.Hidden ? TextLabels.ShowButton : TextLabels.HideButton), new Vector2(90, 34) * scale))
             {
                 configuration.Hidden = !configuration.Hidden;
                 configuration.Save();
@@ -790,33 +791,33 @@ public class Solver
     {
         if (!configuration.EffectiveHideLabels(CurrentSection))
         {
-            ImGui.TextUnformatted("Chaos");
+            ImGui.TextUnformatted(configuration.GetText(TextLabels.ChaosHeader));
         }
 
         var enabled = chaosPressCount < 2;
 
         if (IconButton("##Inferno", "Inferno.png", enabled, scale))
         {
-            OnChaos("FIRE TWISTER", FireColor, "INFERNO REAL - TWISTER");
+            OnChaos(configuration.GetText(TextLabels.InfernoReal), FireColor, "INFERNO REAL - TWISTER");
         }
 
         ImGui.SameLine();
 
         if (IconButton("##FakeInferno", "FakeInferno.png", enabled, scale))
         {
-            OnChaos("FIRE DONUT", FireColor, "INFERNO FAKE - DONUT");
+            OnChaos(configuration.GetText(TextLabels.InfernoFake), FireColor, "INFERNO FAKE - DONUT");
         }
 
         if (IconButton("##Tsunami", "Tsunami.png", enabled, scale))
         {
-            OnChaos("WATER DONUT", WaterColor, "TSUNAMI REAL - DONUT");
+            OnChaos(configuration.GetText(TextLabels.TsunamiReal), WaterColor, "TSUNAMI REAL - DONUT");
         }
 
         ImGui.SameLine();
 
         if (IconButton("##FakeTsunami", "FakeTsunami.png", enabled, scale))
         {
-            OnChaos("WATER TWISTER", WaterColor, "TSUNAMI FAKE - TWISTER");
+            OnChaos(configuration.GetText(TextLabels.TsunamiFake), WaterColor, "TSUNAMI FAKE - TWISTER");
         }
     }
 
@@ -827,7 +828,7 @@ public class Solver
     {
         if (!configuration.EffectiveHideLabels(CurrentSection))
         {
-            ImGui.TextUnformatted("Kefka");
+            ImGui.TextUnformatted(configuration.GetText(TextLabels.KefkaButtonsHeader));
         }
 
         if (IconButton("##Thunder", "Thunder.png", true, scale))
@@ -876,19 +877,20 @@ public class Solver
         // During layout editing the header shows whenever the inline toggles are enabled so their column can be positioned.
         if (!labelsHidden)
         {
-            ImGui.TextUnformatted("< Kefka >");
+            ImGui.TextUnformatted(configuration.GetText(TextLabels.KefkaLabel));
             if (inlineToggles && (LayoutEditActive || thunderPressed || blizzardPressed))
             {
                 ImGui.SameLine(startX + toggleColumn);
-                ImGui.TextUnformatted("Last Fake?");
+                ImGui.TextUnformatted(configuration.GetText(TextLabels.LastFakeHeader));
             }
         }
 
         // While editing the layout, the panel shows sample lines and, when the inline toggles are enabled, the toggle buttons so they populate the panel and can be positioned.
         if (LayoutEditActive)
         {
-            DrawKefkaSampleLine("thunder", ref thunderLastFake, "THUNDER REAL", ThunderColor, startX, toggleColumn, inlineToggles);
-            DrawKefkaSampleLine("blizzard", ref blizzardLastFake, "BLIZZARD REAL", BlizzardColor, startX, toggleColumn, inlineToggles);
+            var real = configuration.GetText(TextLabels.RealWord);
+            DrawKefkaSampleLine("thunder", ref thunderLastFake, $"{configuration.GetText(TextLabels.ThunderName)} {real}", ThunderColor, startX, toggleColumn, inlineToggles);
+            DrawKefkaSampleLine("blizzard", ref blizzardLastFake, $"{configuration.GetText(TextLabels.BlizzardName)} {real}", BlizzardColor, startX, toggleColumn, inlineToggles);
             return;
         }
 
@@ -900,12 +902,12 @@ public class Solver
 
         if (thunderPressed)
         {
-            DrawKefkaLine("thunder", ref thunderLastFake, thunderReal, "THUNDER", ThunderColor, startX, toggleColumn, inlineToggles);
+            DrawKefkaLine("thunder", ref thunderLastFake, thunderReal, configuration.GetText(TextLabels.ThunderName), ThunderColor, startX, toggleColumn, inlineToggles);
         }
 
         if (blizzardPressed)
         {
-            DrawKefkaLine("blizzard", ref blizzardLastFake, blizzardReal, "BLIZZARD", BlizzardColor, startX, toggleColumn, inlineToggles);
+            DrawKefkaLine("blizzard", ref blizzardLastFake, blizzardReal, configuration.GetText(TextLabels.BlizzardName), BlizzardColor, startX, toggleColumn, inlineToggles);
         }
     }
 
@@ -917,7 +919,7 @@ public class Solver
         Vector4 color, float startX, float toggleColumn, bool drawToggleInline)
     {
         var effectiveReal = buttonReal ^ (configuration.ShowLastFake && lastFake);
-        ImGui.TextColored(color, $"{name} {(effectiveReal ? "REAL" : "FAKE")}");
+        ImGui.TextColored(color, $"{name} {configuration.GetText(effectiveReal ? TextLabels.RealWord : TextLabels.FakeWord)}");
         if (drawToggleInline)
         {
             ImGui.SameLine(startX + toggleColumn);
@@ -1022,13 +1024,13 @@ public class Solver
     /// </summary>
     public void DrawLastFakeToggles(float scale)
     {
-        DrawNamedToggle("thunder", ref thunderLastFake, "THUNDER");
+        DrawNamedToggle("thunder", ref thunderLastFake, configuration.GetText(TextLabels.ThunderName));
         if (configuration.ToggleButtonsHorizontal)
         {
             ImGui.SameLine();
         }
 
-        DrawNamedToggle("blizzard", ref blizzardLastFake, "BLIZZARD");
+        DrawNamedToggle("blizzard", ref blizzardLastFake, configuration.GetText(TextLabels.BlizzardName));
     }
 
     /// <summary>
@@ -1036,7 +1038,7 @@ public class Solver
     /// </summary>
     public void DrawLastFakeThunderToggle(float scale)
     {
-        DrawNamedToggle("thunder", ref thunderLastFake, "THUNDER");
+        DrawNamedToggle("thunder", ref thunderLastFake, configuration.GetText(TextLabels.ThunderName));
     }
 
     /// <summary>
@@ -1044,7 +1046,7 @@ public class Solver
     /// </summary>
     public void DrawLastFakeBlizzardToggle(float scale)
     {
-        DrawNamedToggle("blizzard", ref blizzardLastFake, "BLIZZARD");
+        DrawNamedToggle("blizzard", ref blizzardLastFake, configuration.GetText(TextLabels.BlizzardName));
     }
 
     /// <summary>
@@ -1264,13 +1266,13 @@ public class Solver
     /// Presses an Inferno button from a slash command, mirroring the real and fake icon buttons.
     /// </summary>
     public void CommandInferno(bool real) => OnChaos(
-        real ? "FIRE TWISTER" : "FIRE DONUT", FireColor, real ? "INFERNO REAL - TWISTER" : "INFERNO FAKE - DONUT");
+        configuration.GetText(real ? TextLabels.InfernoReal : TextLabels.InfernoFake), FireColor, real ? "INFERNO REAL - TWISTER" : "INFERNO FAKE - DONUT");
 
     /// <summary>
     /// Presses a Tsunami button from a slash command, mirroring the real and fake icon buttons.
     /// </summary>
     public void CommandTsunami(bool real) => OnChaos(
-        real ? "WATER DONUT" : "WATER TWISTER", WaterColor, real ? "TSUNAMI REAL - DONUT" : "TSUNAMI FAKE - TWISTER");
+        configuration.GetText(real ? TextLabels.TsunamiReal : TextLabels.TsunamiFake), WaterColor, real ? "TSUNAMI REAL - DONUT" : "TSUNAMI FAKE - TWISTER");
 
     /// <summary>
     /// Presses a Thunder button from a slash command, mirroring the real and fake icon buttons.

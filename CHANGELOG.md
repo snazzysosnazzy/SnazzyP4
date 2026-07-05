@@ -3,6 +3,13 @@
 All notable changes to Snazzy P4 are listed here. Versions match the `vX.Y.Z.W`
 release tags.
 
+## v1.0.0.12
+
+- **Custom text** — a new **Text** settings tab lets you rename every panel label,
+  section header, resolution callout (spread/stack, gaze, acceleration, chaos,
+  Thunder/Blizzard) and button to whatever text you want. Leave a field blank to
+  keep the default.
+
 ## v1.0.0.11
 
 - The chat announcements moved to their own **Chat** settings tab (renamed from

@@ -115,6 +115,14 @@ public class ConfigWindow : Window, IDisposable
             }
         }
 
+        using (var tab = ImRaii.TabItem("Text"))
+        {
+            if (tab)
+            {
+                DrawTextSettings();
+            }
+        }
+
         using (var tab = ImRaii.TabItem("Layout"))
         {
             if (tab)
@@ -879,6 +887,44 @@ public class ConfigWindow : Window, IDisposable
 
         ImGui.SameLine();
         ImGui.TextUnformatted(command);
+    }
+
+    /// <summary>
+    /// Draws the custom text editor, grouping each editable label with a field that falls back to its default when blank.
+    /// </summary>
+    private void DrawTextSettings()
+    {
+        ImGui.TextDisabled("Rename any label or callout. Leave a field blank to use the default.");
+        if (ImGui.Button("Reset all text to defaults"))
+        {
+            Configuration.ResetText();
+            Configuration.Save();
+        }
+
+        ImGui.Separator();
+
+        var group = string.Empty;
+        foreach (var (id, defaultValue, label, entryGroup) in TextLabels.Entries)
+        {
+            if (entryGroup != group)
+            {
+                group = entryGroup;
+                ImGui.Spacing();
+                ImGui.TextUnformatted(group);
+            }
+
+            var value = Configuration.GetRawText(id);
+            ImGui.SetNextItemWidth(240f);
+            if (ImGui.InputTextWithHint($"{label}##txt_{id}", defaultValue, ref value, 128))
+            {
+                Configuration.SetText(id, value);
+            }
+
+            if (ImGui.IsItemDeactivatedAfterEdit())
+            {
+                Configuration.Save();
+            }
+        }
     }
 
     /// <summary>
