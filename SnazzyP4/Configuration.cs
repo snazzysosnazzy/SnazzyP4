@@ -19,6 +19,12 @@ public class Configuration : IPluginConfiguration
     public int Version { get; set; } = 0;
 
     /// <summary>
+    /// The plugin version that last showed its update notice, used to decide whether to show the changelog after an update.
+    /// An empty value means the notice has never been shown.
+    /// </summary>
+    public string LastSeenVersion { get; set; } = string.Empty;
+
+    /// <summary>
     /// The user-facing scale multiplier applied on top of Dalamud's global scale.
     /// </summary>
     public float UiScale { get; set; } = 0.5f;
@@ -573,7 +579,7 @@ public class Configuration : IPluginConfiguration
         foreach (var property in typeof(Configuration).GetProperties(BindingFlags.Public | BindingFlags.Instance))
         {
             if (!property.CanRead || !property.CanWrite
-                || property.Name is nameof(Version) or nameof(EditMode) or nameof(MoveAllActive))
+                || property.Name is nameof(Version) or nameof(LastSeenVersion) or nameof(EditMode) or nameof(MoveAllActive))
             {
                 continue;
             }

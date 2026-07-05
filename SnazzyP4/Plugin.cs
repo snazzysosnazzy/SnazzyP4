@@ -100,6 +100,31 @@ public sealed class Plugin : IDalamudPlugin
     private ConfigWindow ConfigWindow { get; init; }
 
     /// <summary>
+    /// The changelog window opened from the settings title bar.
+    /// </summary>
+    private ChangelogWindow ChangelogWindow { get; init; }
+
+    /// <summary>
+    /// The one-time update notice window.
+    /// </summary>
+    private UpdateWindow UpdateWindow { get; init; }
+
+    /// <summary>
+    /// The plugin's assembly version, such as "1.0.0.13".
+    /// </summary>
+    public static string Version { get; } = typeof(Plugin).Assembly.GetName().Version?.ToString() ?? "0.0.0.0";
+
+    /// <summary>
+    /// The version the user was on before this update, captured when the update notice is first shown.
+    /// </summary>
+    public string UpdateFromVersion { get; private set; } = string.Empty;
+
+    /// <summary>
+    /// Whether the update-notice check has already run this session.
+    /// </summary>
+    private bool updateChecked;
+
+    /// <summary>
     /// The group move delta published for the current frame.
     /// It is applied one frame after being queued so the window draw order stays simple.
     /// </summary>
@@ -159,8 +184,12 @@ public sealed class Plugin : IDalamudPlugin
 
         MainWindow = new MainWindow(this);
         ConfigWindow = new ConfigWindow(this);
+        ChangelogWindow = new ChangelogWindow();
+        UpdateWindow = new UpdateWindow(this);
         WindowSystem.AddWindow(MainWindow);
         WindowSystem.AddWindow(ConfigWindow);
+        WindowSystem.AddWindow(ChangelogWindow);
+        WindowSystem.AddWindow(UpdateWindow);
 
         foreach (var section in Sections)
         {
@@ -414,6 +443,55 @@ public sealed class Plugin : IDalamudPlugin
     /// Toggles the settings window.
     /// </summary>
     public void ToggleConfigUi() => ConfigWindow.Toggle();
+
+    /// <summary>
+    /// Toggles the changelog window.
+    /// </summary>
+    public void ToggleChangelog() => ChangelogWindow.Toggle();
+
+    /// <summary>
+    /// Returns the changelog entries newer than the given version, or every entry when the version is empty.
+    /// </summary>
+    public Changelog.Entry[] ChangesSince(string from)
+    {
+        if (string.IsNullOrEmpty(from) || !System.Version.TryParse(from, out var fromVersion))
+        {
+            return Changelog.Entries;
+        }
+
+        var newer = new List<Changelog.Entry>();
+        foreach (var entry in Changelog.Entries)
+        {
+            if (System.Version.TryParse(entry.Version, out var entryVersion) && entryVersion > fromVersion)
+            {
+                newer.Add(entry);
+            }
+        }
+
+        return newer.ToArray();
+    }
+
+    /// <summary>
+    /// Shows the one-time update notice the first time the plugin is opened after updating, then records the version so it does not show again until the next update.
+    /// </summary>
+    public void MaybeShowUpdateNotice()
+    {
+        if (updateChecked)
+        {
+            return;
+        }
+
+        updateChecked = true;
+        if (Configuration.LastSeenVersion == Version)
+        {
+            return;
+        }
+
+        UpdateFromVersion = Configuration.LastSeenVersion;
+        Configuration.LastSeenVersion = Version;
+        Configuration.Save();
+        UpdateWindow.IsOpen = true;
+    }
 
     /// <summary>
     /// Toggles Edit Layout, keeping it mutually exclusive with Move All and running the shared enter and exit behaviour.

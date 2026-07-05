@@ -1,6 +1,7 @@
 using System;
 using System.Numerics;
 using Dalamud.Bindings.ImGui;
+using Dalamud.Interface;
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Interface.Windowing;
 
@@ -56,6 +57,15 @@ public class ConfigWindow : Window, IDisposable
                ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoCollapse)
     {
         this.plugin = plugin;
+
+        // A title-bar button opens the full changelog window; Dalamud title-bar buttons are icons, so it shows a changelog icon with a "Changelog" tooltip.
+        TitleBarButtons.Add(new TitleBarButton
+        {
+            Icon = FontAwesomeIcon.ClipboardList,
+            IconOffset = new Vector2(2f, 1f),
+            Click = _ => plugin.ToggleChangelog(),
+            ShowTooltip = () => ImGui.SetTooltip("Changelog"),
+        });
     }
 
     /// <summary>
@@ -236,6 +246,8 @@ public class ConfigWindow : Window, IDisposable
     private void DrawTitleAndCredit()
     {
         ImGui.TextUnformatted("Snazzy P4");
+        ImGui.SameLine();
+        ImGui.TextDisabled($"v{Plugin.Version}");
         var credit = "made by snazz";
         ImGui.SameLine();
         ImGui.SetCursorPosX(ImGui.GetContentRegionMax().X - ImGui.CalcTextSize(credit).X);

@@ -3,6 +3,15 @@
 All notable changes to Snazzy P4 are listed here. Versions match the `vX.Y.Z.W`
 release tags.
 
+## v1.0.0.14
+
+- **Update notice** — the first time you open the plugin after an update, a window
+  shows which version you came from, which you're on now, and a detailed changelog
+  of everything in between. Once per update only; closing dismisses it.
+- **Version in settings** — shown next to "Snazzy P4" at the top of the settings window.
+- **Changelog button** — the clipboard icon in the settings title bar opens the full,
+  detailed changelog for every version, browsable any time.
+
 ## v1.0.0.13
 
 - **Customisable auto-markers** — choose which head marker is placed for each

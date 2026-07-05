@@ -144,6 +144,7 @@ public class MainWindow : Window, IDisposable
     /// </summary>
     public override void Draw()
     {
+        plugin.MaybeShowUpdateNotice();
         ImGui.SetWindowFontScale(Configuration.UiScale);
         DrawToolbar();
 
