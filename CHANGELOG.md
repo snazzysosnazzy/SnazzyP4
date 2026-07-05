@@ -3,6 +3,16 @@
 All notable changes to Snazzy P4 are listed here. Versions match the `vX.Y.Z.W`
 release tags.
 
+## v1.0.0.19
+
+- **Static Chaos sets** — Inferno always resolves in the **First Set** and Tsunami always in
+  the **Second Set**, regardless of press order.
+- **One press each** — the Inferno and Tsunami buttons each **disable after being pressed**
+  until the next Reset, so the same mechanic can't be entered twice.
+- **No more 1st/2nd on Chaos** — the set-number labelling is dropped from Inferno/Tsunami.
+  Default Chaos announcement messages no longer carry a set number, and the Chaos
+  announcement sections are now named **Inferno** and **Tsunami** instead of First/Second set.
+
 ## v1.0.0.18
 
 - **Floating Undo button** — the Undo button can now float as its own panel like Hide and

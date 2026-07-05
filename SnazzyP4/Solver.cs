@@ -89,8 +89,8 @@ public class Solver
         bool SecondExdeathPressed,
         Phase Phase,
         List<Selection> Selections,
-        List<(string Text, Vector4 Color)> ChaosResolutions,
-        int ChaosPressCount,
+        (string Text, Vector4 Color)? FirstSetChaos,
+        (string Text, Vector4 Color)? SecondSetChaos,
         bool ThunderPressed,
         bool ThunderReal,
         bool ThunderLastFake,
@@ -111,9 +111,14 @@ public class Solver
     private readonly List<Selection> selections = new();
 
     /// <summary>
-    /// The chaos twister resolutions in press order, each with its display colour.
+    /// The First Set chaos resolution and its colour. Inferno always resolves in the first set, so this holds the Inferno press.
     /// </summary>
-    private readonly List<(string Text, Vector4 Color)> chaosResolutions = new();
+    private (string Text, Vector4 Color)? firstSetChaos;
+
+    /// <summary>
+    /// The Second Set chaos resolution and its colour. Tsunami always resolves in the second set, so this holds the Tsunami press.
+    /// </summary>
+    private (string Text, Vector4 Color)? secondSetChaos;
 
     /// <summary>
     /// The stack of pre-press state snapshots, newest on top, used by <see cref="Undo"/> to step back one button press at a time.
@@ -144,11 +149,6 @@ public class Solver
     /// Whether the second Exdeath button has been pressed.
     /// </summary>
     private bool secondExdeathPressed;
-
-    /// <summary>
-    /// How many chaos buttons have been pressed, capped at two.
-    /// </summary>
-    private int chaosPressCount;
 
     /// <summary>
     /// Whether a Thunder or Fake Thunder button has been pressed.
@@ -295,7 +295,7 @@ public class Solver
     /// </summary>
     private bool SetHasContent(bool isShort, bool gazeKnown, int chaosIndex)
     {
-        if (phase == Phase.Done || gazeKnown || chaosIndex < chaosResolutions.Count)
+        if (phase == Phase.Done || gazeKnown || ChaosForSet(chaosIndex).HasValue)
         {
             return true;
         }
@@ -605,19 +605,24 @@ public class Solver
             });
         }
 
-        if (chaosIndex < chaosResolutions.Count)
+        var chaos = ChaosForSet(chaosIndex);
+        if (chaos.HasValue)
         {
-            var (chaosText, chaosColor) = chaosResolutions[chaosIndex];
-            lines.Add(new List<SetRun> { ColorRun(chaosText, chaosColor) });
+            lines.Add(new List<SetRun> { ColorRun(chaos.Value.Text, chaos.Value.Color) });
         }
 
-        if (!anyPick && !gazeKnown && !complete && chaosIndex >= chaosResolutions.Count)
+        if (!anyPick && !gazeKnown && !complete && !chaos.HasValue)
         {
             lines.Add(new List<SetRun> { DisabledRun("--") });
         }
 
         return lines;
     }
+
+    /// <summary>
+    /// Returns the chaos resolution for a set: index 0 is the first set (Inferno), index 1 is the second set (Tsunami).
+    /// </summary>
+    private (string Text, Vector4 Color)? ChaosForSet(int chaosIndex) => chaosIndex == 0 ? firstSetChaos : secondSetChaos;
 
     /// <summary>
     /// Builds one spread or stack body line with the role-based target letter, appending the Acceleration word when it shares the line.
@@ -848,28 +853,30 @@ public class Solver
             ImGui.TextUnformatted(configuration.GetText(TextLabels.ChaosHeader));
         }
 
-        var enabled = chaosPressCount < 2;
+        // Inferno and Tsunami each resolve once per pull, so each pair disables after it is pressed until the next reset.
+        var infernoEnabled = !firstSetChaos.HasValue;
+        var tsunamiEnabled = !secondSetChaos.HasValue;
 
-        if (IconButton("##Inferno", "Inferno.png", enabled, scale))
+        if (IconButton("##Inferno", "Inferno.png", infernoEnabled, scale))
         {
             OnChaos(configuration.GetText(TextLabels.InfernoReal), FireColor, "inferno", true);
         }
 
         ImGui.SameLine();
 
-        if (IconButton("##FakeInferno", "FakeInferno.png", enabled, scale))
+        if (IconButton("##FakeInferno", "FakeInferno.png", infernoEnabled, scale))
         {
             OnChaos(configuration.GetText(TextLabels.InfernoFake), FireColor, "inferno", false);
         }
 
-        if (IconButton("##Tsunami", "Tsunami.png", enabled, scale))
+        if (IconButton("##Tsunami", "Tsunami.png", tsunamiEnabled, scale))
         {
             OnChaos(configuration.GetText(TextLabels.TsunamiReal), WaterColor, "tsunami", true);
         }
 
         ImGui.SameLine();
 
-        if (IconButton("##FakeTsunami", "FakeTsunami.png", enabled, scale))
+        if (IconButton("##FakeTsunami", "FakeTsunami.png", tsunamiEnabled, scale))
         {
             OnChaos(configuration.GetText(TextLabels.TsunamiFake), WaterColor, "tsunami", false);
         }
@@ -1267,8 +1274,8 @@ public class Solver
             secondExdeathPressed,
             phase,
             new List<Selection>(selections),
-            new List<(string Text, Vector4 Color)>(chaosResolutions),
-            chaosPressCount,
+            firstSetChaos,
+            secondSetChaos,
             thunderPressed,
             thunderReal,
             thunderLastFake,
@@ -1300,9 +1307,8 @@ public class Solver
         selections.Clear();
         selections.AddRange(snapshot.Selections);
 
-        chaosResolutions.Clear();
-        chaosResolutions.AddRange(snapshot.ChaosResolutions);
-        chaosPressCount = snapshot.ChaosPressCount;
+        firstSetChaos = snapshot.FirstSetChaos;
+        secondSetChaos = snapshot.SecondSetChaos;
 
         thunderPressed = snapshot.ThunderPressed;
         thunderReal = snapshot.ThunderReal;
@@ -1340,20 +1346,28 @@ public class Solver
     }
 
     /// <summary>
-    /// Records a chaos twister press and fires the Chaos announcements for that set, real/fake and pressed mechanic.
+    /// Records a chaos twister press and fires the Chaos announcements for that mechanic and real/fake.
+    /// Inferno always resolves in the first set and Tsunami in the second; each ignores further presses until reset.
     /// </summary>
     private void OnChaos(string text, Vector4 color, string slotId, bool isReal)
     {
-        if (chaosPressCount >= 2)
+        var isInferno = slotId == "inferno";
+        if (isInferno ? firstSetChaos.HasValue : secondSetChaos.HasValue)
         {
             return;
         }
 
         PushUndo();
-        var first = chaosPressCount == 0;
-        chaosResolutions.Add((text, color));
-        chaosPressCount++;
-        FireAnnouncements(ActiveChaos, "chaos", first, isReal, slotId);
+        if (isInferno)
+        {
+            firstSetChaos = (text, color);
+        }
+        else
+        {
+            secondSetChaos = (text, color);
+        }
+
+        FireAnnouncements(ActiveChaos, "chaos", isInferno, isReal, slotId);
     }
 
     /// <summary>
@@ -1455,8 +1469,8 @@ public class Solver
         phase = Phase.WaitFirstExdeath;
         selections.Clear();
 
-        chaosResolutions.Clear();
-        chaosPressCount = 0;
+        firstSetChaos = null;
+        secondSetChaos = null;
 
         thunderPressed = false;
         thunderReal = false;

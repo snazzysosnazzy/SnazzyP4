@@ -89,8 +89,11 @@ public static class AnnouncementData
     /// <summary>The ordered Exdeath announcement slot ids (the built-in title plus the four mechanics).</summary>
     public static readonly string[] ExdeathSlots = { "title", "gaze", "spread", "drop", "accel" };
 
-    /// <summary>The ordered Chaos announcement slot ids (the built-in title plus the two mechanics).</summary>
-    public static readonly string[] ChaosSlots = { "title", "inferno", "tsunami" };
+    /// <summary>The ordered Chaos announcement slot ids for the first set, which always resolves Inferno.</summary>
+    public static readonly string[] ChaosFirstSlots = { "title", "inferno" };
+
+    /// <summary>The ordered Chaos announcement slot ids for the second set, which always resolves Tsunami.</summary>
+    public static readonly string[] ChaosSecondSlots = { "title", "tsunami" };
 
     /// <summary>
     /// Returns the display label for a slot id.
@@ -126,9 +129,10 @@ public static class AnnouncementData
         var set = isFirst ? "1st" : "2nd";
         if (slotId == "title")
         {
+            // Chaos sets are static (Inferno first, Tsunami second), so the title names the mechanic rather than a set number.
             return categoryId == "exdeath"
                 ? $"---------- {set} Set ----------"
-                : $"---------- {set} Chaos ----------";
+                : (isFirst ? "---------- Inferno ----------" : "---------- Tsunami ----------");
         }
 
         if (categoryId == "exdeath")
@@ -145,8 +149,8 @@ public static class AnnouncementData
 
         return slotId switch
         {
-            "inferno" => isReal ? $"{set} Inferno REAL - twister (get out)" : $"{set} Inferno FAKE - donut (get in)",
-            "tsunami" => isReal ? $"{set} Tsunami REAL - donut (get in)" : $"{set} Tsunami FAKE - twister (get out)",
+            "inferno" => isReal ? "Inferno REAL - twister (get out)" : "Inferno FAKE - donut (get in)",
+            "tsunami" => isReal ? "Tsunami REAL - donut (get in)" : "Tsunami FAKE - twister (get out)",
             _ => string.Empty,
         };
     }

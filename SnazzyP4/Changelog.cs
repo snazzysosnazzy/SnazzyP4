@@ -18,6 +18,12 @@ public static class Changelog
     /// </summary>
     public static readonly Entry[] Entries =
     {
+        new("1.0.0.19", new[]
+        {
+            "Chaos resolutions are now static: Inferno always resolves in the First Set and Tsunami always in the Second Set, no matter which you press first.",
+            "The Inferno and Tsunami buttons each disable after you press them, until the next Reset - so you can no longer double-enter the same mechanic.",
+            "Removed the 1st/2nd labelling from Inferno and Tsunami, since their sets are fixed. Default Chaos announcement messages no longer carry a set number, and the Chaos announcement sections are now named \"Inferno\" and \"Tsunami\" instead of \"First set\" / \"Second set\".",
+        }),
         new("1.0.0.18", new[]
         {
             "The Undo button can now float as its own panel, just like Hide and Reset. A new \"Floating Undo button\" setting sits next to the Floating Hide/Reset options, and all three float by default (turn one off to dock that button back onto the toolbar).",

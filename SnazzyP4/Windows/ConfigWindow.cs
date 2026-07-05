@@ -454,8 +454,8 @@ public class ConfigWindow : Window, IDisposable
         ImGui.Separator();
 
         var announcements = Configuration.GetAnnouncements(Configuration.AnnouncementChannel);
-        DrawAnnounceCategory("Announce Exdeath", announcements.Exdeath, "exdeath", AnnouncementData.ExdeathSlots);
-        DrawAnnounceCategory("Announce Chaos", announcements.Chaos, "chaos", AnnouncementData.ChaosSlots);
+        DrawAnnounceCategory("Announce Exdeath", announcements.Exdeath, "exdeath");
+        DrawAnnounceCategory("Announce Chaos", announcements.Chaos, "chaos");
     }
 
     /// <summary>
@@ -490,7 +490,7 @@ public class ConfigWindow : Window, IDisposable
     /// <summary>
     /// Draws one announce category (Exdeath or Chaos): its mode toggle and the first/second set sections.
     /// </summary>
-    private void DrawAnnounceCategory(string label, AnnouncementCategory category, string categoryId, string[] slotIds)
+    private void DrawAnnounceCategory(string label, AnnouncementCategory category, string categoryId)
     {
         if (!ImGui.CollapsingHeader($"{label}##cat_{categoryId}"))
         {
@@ -513,8 +513,18 @@ public class ConfigWindow : Window, IDisposable
             Configuration.Save();
         }
 
-        DrawSetSection("First set", category, true, categoryId, slotIds);
-        DrawSetSection("Second set", category, false, categoryId, slotIds);
+        if (categoryId == "chaos")
+        {
+            // Chaos sets are static: Inferno always resolves first, Tsunami always second, so the sections are named by mechanic.
+            DrawSetSection("Inferno", category, true, categoryId, AnnouncementData.ChaosFirstSlots);
+            DrawSetSection("Tsunami", category, false, categoryId, AnnouncementData.ChaosSecondSlots);
+        }
+        else
+        {
+            DrawSetSection("First set", category, true, categoryId, AnnouncementData.ExdeathSlots);
+            DrawSetSection("Second set", category, false, categoryId, AnnouncementData.ExdeathSlots);
+        }
+
         ImGui.Unindent();
     }
 
