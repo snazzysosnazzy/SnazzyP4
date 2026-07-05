@@ -137,39 +137,44 @@ public class Configuration : IPluginConfiguration
     public bool ToggleButtonsIndividualPanels { get; set; }
 
     /// <summary>
-    /// Whether gaze resolutions are announced in party chat.
+    /// Whether the Last Fake ANNOUNCE button is shown, which announces the current Kefka text to a chat channel.
     /// </summary>
-    public bool PartyGazeEnabled { get; set; }
+    public bool LastFakeAnnounceEnabled { get; set; }
 
     /// <summary>
-    /// Whether the custom gaze message is sent instead of the default one.
+    /// Whether the ANNOUNCE button is docked inside the Kefka text panel rather than floating as its own button.
     /// </summary>
-    public bool PartyGazeCustom { get; set; }
+    public bool LastFakeAnnounceDocked { get; set; }
 
     /// <summary>
-    /// The custom party message sent when a gaze is determined.
+    /// The chat channel the Last Fake ANNOUNCE button sends to.
     /// </summary>
-    public string PartyGazeCustomText { get; set; } = string.Empty;
+    public string LastFakeAnnounceChannel { get; set; } = "/p";
 
     /// <summary>
-    /// Whether chaos resolutions are announced in party chat.
+    /// The message sent by the ANNOUNCE button, where {KefkaThunder} and {KefkaBlizzard} are replaced with the current values.
     /// </summary>
-    public bool PartyChaosEnabled { get; set; }
+    public string LastFakeAnnounceMessage { get; set; } = "Thunder: {KefkaThunder}  Blizzard: {KefkaBlizzard}";
 
     /// <summary>
-    /// Whether the custom chaos message is sent instead of the default one.
+    /// The text {KefkaThunder} and {KefkaBlizzard} resolve to when that mechanic is currently real.
     /// </summary>
-    public bool PartyChaosCustom { get; set; }
+    public string LastFakeAnnounceRealText { get; set; } = "REAL";
 
     /// <summary>
-    /// The custom party message sent when a chaos twister is determined.
+    /// The text {KefkaThunder} and {KefkaBlizzard} resolve to when that mechanic is currently fake.
     /// </summary>
-    public string PartyChaosCustomText { get; set; } = string.Empty;
+    public string LastFakeAnnounceFakeText { get; set; } = "FAKE";
 
     /// <summary>
-    /// The chat command prefix used for the gaze and chaos announcements, such as "/p" for party or "/echo" for a self-only test.
+    /// The chat channel currently selected in the Chat tab, whose announcement configuration is edited and fired.
     /// </summary>
-    public string PartyChatChannel { get; set; } = "/p";
+    public string AnnouncementChannel { get; set; } = "/p";
+
+    /// <summary>
+    /// The per-channel Exdeath and Chaos announcement configuration, keyed by chat command prefix such as "/p".
+    /// </summary>
+    public Dictionary<string, ChannelAnnouncements> Announcements { get; set; } = new();
 
     /// <summary>
     /// Whether each section is drawn as its own floating window instead of inside the single hub window.
@@ -453,6 +458,20 @@ public class Configuration : IPluginConfiguration
     /// Clears every custom text override so all labels return to their defaults.
     /// </summary>
     public void ResetText() => CustomText.Clear();
+
+    /// <summary>
+    /// Gets the announcement configuration for a chat channel, creating an empty one on first use.
+    /// </summary>
+    public ChannelAnnouncements GetAnnouncements(string channel)
+    {
+        if (!Announcements.TryGetValue(channel, out var channelAnnouncements))
+        {
+            channelAnnouncements = new ChannelAnnouncements();
+            Announcements[channel] = channelAnnouncements;
+        }
+
+        return channelAnnouncements;
+    }
 
     /// <summary>
     /// Builds the dictionary key for a per-section value in the current layout mode.

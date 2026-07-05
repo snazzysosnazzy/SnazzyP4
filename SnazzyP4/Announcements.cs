@@ -1,0 +1,153 @@
+using System;
+using System.Collections.Generic;
+
+namespace SnazzyP4;
+
+/// <summary>
+/// One announcement within an ordered-mode leaf, such as "Announce Gaze".
+/// It carries its enabled state, its position in the list and, optionally, one or more custom messages.
+/// </summary>
+public class AnnouncementSlot
+{
+    /// <summary>The slot id, such as "gaze" or "inferno".</summary>
+    public string Id { get; set; } = string.Empty;
+
+    /// <summary>Whether this announcement is sent when its trigger fires.</summary>
+    public bool Enabled { get; set; }
+
+    /// <summary>Whether the custom messages are used instead of the default message.</summary>
+    public bool UseCustomMessage { get; set; }
+
+    /// <summary>The custom messages, sent in order; empty entries are ignored.</summary>
+    public List<string> Messages { get; set; } = new();
+}
+
+/// <summary>
+/// The announcement configuration for one (set, real/fake) combination.
+/// Ordered mode uses the slot list; simple mode uses the multi-line text.
+/// </summary>
+public class AnnouncementLeaf
+{
+    /// <summary>The ordered, reorderable announcement slots.</summary>
+    public List<AnnouncementSlot> Slots { get; set; } = new();
+
+    /// <summary>The simple-mode text, one chat message per non-empty line.</summary>
+    public string SimpleText { get; set; } = string.Empty;
+}
+
+/// <summary>
+/// The announcement configuration for one category (Exdeath or Chaos), split into first/second set and real/fake.
+/// </summary>
+public class AnnouncementCategory
+{
+    /// <summary>Whether the category uses ordered-list mode; otherwise simple text-box mode.</summary>
+    public bool Ordered { get; set; } = true;
+
+    /// <summary>The first set, real branch.</summary>
+    public AnnouncementLeaf FirstReal { get; set; } = new();
+
+    /// <summary>The first set, fake branch.</summary>
+    public AnnouncementLeaf FirstFake { get; set; } = new();
+
+    /// <summary>The second set, real branch.</summary>
+    public AnnouncementLeaf SecondReal { get; set; } = new();
+
+    /// <summary>The second set, fake branch.</summary>
+    public AnnouncementLeaf SecondFake { get; set; } = new();
+
+    /// <summary>
+    /// Returns the leaf for a set and real/fake combination.
+    /// </summary>
+    public AnnouncementLeaf GetLeaf(bool isFirst, bool isReal)
+        => isFirst ? (isReal ? FirstReal : FirstFake) : (isReal ? SecondReal : SecondFake);
+}
+
+/// <summary>
+/// The complete announcement configuration for one chat channel.
+/// </summary>
+public class ChannelAnnouncements
+{
+    /// <summary>The Exdeath announcements.</summary>
+    public AnnouncementCategory Exdeath { get; set; } = new();
+
+    /// <summary>The Chaos announcements.</summary>
+    public AnnouncementCategory Chaos { get; set; } = new();
+}
+
+/// <summary>
+/// Shared data for the announcement system: the slot ids per category, their labels and the generated default messages.
+/// </summary>
+public static class AnnouncementData
+{
+    /// <summary>The ordered Exdeath announcement slot ids.</summary>
+    public static readonly string[] ExdeathSlots = { "gaze", "spread", "drop", "accel" };
+
+    /// <summary>The ordered Chaos announcement slot ids.</summary>
+    public static readonly string[] ChaosSlots = { "inferno", "tsunami" };
+
+    /// <summary>
+    /// Returns the display label for a slot id.
+    /// </summary>
+    public static string SlotLabel(string id) => id switch
+    {
+        "gaze" => "Gaze",
+        "spread" => "Spread",
+        "drop" => "Water Drop",
+        "accel" => "Acceleration",
+        "inferno" => "Inferno",
+        "tsunami" => "Tsunami",
+        _ => id,
+    };
+
+    /// <summary>
+    /// Returns the generated default message for a slot in a given set and real/fake branch.
+    /// </summary>
+    public static string DefaultMessage(string categoryId, string slotId, bool isFirst, bool isReal)
+    {
+        var set = isFirst ? "1st" : "2nd";
+        if (categoryId == "exdeath")
+        {
+            return slotId switch
+            {
+                "gaze" => isReal ? $"{set} Gaze REAL - look away" : $"{set} Gaze FAKE - look",
+                "spread" => $"{set} Spread",
+                "drop" => $"{set} Water Drop",
+                "accel" => isReal ? $"{set} Acceleration - stand still" : $"{set} Acceleration - move",
+                _ => string.Empty,
+            };
+        }
+
+        return slotId switch
+        {
+            "inferno" => isReal ? $"{set} Inferno REAL - twister (get out)" : $"{set} Inferno FAKE - donut (get in)",
+            "tsunami" => isReal ? $"{set} Tsunami REAL - donut (get in)" : $"{set} Tsunami FAKE - twister (get out)",
+            _ => string.Empty,
+        };
+    }
+
+    /// <summary>
+    /// Ensures a leaf contains exactly the slots for its category, adding any that are missing and removing any that no longer apply, while preserving the existing order and state.
+    /// </summary>
+    public static void EnsureSlots(AnnouncementLeaf leaf, string[] slotIds)
+    {
+        foreach (var id in slotIds)
+        {
+            var exists = false;
+            foreach (var slot in leaf.Slots)
+            {
+                if (slot.Id == id)
+                {
+                    exists = true;
+                    break;
+                }
+            }
+
+            if (!exists)
+            {
+                leaf.Slots.Add(new AnnouncementSlot { Id = id });
+            }
+        }
+
+        leaf.Slots.RemoveAll(slot => Array.IndexOf(slotIds, slot.Id) < 0);
+    }
+}

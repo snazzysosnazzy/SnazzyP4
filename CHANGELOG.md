@@ -3,6 +3,19 @@
 All notable changes to Snazzy P4 are listed here. Versions match the `vX.Y.Z.W`
 release tags.
 
+## v1.0.0.15
+
+- **Extended chat announcements** — the Chat tab replaces the old Gaze/Chaos toggles
+  with a full system. **Announce Exdeath** fires on an Exdeath Real/Fake press,
+  **Announce Chaos** on a chaos press, each organised by First/Second set and Real/Fake.
+  Two modes: **ordered list** (reorderable per-mechanic toggles, each with an
+  "Enable custom message" and a reorderable `+`/`-` list of messages) and **simple text
+  box** (one message per line). Settings are **per channel**; a **Copy settings to...**
+  clones one channel's setup to another. Default messages are generated.
+- **Last Fake ANNOUNCE** (Hidden tab) — an **ANNOUNCE** button (floating or dockable to the
+  Kefka panel) posts the current Kefka values to a channel. Use `{KefkaThunder}` /
+  `{KefkaBlizzard}` in the message (current value, REAL/FAKE customisable, `?` if unpressed).
+
 ## v1.0.0.14
 
 - **Update notice** — the first time you open the plugin after an update, a window

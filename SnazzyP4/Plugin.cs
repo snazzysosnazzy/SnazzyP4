@@ -178,6 +178,7 @@ public sealed class Plugin : IDalamudPlugin
             new("LastFakeToggles", "Last Fake toggles", new Vector2(560, 360), Solver.DrawLastFakeToggles, HasButtons: true),
             new("LastFakeThunder", "Last Fake (Thunder)", new Vector2(560, 360), Solver.DrawLastFakeThunderToggle, HasButtons: true),
             new("LastFakeBlizzard", "Last Fake (Blizzard)", new Vector2(700, 360), Solver.DrawLastFakeBlizzardToggle, HasButtons: true),
+            new("AnnounceLastFake", "Announce Last Fake button", new Vector2(700, 300), Solver.DrawAnnounceLastFakeButton, HasButtons: true),
             new("Reset", "Reset button", new Vector2(560, 430), Solver.DrawReset, HasButtons: true),
             new("Hide", "Hide / Show", new Vector2(460, 430), Solver.DrawHideToggle, HasButtons: true),
         };
@@ -586,6 +587,8 @@ public sealed class Plugin : IDalamudPlugin
                                  && !Configuration.ToggleButtonsIndividualPanels,
             "LastFakeThunder" or "LastFakeBlizzard" => Configuration.ShowLastFake && Configuration.DetachToggleButtons
                                  && Configuration.ToggleButtonsIndividualPanels,
+            "AnnounceLastFake" => Configuration.ShowLastFake && Configuration.LastFakeAnnounceEnabled
+                                 && !Configuration.LastFakeAnnounceDocked,
             "FirstSet" or "SecondSet" => !Configuration.CombineSets,
             "CombinedSets" => Configuration.CombineSets,
             _ => true,

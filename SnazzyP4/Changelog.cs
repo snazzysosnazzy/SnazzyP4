@@ -18,6 +18,13 @@ public static class Changelog
     /// </summary>
     public static readonly Entry[] Entries =
     {
+        new("1.0.0.15", new[]
+        {
+            "Extended chat announcements (Chat tab): the old \"Announce Gaze / Chaos\" toggles are replaced with a full announcement system. \"Announce Exdeath\" fires the moment you press an Exdeath Real/Fake button; \"Announce Chaos\" fires when you press a chaos button. Each is organised into First/Second set and then Real/Fake.",
+            "Two modes per category. Ordered list: a reorderable list of per-mechanic toggles (Gaze, Spread, Water Drop, Acceleration for Exdeath; Inferno, Tsunami for Chaos). Enable the ones you want; the order is the send order. Expand a toggle's Message settings for \"Enable custom message\" and a reorderable list of message boxes you can grow with + and shrink with - (blank boxes are skipped). Exdeath sends every enabled toggle; Chaos sends only the mechanic you pressed. Simple text box: one growing box per set/real-fake, one chat message per non-empty line.",
+            "Announcements are stored per channel. Pick the active channel at the top of the Chat tab; only that channel is sent to. \"Copy settings to...\" clones the current channel's setup to another channel. Sensible default messages are generated for every announcement.",
+            "Last Fake ANNOUNCE (Hidden tab, once Last Fake is unlocked): \"Announce Last Fake\" adds an ANNOUNCE button (floating by default, or dockable to the Kefka text panel) that posts the current Kefka values to a channel of your choice. Put {KefkaThunder} and {KefkaBlizzard} in your message and they become the current value (REAL/FAKE by default, both customisable; \"?\" if that mechanic has not been pressed).",
+        }),
         new("1.0.0.14", new[]
         {
             "Update notice: the first time you open the plugin after updating, a window pops up telling you which version you came from, which version you are now on, and a detailed list of everything that changed in between. It only appears once per update (not every time you log in), and closing it dismisses it until the next update.",

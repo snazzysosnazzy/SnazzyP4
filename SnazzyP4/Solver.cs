@@ -811,26 +811,26 @@ public class Solver
 
         if (IconButton("##Inferno", "Inferno.png", enabled, scale))
         {
-            OnChaos(configuration.GetText(TextLabels.InfernoReal), FireColor, "INFERNO REAL - TWISTER");
+            OnChaos(configuration.GetText(TextLabels.InfernoReal), FireColor, "inferno", true);
         }
 
         ImGui.SameLine();
 
         if (IconButton("##FakeInferno", "FakeInferno.png", enabled, scale))
         {
-            OnChaos(configuration.GetText(TextLabels.InfernoFake), FireColor, "INFERNO FAKE - DONUT");
+            OnChaos(configuration.GetText(TextLabels.InfernoFake), FireColor, "inferno", false);
         }
 
         if (IconButton("##Tsunami", "Tsunami.png", enabled, scale))
         {
-            OnChaos(configuration.GetText(TextLabels.TsunamiReal), WaterColor, "TSUNAMI REAL - DONUT");
+            OnChaos(configuration.GetText(TextLabels.TsunamiReal), WaterColor, "tsunami", true);
         }
 
         ImGui.SameLine();
 
         if (IconButton("##FakeTsunami", "FakeTsunami.png", enabled, scale))
         {
-            OnChaos(configuration.GetText(TextLabels.TsunamiFake), WaterColor, "TSUNAMI FAKE - TWISTER");
+            OnChaos(configuration.GetText(TextLabels.TsunamiFake), WaterColor, "tsunami", false);
         }
     }
 
@@ -898,6 +898,11 @@ public class Solver
             }
         }
 
+        if (configuration.ShowLastFake && configuration.LastFakeAnnounceEnabled && configuration.LastFakeAnnounceDocked)
+        {
+            DrawAnnounceLastFakeButton(scale);
+        }
+
         // While editing the layout, the panel shows sample lines and, when the inline toggles are enabled, the toggle buttons so they populate the panel and can be positioned.
         if (LayoutEditActive)
         {
@@ -953,6 +958,43 @@ public class Solver
             DrawToggle(ref lastFake, idSuffix);
         }
     }
+
+    /// <summary>
+    /// Draws the Last Fake ANNOUNCE button, which sends the current Kefka values to the configured channel.
+    /// </summary>
+    public void DrawAnnounceLastFakeButton(float scale)
+    {
+        using (ImRaii.Disabled(LayoutEditActive))
+        {
+            if (ImGui.Button("ANNOUNCE", new Vector2(100, 34) * scale))
+            {
+                AnnounceLastFake();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Sends the Last Fake announcement, replacing the {KefkaThunder} and {KefkaBlizzard} macros with their current values.
+    /// </summary>
+    private void AnnounceLastFake()
+    {
+        var thunder = KefkaMacroValue(thunderPressed, thunderReal ^ (configuration.ShowLastFake && thunderLastFake));
+        var blizzard = KefkaMacroValue(blizzardPressed, blizzardReal ^ (configuration.ShowLastFake && blizzardLastFake));
+        var message = configuration.LastFakeAnnounceMessage
+            .Replace("{KefkaThunder}", thunder)
+            .Replace("{KefkaBlizzard}", blizzard);
+
+        if (!string.IsNullOrWhiteSpace(message))
+        {
+            Plugin.ExecuteGameCommand($"{configuration.LastFakeAnnounceChannel} {message.Trim()}");
+        }
+    }
+
+    /// <summary>
+    /// Resolves a Kefka macro to its current text, using a question mark when that mechanic has not been pressed.
+    /// </summary>
+    private string KefkaMacroValue(bool pressed, bool effectiveReal)
+        => !pressed ? "?" : (effectiveReal ? configuration.LastFakeAnnounceRealText : configuration.LastFakeAnnounceFakeText);
 
     /// <summary>
     /// Draws a Last Fake toggle.
@@ -1097,7 +1139,7 @@ public class Solver
     }
 
     /// <summary>
-    /// Advances the sequence when an Exdeath button is pressed and announces the gaze.
+    /// Advances the sequence when an Exdeath button is pressed and fires the Exdeath announcements for that set and real/fake.
     /// </summary>
     private void OnExdeath(bool real)
     {
@@ -1106,14 +1148,14 @@ public class Solver
             firstExdeathReal = real;
             firstExdeathPressed = true;
             phase = Phase.WaitFirstShortLong;
-            SendGazeMessage(true, real);
+            FireAnnouncements(ActiveExdeath, "exdeath", true, real, null);
         }
         else if (phase == Phase.WaitSecondExdeath)
         {
             secondExdeathReal = real;
             secondExdeathPressed = true;
             phase = Phase.WaitSecondShortLong;
-            SendGazeMessage(false, real);
+            FireAnnouncements(ActiveExdeath, "exdeath", false, real, null);
         }
     }
 
@@ -1141,9 +1183,9 @@ public class Solver
     }
 
     /// <summary>
-    /// Records a chaos twister press and announces it.
+    /// Records a chaos twister press and fires the Chaos announcements for that set, real/fake and pressed mechanic.
     /// </summary>
-    private void OnChaos(string text, Vector4 color, string partyBody)
+    private void OnChaos(string text, Vector4 color, string slotId, bool isReal)
     {
         if (chaosPressCount >= 2)
         {
@@ -1153,53 +1195,70 @@ public class Solver
         var first = chaosPressCount == 0;
         chaosResolutions.Add((text, color));
         chaosPressCount++;
-        SendChaosMessage(first, partyBody);
+        FireAnnouncements(ActiveChaos, "chaos", first, isReal, slotId);
     }
 
     /// <summary>
-    /// Sends the gaze party message when the feature is enabled.
+    /// The Exdeath announcement configuration for the currently selected channel.
     /// </summary>
-    private void SendGazeMessage(bool first, bool real)
+    private AnnouncementCategory ActiveExdeath => configuration.GetAnnouncements(configuration.AnnouncementChannel).Exdeath;
+
+    /// <summary>
+    /// The Chaos announcement configuration for the currently selected channel.
+    /// </summary>
+    private AnnouncementCategory ActiveChaos => configuration.GetAnnouncements(configuration.AnnouncementChannel).Chaos;
+
+    /// <summary>
+    /// Fires the announcements for one category, set and real/fake, sending each to the selected channel.
+    /// Ordered mode sends every enabled slot in order (Exdeath) or only the pressed slot (Chaos, via <paramref name="onlySlot"/>); simple mode sends each non-empty line.
+    /// </summary>
+    private void FireAnnouncements(AnnouncementCategory category, string categoryId, bool isFirst, bool isReal, string? onlySlot)
     {
-        if (!configuration.PartyGazeEnabled)
+        var channel = configuration.AnnouncementChannel;
+        var leaf = category.GetLeaf(isFirst, isReal);
+
+        if (category.Ordered)
+        {
+            foreach (var slot in leaf.Slots)
+            {
+                if (!slot.Enabled || (onlySlot != null && slot.Id != onlySlot))
+                {
+                    continue;
+                }
+
+                if (slot.UseCustomMessage)
+                {
+                    foreach (var message in slot.Messages)
+                    {
+                        SendAnnouncement(channel, message);
+                    }
+                }
+                else
+                {
+                    SendAnnouncement(channel, AnnouncementData.DefaultMessage(categoryId, slot.Id, isFirst, isReal));
+                }
+            }
+
+            return;
+        }
+
+        foreach (var line in leaf.SimpleText.Replace("\r", string.Empty).Split('\n'))
+        {
+            SendAnnouncement(channel, line);
+        }
+    }
+
+    /// <summary>
+    /// Sends one announcement message to a chat channel, ignoring empty messages.
+    /// </summary>
+    private static void SendAnnouncement(string channel, string message)
+    {
+        if (string.IsNullOrWhiteSpace(message))
         {
             return;
         }
 
-        string message;
-        if (configuration.PartyGazeCustom && !string.IsNullOrWhiteSpace(configuration.PartyGazeCustomText))
-        {
-            message = configuration.PartyGazeCustomText;
-        }
-        else
-        {
-            message = (first ? "(1st) " : "[2nd] ") + (real ? "GAZE REAL - DON'T LOOK" : "GAZE FAKE - LOOK");
-        }
-
-        Plugin.ExecuteGameCommand(configuration.PartyChatChannel + " " + message);
-    }
-
-    /// <summary>
-    /// Sends the chaos party message when the feature is enabled.
-    /// </summary>
-    private void SendChaosMessage(bool first, string body)
-    {
-        if (!configuration.PartyChaosEnabled)
-        {
-            return;
-        }
-
-        string message;
-        if (configuration.PartyChaosCustom && !string.IsNullOrWhiteSpace(configuration.PartyChaosCustomText))
-        {
-            message = configuration.PartyChaosCustomText;
-        }
-        else
-        {
-            message = (first ? "(1st) " : "[2nd] ") + body;
-        }
-
-        Plugin.ExecuteGameCommand(configuration.PartyChatChannel + " " + message);
+        Plugin.ExecuteGameCommand($"{channel} {message.Trim()}");
     }
 
     /// <summary>
@@ -1279,13 +1338,13 @@ public class Solver
     /// Presses an Inferno button from a slash command, mirroring the real and fake icon buttons.
     /// </summary>
     public void CommandInferno(bool real) => OnChaos(
-        configuration.GetText(real ? TextLabels.InfernoReal : TextLabels.InfernoFake), FireColor, real ? "INFERNO REAL - TWISTER" : "INFERNO FAKE - DONUT");
+        configuration.GetText(real ? TextLabels.InfernoReal : TextLabels.InfernoFake), FireColor, "inferno", real);
 
     /// <summary>
     /// Presses a Tsunami button from a slash command, mirroring the real and fake icon buttons.
     /// </summary>
     public void CommandTsunami(bool real) => OnChaos(
-        configuration.GetText(real ? TextLabels.TsunamiReal : TextLabels.TsunamiFake), WaterColor, real ? "TSUNAMI REAL - DONUT" : "TSUNAMI FAKE - TWISTER");
+        configuration.GetText(real ? TextLabels.TsunamiReal : TextLabels.TsunamiFake), WaterColor, "tsunami", real);
 
     /// <summary>
     /// Presses a Thunder button from a slash command, mirroring the real and fake icon buttons.

@@ -50,6 +50,11 @@ public class ConfigWindow : Window, IDisposable
     private string profileStatus = string.Empty;
 
     /// <summary>
+    /// The most recent chat announcement copy status message.
+    /// </summary>
+    private string chatStatus = string.Empty;
+
+    /// <summary>
     /// Creates the settings window bound to the plugin.
     /// </summary>
     public ConfigWindow(Plugin plugin)
@@ -407,21 +412,282 @@ public class ConfigWindow : Window, IDisposable
     private void DrawChatMessages()
     {
         ImGui.TextUnformatted("Chat Messages");
-        ImGui.TextDisabled("Sends a chat message on your behalf in the selected channel when a\nmechanic is determined. Issues input on your behalf - use at your own risk.");
+        ImGui.TextWrapped("Announcements are configured per channel. Pick a channel below; its Exdeath and Chaos announcements are sent to that channel when the matching button is pressed. This issues input on your behalf - use at your own risk.");
 
         DrawChannelSelector();
+        DrawCopyToChannel();
+        if (!string.IsNullOrEmpty(chatStatus))
+        {
+            ImGui.TextDisabled(chatStatus);
+        }
 
-        DrawPartyMechanic(
-            "Announce Gaze", "gaze",
-            () => Configuration.PartyGazeEnabled, value => Configuration.PartyGazeEnabled = value,
-            () => Configuration.PartyGazeCustom, value => Configuration.PartyGazeCustom = value,
-            () => Configuration.PartyGazeCustomText, value => Configuration.PartyGazeCustomText = value);
+        ImGui.Separator();
 
-        DrawPartyMechanic(
-            "Announce Chaos (Inferno/Tsunami)", "chaos",
-            () => Configuration.PartyChaosEnabled, value => Configuration.PartyChaosEnabled = value,
-            () => Configuration.PartyChaosCustom, value => Configuration.PartyChaosCustom = value,
-            () => Configuration.PartyChaosCustomText, value => Configuration.PartyChaosCustomText = value);
+        var announcements = Configuration.GetAnnouncements(Configuration.AnnouncementChannel);
+        DrawAnnounceCategory("Announce Exdeath", announcements.Exdeath, "exdeath", AnnouncementData.ExdeathSlots);
+        DrawAnnounceCategory("Announce Chaos", announcements.Chaos, "chaos", AnnouncementData.ChaosSlots);
+    }
+
+    /// <summary>
+    /// Draws a "Copy settings to..." dropdown that clones the current channel's announcements to another channel.
+    /// </summary>
+    private void DrawCopyToChannel()
+    {
+        ImGui.SetNextItemWidth(260f);
+        using var combo = ImRaii.Combo("Copy settings to...##copychan", "Copy settings to another channel");
+        if (!combo)
+        {
+            return;
+        }
+
+        foreach (var (label, prefix) in ChatChannels)
+        {
+            if (prefix == Configuration.AnnouncementChannel)
+            {
+                continue;
+            }
+
+            if (ImGui.Selectable(label))
+            {
+                var source = Newtonsoft.Json.JsonConvert.SerializeObject(Configuration.GetAnnouncements(Configuration.AnnouncementChannel));
+                Configuration.Announcements[prefix] = Newtonsoft.Json.JsonConvert.DeserializeObject<ChannelAnnouncements>(source) ?? new ChannelAnnouncements();
+                Configuration.Save();
+                chatStatus = $"Copied announcements to {label}.";
+            }
+        }
+    }
+
+    /// <summary>
+    /// Draws one announce category (Exdeath or Chaos): its mode toggle and the first/second set sections.
+    /// </summary>
+    private void DrawAnnounceCategory(string label, AnnouncementCategory category, string categoryId, string[] slotIds)
+    {
+        if (!ImGui.CollapsingHeader($"{label}##cat_{categoryId}"))
+        {
+            return;
+        }
+
+        ImGui.Indent();
+
+        var ordered = category.Ordered;
+        if (ImGui.RadioButton($"Ordered list##mode_{categoryId}", ordered) && !ordered)
+        {
+            category.Ordered = true;
+            Configuration.Save();
+        }
+
+        ImGui.SameLine();
+        if (ImGui.RadioButton($"Simple text box##mode_{categoryId}", !ordered) && ordered)
+        {
+            category.Ordered = false;
+            Configuration.Save();
+        }
+
+        DrawSetSection("First set", category, true, categoryId, slotIds);
+        DrawSetSection("Second set", category, false, categoryId, slotIds);
+        ImGui.Unindent();
+    }
+
+    /// <summary>
+    /// Draws a set section (First/Second) with its real and fake leaves.
+    /// </summary>
+    private void DrawSetSection(string label, AnnouncementCategory category, bool isFirst, string categoryId, string[] slotIds)
+    {
+        if (!ImGui.CollapsingHeader($"{label}##set_{categoryId}_{isFirst}"))
+        {
+            return;
+        }
+
+        ImGui.Indent();
+        DrawLeaf("Real", category.GetLeaf(isFirst, true), category.Ordered, categoryId, slotIds, isFirst, true);
+        DrawLeaf("Fake", category.GetLeaf(isFirst, false), category.Ordered, categoryId, slotIds, isFirst, false);
+        ImGui.Unindent();
+    }
+
+    /// <summary>
+    /// Draws one leaf (a set and real/fake) in either ordered or simple mode.
+    /// </summary>
+    private void DrawLeaf(string label, AnnouncementLeaf leaf, bool ordered, string categoryId, string[] slotIds, bool isFirst, bool isReal)
+    {
+        var key = $"{categoryId}_{isFirst}_{isReal}";
+        if (!ImGui.CollapsingHeader($"{label}##leaf_{key}"))
+        {
+            return;
+        }
+
+        ImGui.Indent();
+        if (ordered)
+        {
+            DrawOrderedLeaf(leaf, categoryId, slotIds, isFirst, isReal, key);
+        }
+        else
+        {
+            DrawSimpleLeaf(leaf, key);
+        }
+
+        ImGui.Unindent();
+    }
+
+    /// <summary>
+    /// Draws the simple-mode growing text box for a leaf.
+    /// </summary>
+    private void DrawSimpleLeaf(AnnouncementLeaf leaf, string key)
+    {
+        ImGui.TextDisabled("One chat message per line; empty lines are ignored.");
+        var text = leaf.SimpleText;
+        var rows = Math.Max(5, text.Split('\n').Length + 1);
+        var size = new Vector2(360f, rows * ImGui.GetTextLineHeight() + ImGui.GetStyle().FramePadding.Y * 2f);
+        if (ImGui.InputTextMultiline($"##simple_{key}", ref text, 2048, size))
+        {
+            leaf.SimpleText = text;
+        }
+
+        if (ImGui.IsItemDeactivatedAfterEdit())
+        {
+            Configuration.Save();
+        }
+    }
+
+    /// <summary>
+    /// Draws the ordered-mode reorderable announcement slots for a leaf, each with its custom message list.
+    /// </summary>
+    private void DrawOrderedLeaf(AnnouncementLeaf leaf, string categoryId, string[] slotIds, bool isFirst, bool isReal, string key)
+    {
+        AnnouncementData.EnsureSlots(leaf, slotIds);
+        var moveFrom = -1;
+        var moveTo = -1;
+
+        for (var index = 0; index < leaf.Slots.Count; index++)
+        {
+            var slot = leaf.Slots[index];
+            using (ImRaii.PushId($"{key}_{slot.Id}"))
+            {
+                if (ImGui.ArrowButton("up", ImGuiDir.Up) && index > 0)
+                {
+                    moveFrom = index;
+                    moveTo = index - 1;
+                }
+
+                ImGui.SameLine();
+                if (ImGui.ArrowButton("down", ImGuiDir.Down) && index < leaf.Slots.Count - 1)
+                {
+                    moveFrom = index;
+                    moveTo = index + 1;
+                }
+
+                ImGui.SameLine();
+                var enabled = slot.Enabled;
+                if (ImGui.Checkbox($"Announce {AnnouncementData.SlotLabel(slot.Id)}", ref enabled))
+                {
+                    slot.Enabled = enabled;
+                    Configuration.Save();
+                }
+
+                ImGui.Indent();
+                if (ImGui.CollapsingHeader("Message settings##msgset"))
+                {
+                    var custom = slot.UseCustomMessage;
+                    if (ImGui.Checkbox("Enable custom message", ref custom))
+                    {
+                        slot.UseCustomMessage = custom;
+                        if (custom && slot.Messages.Count == 0)
+                        {
+                            slot.Messages.Add(AnnouncementData.DefaultMessage(categoryId, slot.Id, isFirst, isReal));
+                        }
+
+                        Configuration.Save();
+                    }
+
+                    if (slot.UseCustomMessage)
+                    {
+                        DrawMessageList(slot);
+                    }
+                    else
+                    {
+                        ImGui.TextDisabled($"Default: {AnnouncementData.DefaultMessage(categoryId, slot.Id, isFirst, isReal)}");
+                    }
+                }
+
+                ImGui.Unindent();
+            }
+        }
+
+        if (moveFrom >= 0)
+        {
+            var moved = leaf.Slots[moveFrom];
+            leaf.Slots.RemoveAt(moveFrom);
+            leaf.Slots.Insert(moveTo, moved);
+            Configuration.Save();
+        }
+    }
+
+    /// <summary>
+    /// Draws the reorderable list of custom message boxes for a slot, with add and remove controls.
+    /// </summary>
+    private void DrawMessageList(AnnouncementSlot slot)
+    {
+        if (slot.Messages.Count == 0)
+        {
+            slot.Messages.Add(string.Empty);
+        }
+
+        var moveFrom = -1;
+        var moveTo = -1;
+        for (var index = 0; index < slot.Messages.Count; index++)
+        {
+            using (ImRaii.PushId(index))
+            {
+                if (ImGui.ArrowButton("mup", ImGuiDir.Up) && index > 0)
+                {
+                    moveFrom = index;
+                    moveTo = index - 1;
+                }
+
+                ImGui.SameLine();
+                if (ImGui.ArrowButton("mdown", ImGuiDir.Down) && index < slot.Messages.Count - 1)
+                {
+                    moveFrom = index;
+                    moveTo = index + 1;
+                }
+
+                ImGui.SameLine();
+                var message = slot.Messages[index];
+                ImGui.SetNextItemWidth(280f);
+                if (ImGui.InputText("##msg", ref message, 256))
+                {
+                    slot.Messages[index] = message;
+                }
+
+                if (ImGui.IsItemDeactivatedAfterEdit())
+                {
+                    Configuration.Save();
+                }
+            }
+        }
+
+        if (moveFrom >= 0)
+        {
+            var moved = slot.Messages[moveFrom];
+            slot.Messages.RemoveAt(moveFrom);
+            slot.Messages.Insert(moveTo, moved);
+            Configuration.Save();
+        }
+
+        if (ImGui.Button("+##addmsg"))
+        {
+            slot.Messages.Add(string.Empty);
+            Configuration.Save();
+        }
+
+        if (slot.Messages.Count > 1)
+        {
+            ImGui.SameLine();
+            if (ImGui.Button("-##delmsg"))
+            {
+                slot.Messages.RemoveAt(slot.Messages.Count - 1);
+                Configuration.Save();
+            }
+        }
     }
 
     /// <summary>
@@ -456,32 +722,39 @@ public class ConfigWindow : Window, IDisposable
     };
 
     /// <summary>
-    /// Draws the dropdown that selects which chat channel the gaze and chaos announcements are sent to.
+    /// Draws the dropdown that selects which chat channel the announcements are sent to.
     /// </summary>
     private void DrawChannelSelector()
+        => DrawChannelCombo("Channel##announcechannel", () => Configuration.AnnouncementChannel, value => Configuration.AnnouncementChannel = value);
+
+    /// <summary>
+    /// Draws a chat channel dropdown bound to a getter and setter.
+    /// </summary>
+    private void DrawChannelCombo(string label, Func<string> getChannel, Action<string> setChannel)
     {
-        var preview = Configuration.PartyChatChannel;
-        foreach (var (label, prefix) in ChatChannels)
+        var current = getChannel();
+        var preview = current;
+        foreach (var (channelLabel, prefix) in ChatChannels)
         {
-            if (prefix == Configuration.PartyChatChannel)
+            if (prefix == current)
             {
-                preview = label;
+                preview = channelLabel;
                 break;
             }
         }
 
         ImGui.SetNextItemWidth(260f);
-        using var combo = ImRaii.Combo("Channel##partychannel", preview);
+        using var combo = ImRaii.Combo(label, preview);
         if (!combo)
         {
             return;
         }
 
-        foreach (var (label, prefix) in ChatChannels)
+        foreach (var (channelLabel, prefix) in ChatChannels)
         {
-            if (ImGui.Selectable(label, Configuration.PartyChatChannel == prefix))
+            if (ImGui.Selectable(channelLabel, current == prefix))
             {
-                Configuration.PartyChatChannel = prefix;
+                setChannel(prefix);
                 Configuration.Save();
             }
         }
@@ -789,15 +1062,90 @@ public class ConfigWindow : Window, IDisposable
             Configuration.Save();
         }
 
-        if (basic)
+        if (!basic)
+        {
+            ImGui.Indent();
+            DrawCustomToggleText();
+            DrawToggleSharedSettings();
+            DrawToggleDetachSettings();
+            ImGui.Unindent();
+        }
+
+        ImGui.Separator();
+        DrawLastFakeAnnounceSettings();
+    }
+
+    /// <summary>
+    /// Draws the ANNOUNCE button options: enable, dock, channel, message and the parseable macros.
+    /// </summary>
+    private void DrawLastFakeAnnounceSettings()
+    {
+        ImGui.TextUnformatted("Announce Last Fake");
+
+        var enabled = Configuration.LastFakeAnnounceEnabled;
+        if (ImGui.Checkbox("Show the ANNOUNCE button", ref enabled))
+        {
+            Configuration.LastFakeAnnounceEnabled = enabled;
+            Configuration.Save();
+        }
+
+        if (!Configuration.LastFakeAnnounceEnabled)
         {
             return;
         }
 
         ImGui.Indent();
-        DrawCustomToggleText();
-        DrawToggleSharedSettings();
-        DrawToggleDetachSettings();
+
+        var docked = Configuration.LastFakeAnnounceDocked;
+        if (ImGui.Checkbox("Dock to the Kefka text panel (otherwise floats as its own button)", ref docked))
+        {
+            Configuration.LastFakeAnnounceDocked = docked;
+            Configuration.Save();
+        }
+
+        DrawChannelCombo("Channel##lastfakeannounce", () => Configuration.LastFakeAnnounceChannel, value => Configuration.LastFakeAnnounceChannel = value);
+
+        var message = Configuration.LastFakeAnnounceMessage;
+        ImGui.SetNextItemWidth(360f);
+        if (ImGui.InputText("Message##lastfakeannouncemsg", ref message, 512))
+        {
+            Configuration.LastFakeAnnounceMessage = message;
+        }
+
+        if (ImGui.IsItemDeactivatedAfterEdit())
+        {
+            Configuration.Save();
+        }
+
+        ImGui.TextWrapped("Use these macros in your message; they are replaced when you press ANNOUNCE:");
+        ImGui.BulletText("{KefkaThunder} - the current Thunder value");
+        ImGui.BulletText("{KefkaBlizzard} - the current Blizzard value");
+        ImGui.TextDisabled("An unpressed mechanic shows as \"?\".");
+
+        var realText = Configuration.LastFakeAnnounceRealText;
+        ImGui.SetNextItemWidth(120f);
+        if (ImGui.InputText("Text for REAL", ref realText, 64))
+        {
+            Configuration.LastFakeAnnounceRealText = realText;
+        }
+
+        if (ImGui.IsItemDeactivatedAfterEdit())
+        {
+            Configuration.Save();
+        }
+
+        var fakeText = Configuration.LastFakeAnnounceFakeText;
+        ImGui.SetNextItemWidth(120f);
+        if (ImGui.InputText("Text for FAKE", ref fakeText, 64))
+        {
+            Configuration.LastFakeAnnounceFakeText = fakeText;
+        }
+
+        if (ImGui.IsItemDeactivatedAfterEdit())
+        {
+            Configuration.Save();
+        }
+
         ImGui.Unindent();
     }
 
@@ -1297,49 +1645,4 @@ public class ConfigWindow : Window, IDisposable
         }
     }
 
-    /// <summary>
-    /// Draws the enable, custom-message and text-field controls for a party-chat mechanic.
-    /// The text field is greyed out unless custom is on, and the whole block is greyed out unless the mechanic is enabled.
-    /// </summary>
-    private void DrawPartyMechanic(string label, string id,
-        Func<bool> getEnabled, Action<bool> setEnabled,
-        Func<bool> getCustom, Action<bool> setCustom,
-        Func<string> getText, Action<string> setText)
-    {
-        var enabled = getEnabled();
-        if (ImGui.Checkbox($"{label}##{id}en", ref enabled))
-        {
-            setEnabled(enabled);
-            Configuration.Save();
-        }
-
-        using (ImRaii.Disabled(!enabled))
-        {
-            ImGui.Indent();
-
-            var custom = getCustom();
-            if (ImGui.Checkbox($"Enable custom message##{id}cust", ref custom))
-            {
-                setCustom(custom);
-                Configuration.Save();
-            }
-
-            using (ImRaii.Disabled(!custom))
-            {
-                var text = getText();
-                ImGui.SetNextItemWidth(320f);
-                if (ImGui.InputText($"##{id}text", ref text, 256))
-                {
-                    setText(text);
-                }
-
-                if (ImGui.IsItemDeactivatedAfterEdit())
-                {
-                    Configuration.Save();
-                }
-            }
-
-            ImGui.Unindent();
-        }
-    }
 }
