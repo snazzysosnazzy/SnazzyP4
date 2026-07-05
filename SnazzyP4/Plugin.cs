@@ -269,6 +269,7 @@ public sealed class Plugin : IDalamudPlugin
         }
 
         Solver.UpdateAutoMarkers();
+        Solver.MaybeSendChronological();
 
         // The Hide control stays visible even when hidden and only when it is the floating variant, the Reset control only shows while floating, and every other section hides when the display is hidden or empty.
         var baseShow = Configuration.Detached && MainWindow.IsOpen;

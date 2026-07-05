@@ -18,6 +18,11 @@ public static class Changelog
     /// </summary>
     public static readonly Entry[] Entries =
     {
+        new("1.0.0.20", new[]
+        {
+            "New \"Chronological party-chat summary\" option on the Chat tab. When on, the per-press announcements are held back and the whole announcement list is instead sent to Party (/p) as one ordered list, only once both Exdeaths, both debuff picks and both chaos have been pressed.",
+            "The list is sent in resolution order: 1st-set Exdeath debuffs, then the 1st gaze, then Inferno, then the 2nd-set debuffs, then the 2nd gaze, then Tsunami. It uses the Party (/p) channel's configured announcement messages, sends exactly once per pull, and re-arms after a Reset or Undo.",
+        }),
         new("1.0.0.19", new[]
         {
             "Chaos resolutions are now static: Inferno always resolves in the First Set and Tsunami always in the Second Set, no matter which you press first.",

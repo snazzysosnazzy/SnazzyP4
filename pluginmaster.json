@@ -4,9 +4,9 @@
     "Name": "Snazzy P4",
     "Punchline": "A robust custom macro system for the Kefka UMAD/DMU Phase 4 mechanics.",
     "Description": "A robust custom macro system for the Kefka UMAD/DMU Phase 4 mechanics. Press the buttons for what you see in the fight and it lays out clean, colour-coded callouts. Open with /snazzyp4.",
-    "Changelog": "Chaos is now static: Inferno always resolves in the First Set and Tsunami in the Second, each button disables after it is pressed, and the 1st/2nd labelling is dropped from Inferno/Tsunami. See CHANGELOG.md.",
+    "Changelog": "New 'Chronological party-chat summary' mode: sends the whole announcement list to Party (/p) as one ordered list (1st debuffs, 1st gaze, Inferno, 2nd debuffs, 2nd gaze, Tsunami) once everything is pressed. See CHANGELOG.md.",
     "InternalName": "SnazzyP4",
-    "AssemblyVersion": "1.0.0.19",
+    "AssemblyVersion": "1.0.0.20",
     "RepoUrl": "https://github.com/snazzysosnazzy/SnazzyP4",
     "ApplicableVersion": "any",
     "Tags": [
@@ -31,11 +31,11 @@
     "DalamudApiLevel": 15,
     "IconUrl": "https://raw.githubusercontent.com/snazzysosnazzy/SnazzyP4/main/SnazzyP4/images/icon.png",
     "ImageUrls": [],
-    "DownloadLinkInstall": "https://github.com/snazzysosnazzy/SnazzyP4/releases/download/v1.0.0.19/latest.zip",
+    "DownloadLinkInstall": "https://github.com/snazzysosnazzy/SnazzyP4/releases/download/v1.0.0.20/latest.zip",
     "IsHide": false,
     "IsTestingExclusive": false,
-    "DownloadLinkTesting": "https://github.com/snazzysosnazzy/SnazzyP4/releases/download/v1.0.0.19/latest.zip",
-    "DownloadLinkUpdate": "https://github.com/snazzysosnazzy/SnazzyP4/releases/download/v1.0.0.19/latest.zip",
+    "DownloadLinkTesting": "https://github.com/snazzysosnazzy/SnazzyP4/releases/download/v1.0.0.20/latest.zip",
+    "DownloadLinkUpdate": "https://github.com/snazzysosnazzy/SnazzyP4/releases/download/v1.0.0.20/latest.zip",
     "DownloadCount": 0,
     "LastUpdate": "1783294249"
   }

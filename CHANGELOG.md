@@ -3,6 +3,15 @@
 All notable changes to Snazzy P4 are listed here. Versions match the `vX.Y.Z.W`
 release tags.
 
+## v1.0.0.20
+
+- **Chronological party-chat summary** — a new Chat-tab option. When on, the per-press
+  announcements are held back and the whole announcement list is instead sent to **Party
+  (/p)** as one ordered list, **only once both Exdeaths, both debuff picks and both chaos have
+  been pressed**. Order: 1st-set debuffs → 1st gaze → Inferno → 2nd-set debuffs → 2nd gaze →
+  Tsunami. It uses the Party (/p) channel's configured messages, sends once per pull, and
+  re-arms after a Reset or Undo.
+
 ## v1.0.0.19
 
 - **Static Chaos sets** — Inferno always resolves in the **First Set** and Tsunami always in

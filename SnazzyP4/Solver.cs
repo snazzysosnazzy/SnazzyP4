@@ -91,6 +91,8 @@ public class Solver
         List<Selection> Selections,
         (string Text, Vector4 Color)? FirstSetChaos,
         (string Text, Vector4 Color)? SecondSetChaos,
+        bool InfernoReal,
+        bool TsunamiReal,
         bool ThunderPressed,
         bool ThunderReal,
         bool ThunderLastFake,
@@ -119,6 +121,15 @@ public class Solver
     /// The Second Set chaos resolution and its colour. Tsunami always resolves in the second set, so this holds the Tsunami press.
     /// </summary>
     private (string Text, Vector4 Color)? secondSetChaos;
+
+    /// <summary>Whether the pressed Inferno was the real variant (only meaningful once <see cref="firstSetChaos"/> is set).</summary>
+    private bool infernoReal;
+
+    /// <summary>Whether the pressed Tsunami was the real variant (only meaningful once <see cref="secondSetChaos"/> is set).</summary>
+    private bool tsunamiReal;
+
+    /// <summary>Whether the chronological party-chat summary has already been sent for the current pull.</summary>
+    private bool chronoSent;
 
     /// <summary>
     /// The stack of pre-press state snapshots, newest on top, used by <see cref="Undo"/> to step back one button press at a time.
@@ -1276,6 +1287,8 @@ public class Solver
             new List<Selection>(selections),
             firstSetChaos,
             secondSetChaos,
+            infernoReal,
+            tsunamiReal,
             thunderPressed,
             thunderReal,
             thunderLastFake,
@@ -1309,6 +1322,8 @@ public class Solver
 
         firstSetChaos = snapshot.FirstSetChaos;
         secondSetChaos = snapshot.SecondSetChaos;
+        infernoReal = snapshot.InfernoReal;
+        tsunamiReal = snapshot.TsunamiReal;
 
         thunderPressed = snapshot.ThunderPressed;
         thunderReal = snapshot.ThunderReal;
@@ -1361,10 +1376,12 @@ public class Solver
         if (isInferno)
         {
             firstSetChaos = (text, color);
+            infernoReal = isReal;
         }
         else
         {
             secondSetChaos = (text, color);
+            tsunamiReal = isReal;
         }
 
         FireAnnouncements(ActiveChaos, "chaos", isInferno, isReal, slotId);
@@ -1386,7 +1403,7 @@ public class Solver
     /// </summary>
     private void FireAnnouncements(AnnouncementCategory category, string categoryId, bool isFirst, bool isReal, string? onlySlot)
     {
-        if (!configuration.AnnouncementsEnabled)
+        if (!configuration.AnnouncementsEnabled || configuration.AnnouncementChronological)
         {
             return;
         }
@@ -1447,6 +1464,127 @@ public class Solver
     }
 
     /// <summary>
+    /// When the chronological summary mode is enabled, sends the whole announcement list to party chat once the
+    /// full sequence and both chaos presses are complete. It sends exactly once per pull and re-arms after a reset or undo.
+    /// Called every frame from the plugin update.
+    /// </summary>
+    public void MaybeSendChronological()
+    {
+        if (!configuration.AnnouncementsEnabled || !configuration.AnnouncementChronological)
+        {
+            return;
+        }
+
+        var complete = phase == Phase.Done && firstSetChaos.HasValue && secondSetChaos.HasValue;
+        if (!complete)
+        {
+            chronoSent = false;
+            return;
+        }
+
+        if (chronoSent)
+        {
+            return;
+        }
+
+        chronoSent = true;
+        SendChronological();
+    }
+
+    /// <summary>
+    /// Builds and sends the chronological announcement list to party chat in resolution order:
+    /// first-set debuffs, 1st gaze, Inferno, second-set debuffs, 2nd gaze, Tsunami.
+    /// It reads the Party (/p) channel's configured announcement messages.
+    /// </summary>
+    private void SendChronological()
+    {
+        const string channel = "/p";
+        var announcements = configuration.GetAnnouncements(channel);
+        var exdeath = announcements.Exdeath;
+        var chaos = announcements.Chaos;
+
+        var messages = new List<string>();
+
+        // 1. First set Exdeath debuffs (everything enabled except the gaze).
+        CollectLeafMessages(messages, exdeath, "exdeath", true, firstExdeathReal, includeGaze: false, includeNonGaze: true);
+        // 2. First gaze.
+        CollectLeafMessages(messages, exdeath, "exdeath", true, firstExdeathReal, includeGaze: true, includeNonGaze: false);
+        // 3. Inferno (first set chaos).
+        CollectLeafMessages(messages, chaos, "chaos", true, infernoReal, includeGaze: false, includeNonGaze: true);
+        // 4. Second set Exdeath debuffs (everything enabled except the gaze).
+        CollectLeafMessages(messages, exdeath, "exdeath", false, secondExdeathReal, includeGaze: false, includeNonGaze: true);
+        // 5. Second gaze.
+        CollectLeafMessages(messages, exdeath, "exdeath", false, secondExdeathReal, includeGaze: true, includeNonGaze: false);
+        // 6. Tsunami (second set chaos).
+        CollectLeafMessages(messages, chaos, "chaos", false, tsunamiReal, includeGaze: false, includeNonGaze: true);
+
+        foreach (var message in messages)
+        {
+            SendAnnouncement(channel, message);
+        }
+    }
+
+    /// <summary>
+    /// Appends one leaf's enabled announcement messages to the chronological list.
+    /// The gaze slot is separated out via <paramref name="includeGaze"/>/<paramref name="includeNonGaze"/> so it can be placed after the other debuffs.
+    /// Simple-mode leaves have no per-mechanic split, so their text is added only on the non-gaze pass.
+    /// </summary>
+    private static void CollectLeafMessages(List<string> output, AnnouncementCategory category, string categoryId, bool isFirst, bool isReal, bool includeGaze, bool includeNonGaze)
+    {
+        var leaf = category.GetLeaf(isFirst, isReal);
+        if (!category.Ordered)
+        {
+            if (!includeNonGaze)
+            {
+                return;
+            }
+
+            foreach (var line in leaf.SimpleText.Replace("\r", string.Empty).Split('\n'))
+            {
+                if (!string.IsNullOrWhiteSpace(line))
+                {
+                    output.Add(line.Trim());
+                }
+            }
+
+            return;
+        }
+
+        foreach (var slot in leaf.Slots)
+        {
+            if (!slot.Enabled)
+            {
+                continue;
+            }
+
+            var isGaze = slot.Id == "gaze";
+            if (isGaze ? !includeGaze : !includeNonGaze)
+            {
+                continue;
+            }
+
+            if (slot.UseCustomMessage)
+            {
+                foreach (var message in slot.Messages)
+                {
+                    if (!string.IsNullOrWhiteSpace(message))
+                    {
+                        output.Add(message.Trim());
+                    }
+                }
+            }
+            else
+            {
+                var message = AnnouncementData.DefaultMessage(categoryId, slot.Id, isFirst, isReal);
+                if (!string.IsNullOrWhiteSpace(message))
+                {
+                    output.Add(message);
+                }
+            }
+        }
+    }
+
+    /// <summary>
     /// Resolves a mechanic pick to its callout word.
     /// </summary>
     private static string MechanicText(MechanicKind kind, bool real) => kind switch
@@ -1471,6 +1609,9 @@ public class Solver
 
         firstSetChaos = null;
         secondSetChaos = null;
+        infernoReal = false;
+        tsunamiReal = false;
+        chronoSent = false;
 
         thunderPressed = false;
         thunderReal = false;
