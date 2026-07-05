@@ -3,6 +3,15 @@
 All notable changes to Snazzy P4 are listed here. Versions match the `vX.Y.Z.W`
 release tags.
 
+## v1.0.0.17
+
+- **Master announcements toggle** — an **Enable chat announcements** checkbox at the top of the
+  **Chat** tab, **off by default**. While off, nothing is sent no matter which per-mechanic
+  announcements are enabled.
+- **Undo button** — a new **Undo** button on the toolbar (next to Reset) steps back the last
+  button press and its resolution text, one press at a time. Also available as
+  `/snazzyp4 undo`. Chat announcements and markers already sent for that press are not recalled.
+
 ## v1.0.0.16
 
 - **Dock ANNOUNCE to any side** — when the Last Fake ANNOUNCE button is docked, a new

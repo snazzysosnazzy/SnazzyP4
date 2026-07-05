@@ -79,6 +79,28 @@ public class Solver
     private readonly record struct Selection(MechanicKind Kind, bool IsShort, bool IsReal);
 
     /// <summary>
+    /// A full copy of the solver's input state, captured before each button press so the last press can be undone.
+    /// The two collections are copied so later mutation does not change a stored snapshot.
+    /// </summary>
+    private sealed record Snapshot(
+        bool FirstExdeathReal,
+        bool SecondExdeathReal,
+        bool FirstExdeathPressed,
+        bool SecondExdeathPressed,
+        Phase Phase,
+        List<Selection> Selections,
+        List<(string Text, Vector4 Color)> ChaosResolutions,
+        int ChaosPressCount,
+        bool ThunderPressed,
+        bool ThunderReal,
+        bool ThunderLastFake,
+        bool BlizzardPressed,
+        bool BlizzardReal,
+        bool BlizzardLastFake,
+        bool ShortMarkerSent,
+        bool LongMarkerSent);
+
+    /// <summary>
     /// The plugin configuration this solver reads colours and options from.
     /// </summary>
     private readonly Configuration configuration;
@@ -92,6 +114,11 @@ public class Solver
     /// The chaos twister resolutions in press order, each with its display colour.
     /// </summary>
     private readonly List<(string Text, Vector4 Color)> chaosResolutions = new();
+
+    /// <summary>
+    /// The stack of pre-press state snapshots, newest on top, used by <see cref="Undo"/> to step back one button press at a time.
+    /// </summary>
+    private readonly Stack<Snapshot> undoStack = new();
 
     /// <summary>
     /// The current stage of the input sequence.
@@ -846,31 +873,47 @@ public class Solver
 
         if (IconButton("##Thunder", "Thunder.png", true, scale))
         {
-            thunderPressed = true;
-            thunderReal = true;
+            OnThunder(true);
         }
 
         ImGui.SameLine();
 
         if (IconButton("##FakeThunder", "FakeThunder.png", true, scale))
         {
-            thunderPressed = true;
-            thunderReal = false;
+            OnThunder(false);
         }
 
         if (IconButton("##Blizzard", "Blizzard.png", true, scale))
         {
-            blizzardPressed = true;
-            blizzardReal = true;
+            OnBlizzard(true);
         }
 
         ImGui.SameLine();
 
         if (IconButton("##FakeBlizzard", "FakeBlizzard.png", true, scale))
         {
-            blizzardPressed = true;
-            blizzardReal = false;
+            OnBlizzard(false);
         }
+    }
+
+    /// <summary>
+    /// Records a Thunder press (real or fake), capturing an undo point first.
+    /// </summary>
+    private void OnThunder(bool real)
+    {
+        PushUndo();
+        thunderPressed = true;
+        thunderReal = real;
+    }
+
+    /// <summary>
+    /// Records a Blizzard press (real or fake), capturing an undo point first.
+    /// </summary>
+    private void OnBlizzard(bool real)
+    {
+        PushUndo();
+        blizzardPressed = true;
+        blizzardReal = real;
     }
 
     /// <summary>
@@ -1177,6 +1220,7 @@ public class Solver
     {
         if (phase == Phase.WaitFirstExdeath)
         {
+            PushUndo();
             firstExdeathReal = real;
             firstExdeathPressed = true;
             phase = Phase.WaitFirstShortLong;
@@ -1184,11 +1228,77 @@ public class Solver
         }
         else if (phase == Phase.WaitSecondExdeath)
         {
+            PushUndo();
             secondExdeathReal = real;
             secondExdeathPressed = true;
             phase = Phase.WaitSecondShortLong;
             FireAnnouncements(ActiveExdeath, "exdeath", false, real, null);
         }
+    }
+
+    /// <summary>
+    /// Whether there is at least one button press that can be undone.
+    /// </summary>
+    public bool CanUndo => undoStack.Count > 0;
+
+    /// <summary>
+    /// Captures the current input state onto the undo stack. Called before each state-changing button press.
+    /// </summary>
+    private void PushUndo()
+    {
+        undoStack.Push(new Snapshot(
+            firstExdeathReal,
+            secondExdeathReal,
+            firstExdeathPressed,
+            secondExdeathPressed,
+            phase,
+            new List<Selection>(selections),
+            new List<(string Text, Vector4 Color)>(chaosResolutions),
+            chaosPressCount,
+            thunderPressed,
+            thunderReal,
+            thunderLastFake,
+            blizzardPressed,
+            blizzardReal,
+            blizzardLastFake,
+            shortMarkerSent,
+            longMarkerSent));
+    }
+
+    /// <summary>
+    /// Reverts the most recent button press, restoring the input state and on-screen resolution to just before it.
+    /// Chat announcements and markers already sent for that press are not recalled.
+    /// </summary>
+    public void Undo()
+    {
+        if (undoStack.Count == 0)
+        {
+            return;
+        }
+
+        var snapshot = undoStack.Pop();
+        firstExdeathReal = snapshot.FirstExdeathReal;
+        secondExdeathReal = snapshot.SecondExdeathReal;
+        firstExdeathPressed = snapshot.FirstExdeathPressed;
+        secondExdeathPressed = snapshot.SecondExdeathPressed;
+        phase = snapshot.Phase;
+
+        selections.Clear();
+        selections.AddRange(snapshot.Selections);
+
+        chaosResolutions.Clear();
+        chaosResolutions.AddRange(snapshot.ChaosResolutions);
+        chaosPressCount = snapshot.ChaosPressCount;
+
+        thunderPressed = snapshot.ThunderPressed;
+        thunderReal = snapshot.ThunderReal;
+        thunderLastFake = snapshot.ThunderLastFake;
+        blizzardPressed = snapshot.BlizzardPressed;
+        blizzardReal = snapshot.BlizzardReal;
+        blizzardLastFake = snapshot.BlizzardLastFake;
+
+        shortMarkerSent = snapshot.ShortMarkerSent;
+        longMarkerSent = snapshot.LongMarkerSent;
     }
 
     /// <summary>
@@ -1210,6 +1320,7 @@ public class Solver
             return;
         }
 
+        PushUndo();
         selections.Add(new Selection(kind, isShort, real));
         phase = phase == Phase.WaitFirstShortLong ? Phase.WaitSecondExdeath : Phase.Done;
     }
@@ -1224,6 +1335,7 @@ public class Solver
             return;
         }
 
+        PushUndo();
         var first = chaosPressCount == 0;
         chaosResolutions.Add((text, color));
         chaosPressCount++;
@@ -1246,6 +1358,11 @@ public class Solver
     /// </summary>
     private void FireAnnouncements(AnnouncementCategory category, string categoryId, bool isFirst, bool isReal, string? onlySlot)
     {
+        if (!configuration.AnnouncementsEnabled)
+        {
+            return;
+        }
+
         var channel = configuration.AnnouncementChannel;
         var leaf = category.GetLeaf(isFirst, isReal);
 
@@ -1337,6 +1454,8 @@ public class Solver
         shortMarkerSent = false;
         longMarkerSent = false;
 
+        undoStack.Clear();
+
         if (configuration.AutoMarker)
         {
             Plugin.ExecuteGameCommand("/mk off <me>");
@@ -1389,20 +1508,12 @@ public class Solver
     /// <summary>
     /// Presses a Thunder button from a slash command, mirroring the real and fake icon buttons.
     /// </summary>
-    public void CommandThunder(bool real)
-    {
-        thunderPressed = true;
-        thunderReal = real;
-    }
+    public void CommandThunder(bool real) => OnThunder(real);
 
     /// <summary>
     /// Presses a Blizzard button from a slash command, mirroring the real and fake icon buttons.
     /// </summary>
-    public void CommandBlizzard(bool real)
-    {
-        blizzardPressed = true;
-        blizzardReal = real;
-    }
+    public void CommandBlizzard(bool real) => OnBlizzard(real);
 
     /// <summary>
     /// Sets the Thunder Last Fake toggle from a slash command, where fake marks the last as fake.

@@ -434,6 +434,16 @@ public class ConfigWindow : Window, IDisposable
         ImGui.TextUnformatted("Chat Messages");
         ImGui.TextWrapped("Announcements are configured per channel. Pick a channel below; its Exdeath and Chaos announcements are sent to that channel when the matching button is pressed. This issues input on your behalf - use at your own risk.");
 
+        var enabled = Configuration.AnnouncementsEnabled;
+        if (ImGui.Checkbox("Enable chat announcements", ref enabled))
+        {
+            Configuration.AnnouncementsEnabled = enabled;
+            Configuration.Save();
+        }
+
+        ImGui.TextDisabled("Master switch. When off, nothing below is sent no matter which announcements are toggled on.");
+        ImGui.Separator();
+
         DrawChannelSelector();
         DrawCopyToChannel();
         if (!string.IsNullOrEmpty(chatStatus))

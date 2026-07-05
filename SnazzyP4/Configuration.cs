@@ -178,6 +178,12 @@ public class Configuration : IPluginConfiguration
     public string LastFakeAnnounceFakeText { get; set; } = "FAKE";
 
     /// <summary>
+    /// The master switch for the Exdeath and Chaos chat announcements. When false, no announcement fires on any button press.
+    /// Disabled by default so nothing is sent to chat until the user opts in.
+    /// </summary>
+    public bool AnnouncementsEnabled { get; set; }
+
+    /// <summary>
     /// The chat channel currently selected in the Chat tab, whose announcement configuration is edited and fired.
     /// </summary>
     public string AnnouncementChannel { get; set; } = "/p";

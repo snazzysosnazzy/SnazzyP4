@@ -413,6 +413,9 @@ public sealed class Plugin : IDalamudPlugin
             case "reset":
                 Solver.ResetAll();
                 break;
+            case "undo":
+                Solver.Undo();
+                break;
             case "hide":
                 Configuration.Hidden = !Configuration.Hidden;
                 Configuration.Save();

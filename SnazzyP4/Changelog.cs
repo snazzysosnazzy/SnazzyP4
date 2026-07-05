@@ -18,6 +18,11 @@ public static class Changelog
     /// </summary>
     public static readonly Entry[] Entries =
     {
+        new("1.0.0.17", new[]
+        {
+            "Chat tab: a master \"Enable chat announcements\" toggle sits at the top and is OFF by default. While it is off, nothing is sent to chat no matter which per-mechanic announcements are turned on - turn it on once you have your announcements set up.",
+            "New UNDO button on the toolbar (next to Reset) steps back the last button press and its resolution text, one press at a time - handy for a misclick without resetting the whole pull. It is also available as the slash command /snazzyp4 undo. Note: chat announcements and markers already sent for that press cannot be recalled.",
+        }),
         new("1.0.0.16", new[]
         {
             "Announce Last Fake: the docked ANNOUNCE button can now anchor to any side of the Kefka panel - a new \"Dock side\" dropdown (Top / Bottom / Left / Right) appears when docking is on.",

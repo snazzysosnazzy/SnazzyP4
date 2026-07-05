@@ -87,7 +87,8 @@ Snazzy P4 is distributed through my personal Dalamud plugin repository.
    - Press the **Chaos** button (Inferno/Tsunami) that goes off.
    - Press the **Kefka** button (Thunder/Blizzard) that goes off.
 5. Read the **First Set** / **Second Set** / **Kefka** panels for the resolution.
-6. Press **RESET** between pulls to clear everything.
+6. Made a misclick? Press **Undo** to step back the last button press (one at a time).
+7. Press **RESET** between pulls to clear everything.
 
 That's it — the buttons grey out when they no longer apply, so you can't mis-enter.
 
@@ -119,6 +120,7 @@ command below.
 /snazzyp4 ThunderReal        /snazzyp4 ThunderFake
 /snazzyp4 BlizzardReal       /snazzyp4 BlizzardFake
 /snazzyp4 Reset              /snazzyp4 Hide
+/snazzyp4 Undo
 ```
 
 The commands respect the same rules as the buttons — a pick that isn't valid yet (for example
@@ -134,7 +136,8 @@ Open with the **Settings** button or `/snazzyp4 config`. Settings are grouped in
   on yourself), **settings profiles** (copy your whole setup to the clipboard or paste one in
   — handy for sharing a layout), and the reset buttons (**Reset layout to defaults** /
   **Restore ALL settings to defaults**).
-- **Chat** — a full announcement system. **Announce Exdeath** fires when you press an Exdeath
+- **Chat** — a full announcement system, gated behind a master **Enable chat announcements**
+  toggle (off by default). **Announce Exdeath** fires when you press an Exdeath
   Real/Fake button and **Announce Chaos** when you press a chaos button, each split by
   First/Second set and Real/Fake. Choose **ordered-list** mode (reorderable per-mechanic
   toggles with custom, reorderable message lists, an optional **Announce Title** line, and a

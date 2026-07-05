@@ -250,6 +250,16 @@ public class MainWindow : Window, IDisposable
             ImGui.SameLine();
         }
 
+        using (ImRaii.Disabled(plugin.LayoutEditActive || !plugin.Solver.CanUndo))
+        {
+            if (ImGui.Button("Undo"))
+            {
+                plugin.Solver.Undo();
+            }
+        }
+
+        ImGui.SameLine();
+
         // The Reset control only docks to the toolbar when it is not floating as its own section.
         if (!Configuration.FloatingResetButton)
         {
