@@ -3,6 +3,10 @@
 All notable changes to Snazzy P4 are listed here. Versions match the `vX.Y.Z.W`
 release tags.
 
+## v1.0.3.3 — 2026-07-06
+
+- Minor internal cleanup and changelog wording tidy-up.
+
 ## v1.0.3.2 — 2026-07-06
 
 - Fixed the **Layout** tab showing in the wrong place (after Text) instead of between **Chat**
