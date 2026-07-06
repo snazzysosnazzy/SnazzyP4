@@ -123,8 +123,9 @@ public static class AnnouncementData
 
     /// <summary>
     /// Returns the generated default message for a slot in a given set and real/fake branch.
+    /// When <paramref name="includeSetNumber"/> is false, the "[1st]"/"[2nd]" prefix is dropped from Exdeath debuff messages.
     /// </summary>
-    public static string DefaultMessage(string categoryId, string slotId, bool isFirst, bool isReal)
+    public static string DefaultMessage(string categoryId, string slotId, bool isFirst, bool isReal, bool includeSetNumber = true)
     {
         var set = isFirst ? "1st" : "2nd";
         if (slotId == "title")
@@ -135,15 +136,16 @@ public static class AnnouncementData
                 : (isFirst ? "---------- Inferno ----------" : "---------- Tsunami ----------");
         }
 
-        // Format: "[set] Debuff - Resolvement", for example "[1st] Lightning - Spread".
+        // Format: "[set] Debuff - Resolvement", for example "[1st] Lightning - Spread". The set prefix is optional.
         if (categoryId == "exdeath")
         {
+            var prefix = includeSetNumber ? $"[{set}] " : string.Empty;
             return slotId switch
             {
-                "gaze" => isReal ? $"[{set}] Gaze - Look Away" : $"[{set}] Gaze - Look",
-                "spread" => isReal ? $"[{set}] Lightning - Spread" : $"[{set}] Lightning - Stack",
-                "drop" => isReal ? $"[{set}] Water Drop - Stack" : $"[{set}] Water Drop - Spread",
-                "accel" => isReal ? $"[{set}] Acceleration - Stand Still" : $"[{set}] Acceleration - Move",
+                "gaze" => isReal ? $"{prefix}Gaze - Look Away" : $"{prefix}Gaze - Look",
+                "spread" => isReal ? $"{prefix}Lightning - Spread" : $"{prefix}Lightning - Stack",
+                "drop" => isReal ? $"{prefix}Water Drop - Stack" : $"{prefix}Water Drop - Spread",
+                "accel" => isReal ? $"{prefix}Acceleration - Stand Still" : $"{prefix}Acceleration - Move",
                 _ => string.Empty,
             };
         }

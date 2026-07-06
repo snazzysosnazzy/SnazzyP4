@@ -18,6 +18,12 @@ public static class Changelog
     /// </summary>
     public static readonly Entry[] Entries =
     {
+        new("1.0.1.1", new[]
+        {
+            "Fixed the Quick toggle buttons clipping their text - they now size to fit their labels.",
+            "The set-title Quick toggles now only affect the 1st/2nd set (Exdeath) titles and leave the Inferno/Tsunami (Chaos) titles alone.",
+            "New Chat-tab setting \"Include [1st] / [2nd] prefix in default messages\" (on by default). Turn it off to drop the set number, so a default reads \"Lightning - Spread\" instead of \"[1st] Lightning - Spread\".",
+        }),
         new("1.0.1.0", new[]
         {
             "Inferno and Tsunami no longer use the words \"Fire\" or \"Water\" anywhere. The resolution text panel now reads INFERNO TWISTER / INFERNO DONUT / TSUNAMI DONUT / TSUNAMI TWISTER, and the two colour pickers are simply labelled \"Inferno\" and \"Tsunami\".",

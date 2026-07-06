@@ -3,6 +3,14 @@
 All notable changes to Snazzy P4 are listed here. Versions match the `vX.Y.Z.W`
 release tags.
 
+## v1.0.1.1
+
+- **Quick toggle buttons** now size to fit their labels, so the text no longer clips.
+- The **set-title** Quick toggles only affect the 1st/2nd set (Exdeath) titles now, leaving
+  the Inferno/Tsunami (Chaos) titles alone.
+- New Chat-tab setting **Include [1st] / [2nd] prefix in default messages** (on by default).
+  Turn it off and a default reads `Lightning - Spread` instead of `[1st] Lightning - Spread`.
+
 ## v1.0.1.0
 
 - **Inferno/Tsunami terminology** — the words "Fire" and "Water" are gone. The resolution text

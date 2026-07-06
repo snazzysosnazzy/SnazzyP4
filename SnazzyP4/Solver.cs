@@ -1437,7 +1437,7 @@ public class Solver
                 }
                 else
                 {
-                    SendAnnouncement(channel, AnnouncementData.DefaultMessage(categoryId, slot.Id, isFirst, isReal));
+                    SendAnnouncement(channel, AnnouncementData.DefaultMessage(categoryId, slot.Id, isFirst, isReal, configuration.AnnouncementShowSetNumber));
                 }
             }
 
@@ -1504,19 +1504,20 @@ public class Solver
         var chaos = announcements.Chaos;
 
         var messages = new List<string>();
+        var showSet = configuration.AnnouncementShowSetNumber;
 
         // 1. First set Exdeath debuffs (everything enabled except the gaze).
-        CollectLeafMessages(messages, exdeath, "exdeath", true, firstExdeathReal, includeGaze: false, includeNonGaze: true);
+        CollectLeafMessages(messages, exdeath, "exdeath", true, firstExdeathReal, includeGaze: false, includeNonGaze: true, showSet);
         // 2. First gaze.
-        CollectLeafMessages(messages, exdeath, "exdeath", true, firstExdeathReal, includeGaze: true, includeNonGaze: false);
+        CollectLeafMessages(messages, exdeath, "exdeath", true, firstExdeathReal, includeGaze: true, includeNonGaze: false, showSet);
         // 3. Inferno (first set chaos).
-        CollectLeafMessages(messages, chaos, "chaos", true, infernoReal, includeGaze: false, includeNonGaze: true);
+        CollectLeafMessages(messages, chaos, "chaos", true, infernoReal, includeGaze: false, includeNonGaze: true, showSet);
         // 4. Second set Exdeath debuffs (everything enabled except the gaze).
-        CollectLeafMessages(messages, exdeath, "exdeath", false, secondExdeathReal, includeGaze: false, includeNonGaze: true);
+        CollectLeafMessages(messages, exdeath, "exdeath", false, secondExdeathReal, includeGaze: false, includeNonGaze: true, showSet);
         // 5. Second gaze.
-        CollectLeafMessages(messages, exdeath, "exdeath", false, secondExdeathReal, includeGaze: true, includeNonGaze: false);
+        CollectLeafMessages(messages, exdeath, "exdeath", false, secondExdeathReal, includeGaze: true, includeNonGaze: false, showSet);
         // 6. Tsunami (second set chaos).
-        CollectLeafMessages(messages, chaos, "chaos", false, tsunamiReal, includeGaze: false, includeNonGaze: true);
+        CollectLeafMessages(messages, chaos, "chaos", false, tsunamiReal, includeGaze: false, includeNonGaze: true, showSet);
 
         foreach (var message in messages)
         {
@@ -1529,7 +1530,7 @@ public class Solver
     /// The gaze slot is separated out via <paramref name="includeGaze"/>/<paramref name="includeNonGaze"/> so it can be placed after the other debuffs.
     /// Simple-mode leaves have no per-mechanic split, so their text is added only on the non-gaze pass.
     /// </summary>
-    private static void CollectLeafMessages(List<string> output, AnnouncementCategory category, string categoryId, bool isFirst, bool isReal, bool includeGaze, bool includeNonGaze)
+    private static void CollectLeafMessages(List<string> output, AnnouncementCategory category, string categoryId, bool isFirst, bool isReal, bool includeGaze, bool includeNonGaze, bool includeSetNumber)
     {
         var leaf = category.GetLeaf(isFirst, isReal);
         if (!category.Ordered)
@@ -1575,7 +1576,7 @@ public class Solver
             }
             else
             {
-                var message = AnnouncementData.DefaultMessage(categoryId, slot.Id, isFirst, isReal);
+                var message = AnnouncementData.DefaultMessage(categoryId, slot.Id, isFirst, isReal, includeSetNumber);
                 if (!string.IsNullOrWhiteSpace(message))
                 {
                     output.Add(message);

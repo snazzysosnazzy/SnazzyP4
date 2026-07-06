@@ -453,6 +453,15 @@ public class ConfigWindow : Window, IDisposable
         ImGui.TextDisabled("When on, the per-press announcements are held back. Instead, once both Exdeaths, both debuff picks and both\n"
                            + "chaos are pressed, the whole list is sent to the selected channel in resolution order: 1st-set debuffs,\n"
                            + "1st gaze, Inferno, 2nd-set debuffs, 2nd gaze, Tsunami.");
+
+        var showSetNumber = Configuration.AnnouncementShowSetNumber;
+        if (ImGui.Checkbox("Include [1st] / [2nd] prefix in default messages", ref showSetNumber))
+        {
+            Configuration.AnnouncementShowSetNumber = showSetNumber;
+            Configuration.Save();
+        }
+
+        ImGui.TextDisabled("Affects the generated default Exdeath messages (e.g. \"[1st] Lightning - Spread\" vs \"Lightning - Spread\").");
         ImGui.Separator();
 
         DrawChannelSelector();
@@ -477,7 +486,15 @@ public class ConfigWindow : Window, IDisposable
     {
         ImGui.TextUnformatted("Quick toggles (this channel)");
 
-        var buttonSize = new Vector2(210f, 0f);
+        // Size every button to the widest label so the text never clips and the two rows stay aligned.
+        var labels = new[] { "Turn on all announcements", "Turn off all announcements", "Turn on set titles", "Turn off set titles" };
+        var width = 0f;
+        foreach (var text in labels)
+        {
+            width = Math.Max(width, ImGui.CalcTextSize(text).X);
+        }
+
+        var buttonSize = new Vector2(width + ImGui.GetStyle().FramePadding.X * 2f + 4f, 0f);
         if (ImGui.Button("Turn on all announcements", buttonSize))
         {
             SetAllAnnouncementSlots(enabled: true, titlesOnly: false);
@@ -509,11 +526,17 @@ public class ConfigWindow : Window, IDisposable
     {
         var announcements = Configuration.GetAnnouncements(Configuration.AnnouncementChannel);
         ApplyAnnouncementToggle(announcements.Exdeath, "exdeath", enabled, titlesOnly);
-        ApplyAnnouncementToggle(announcements.Chaos, "chaos", enabled, titlesOnly);
+
+        // The set-title buttons only affect the Exdeath 1st/2nd set titles, not the Chaos (Inferno/Tsunami) titles.
+        if (!titlesOnly)
+        {
+            ApplyAnnouncementToggle(announcements.Chaos, "chaos", enabled, titlesOnly);
+        }
+
         Configuration.Save();
 
         chatStatus = titlesOnly
-            ? (enabled ? "Turned on all set titles." : "Turned off all set titles.")
+            ? (enabled ? "Turned on the 1st/2nd set titles." : "Turned off the 1st/2nd set titles.")
             : (enabled ? "Turned on all announcements (except titles)." : "Turned off all announcements (except titles).");
     }
 
@@ -736,7 +759,7 @@ public class ConfigWindow : Window, IDisposable
                         slot.UseCustomMessage = custom;
                         if (custom && slot.Messages.Count == 0)
                         {
-                            slot.Messages.Add(AnnouncementData.DefaultMessage(categoryId, slot.Id, isFirst, isReal));
+                            slot.Messages.Add(AnnouncementData.DefaultMessage(categoryId, slot.Id, isFirst, isReal, Configuration.AnnouncementShowSetNumber));
                         }
 
                         Configuration.Save();
@@ -748,7 +771,7 @@ public class ConfigWindow : Window, IDisposable
                     }
                     else
                     {
-                        ImGui.TextDisabled($"Default: {AnnouncementData.DefaultMessage(categoryId, slot.Id, isFirst, isReal)}");
+                        ImGui.TextDisabled($"Default: {AnnouncementData.DefaultMessage(categoryId, slot.Id, isFirst, isReal, Configuration.AnnouncementShowSetNumber)}");
                     }
                 }
 

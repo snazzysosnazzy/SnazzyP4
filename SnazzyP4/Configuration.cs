@@ -192,6 +192,12 @@ public class Configuration : IPluginConfiguration
     public bool AnnouncementChronological { get; set; }
 
     /// <summary>
+    /// Whether the generated default Exdeath announcement messages include the "[1st]"/"[2nd]" set prefix.
+    /// When false, a default reads "Lightning - Spread" instead of "[1st] Lightning - Spread". Enabled by default.
+    /// </summary>
+    public bool AnnouncementShowSetNumber { get; set; } = true;
+
+    /// <summary>
     /// The chat channel currently selected in the Chat tab, whose announcement configuration is edited and fired.
     /// </summary>
     public string AnnouncementChannel { get; set; } = "/p";
