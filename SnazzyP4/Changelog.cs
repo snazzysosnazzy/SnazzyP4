@@ -131,7 +131,7 @@ public static class Changelog
             "Colourblind palette presets (Settings > Colors): one-click Deuteranopia / Protanopia / Tritanopia palettes plus Default.",
             "Bring all windows on-screen (Settings > Layout, detached): clamps every detached window back into view.",
             "The combined-set divider can now be pinned in both orientations (stacked as well as side by side) and its thickness and colour are customisable.",
-            "Added an MIT LICENSE and this changelog.",
+            "Added this changelog.",
         }),
         new("1.0.0.8", "2026-07-03", new[]
         {

@@ -197,7 +197,7 @@ release tags.
   pinned when stacked (grows up/down) as well as side by side.
 - **Customisable divider** — thickness and colour options for the combined-set
   divider.
-- Added an MIT `LICENSE` and this changelog.
+- Added this changelog.
 
 ## v1.0.0.8 — 2026-07-03
 
