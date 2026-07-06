@@ -1621,8 +1621,8 @@ public class ConfigWindow : Window, IDisposable
         DrawColorPicker("Acceleration (Move / Stand)##colAccel", () => Configuration.ColorAcceleration, value => Configuration.ColorAcceleration = value);
         DrawColorPicker("Gaze Real##colGazeReal", () => Configuration.ColorGazeReal, value => Configuration.ColorGazeReal = value);
         DrawColorPicker("Gaze Fake##colGazeFake", () => Configuration.ColorGazeFake, value => Configuration.ColorGazeFake = value);
-        DrawColorPicker("Fire (Inferno)##colFire", () => Configuration.ColorFire, value => Configuration.ColorFire = value);
-        DrawColorPicker("Water (Tsunami)##colWater", () => Configuration.ColorWater, value => Configuration.ColorWater = value);
+        DrawColorPicker("Inferno##colFire", () => Configuration.ColorFire, value => Configuration.ColorFire = value);
+        DrawColorPicker("Tsunami##colWater", () => Configuration.ColorWater, value => Configuration.ColorWater = value);
         DrawColorPicker("Thunder##colThunder", () => Configuration.ColorThunder, value => Configuration.ColorThunder = value);
         DrawColorPicker("Blizzard##colBlizzard", () => Configuration.ColorBlizzard, value => Configuration.ColorBlizzard = value);
         DrawColorPicker("Last Fake toggle - Real##colTogReal", () => Configuration.ColorToggleReal, value => Configuration.ColorToggleReal = value);

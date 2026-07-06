@@ -129,9 +129,9 @@ public static class AnnouncementData
         var set = isFirst ? "1st" : "2nd";
         if (slotId == "title")
         {
-            // Chaos sets are static (Inferno first, Tsunami second), so the title names the mechanic rather than a set number.
+            // Exdeath set titles include the real/fake state; chaos sets are static (Inferno first, Tsunami second) so the title names the mechanic.
             return categoryId == "exdeath"
-                ? $"---------- {set} Set ----------"
+                ? $"---------- {set} Set : {(isReal ? "REAL" : "FAKE")} ----------"
                 : (isFirst ? "---------- Inferno ----------" : "---------- Tsunami ----------");
         }
 
@@ -150,8 +150,8 @@ public static class AnnouncementData
 
         return slotId switch
         {
-            "inferno" => isReal ? "Inferno - Twister (get out)" : "Inferno - Donut (get in)",
-            "tsunami" => isReal ? "Tsunami - Donut (get in)" : "Tsunami - Twister (get out)",
+            "inferno" => isReal ? "Inferno - Twister (MOVE)" : "Inferno - Donut (STAY)",
+            "tsunami" => isReal ? "Tsunami - Donut (STAY)" : "Tsunami - Twister (MOVE)",
             _ => string.Empty,
         };
     }

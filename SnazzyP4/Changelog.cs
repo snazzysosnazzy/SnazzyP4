@@ -18,6 +18,12 @@ public static class Changelog
     /// </summary>
     public static readonly Entry[] Entries =
     {
+        new("1.0.1.0", new[]
+        {
+            "Inferno and Tsunami no longer use the words \"Fire\" or \"Water\" anywhere. The resolution text panel now reads INFERNO TWISTER / INFERNO DONUT / TSUNAMI DONUT / TSUNAMI TWISTER, and the two colour pickers are simply labelled \"Inferno\" and \"Tsunami\".",
+            "Chaos announcement defaults now spell out the movement: Donut (STAY) and Twister (MOVE) - for example \"Inferno - Twister (MOVE)\" and \"Tsunami - Donut (STAY)\". The STAY/MOVE hint is only on the announcements; the resolution text panel still just shows the twister/donut shape.",
+            "First/Second set announcement titles now include the real/fake state, for example \"---------- 2nd Set : FAKE ----------\".",
+        }),
         new("1.0.0.22", new[]
         {
             "Chat tab: new Quick toggles. \"Turn on all announcements\" / \"Turn off all announcements\" flip every announcement except the titles, and \"Turn on set titles\" / \"Turn off set titles\" flip just the titles. They apply across the whole selected channel (both Exdeath and Chaos, every set and real/fake).",

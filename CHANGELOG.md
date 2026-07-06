@@ -3,6 +3,18 @@
 All notable changes to Snazzy P4 are listed here. Versions match the `vX.Y.Z.W`
 release tags.
 
+## v1.0.1.0
+
+- **Inferno/Tsunami terminology** — the words "Fire" and "Water" are gone. The resolution text
+  panel reads **INFERNO TWISTER / INFERNO DONUT / TSUNAMI DONUT / TSUNAMI TWISTER**, and the
+  colour pickers are labelled **Inferno** and **Tsunami**.
+- **STAY / MOVE on chaos announcements** — chaos announcement defaults now spell out the
+  movement: **Donut (STAY)** and **Twister (MOVE)**, e.g. `Inferno - Twister (MOVE)`,
+  `Tsunami - Donut (STAY)`. The STAY/MOVE hint is only on announcements; the resolution text
+  panel still shows just the twister/donut shape.
+- **Real/Fake in set titles** — First/Second set announcement titles now include the state,
+  e.g. `---------- 2nd Set : FAKE ----------`.
+
 ## v1.0.0.22
 
 - **Quick toggles** (Chat tab) — **Turn on / off all announcements** (everything except titles)

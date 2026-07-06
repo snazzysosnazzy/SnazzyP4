@@ -131,10 +131,10 @@ public static class TextLabels
         (GazeReal, "Gaze REAL / LOOK AWAY", "Gaze - real", "Resolutions"),
         (GazeFake, "Gaze FAKE / LOOK", "Gaze - fake", "Resolutions"),
 
-        (InfernoReal, "FIRE TWISTER", "Inferno - real", "Chaos"),
-        (InfernoFake, "FIRE DONUT", "Inferno - fake", "Chaos"),
-        (TsunamiReal, "WATER DONUT", "Tsunami - real", "Chaos"),
-        (TsunamiFake, "WATER TWISTER", "Tsunami - fake", "Chaos"),
+        (InfernoReal, "INFERNO TWISTER", "Inferno - real", "Chaos"),
+        (InfernoFake, "INFERNO DONUT", "Inferno - fake", "Chaos"),
+        (TsunamiReal, "TSUNAMI DONUT", "Tsunami - real", "Chaos"),
+        (TsunamiFake, "TSUNAMI TWISTER", "Tsunami - fake", "Chaos"),
 
         (ThunderName, "THUNDER", "Thunder name", "Kefka text"),
         (BlizzardName, "BLIZZARD", "Blizzard name", "Kefka text"),
