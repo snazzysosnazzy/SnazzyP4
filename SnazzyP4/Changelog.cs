@@ -18,6 +18,11 @@ public static class Changelog
     /// </summary>
     public static readonly Entry[] Entries =
     {
+        new("1.0.3.0", new[]
+        {
+            "Settings tabs reorganised. The old Layout tab's options (toolbar, detached windows, edit layout, Move All, floating Hide/Reset/Undo, Acceleration on the same line, combine sets, bring windows on-screen) now live on the General tab, just below the marker settings.",
+            "The Appearance tab has absorbed the old Sections tab and is renamed Layout. The separate Appearance and Sections tabs are gone. Tabs are now: General, Chat, Layout, Colors, Text, Controller, Hidden.",
+        }),
         new("1.0.2.1", new[]
         {
             "The Edit Layout preview now shows INFERNO TWISTER in the first set (and Tsunami in the second), matching the static chaos sets, instead of Tsunami in both.",

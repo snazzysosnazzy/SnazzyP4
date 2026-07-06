@@ -135,9 +135,12 @@ Open with the **Settings** button or `/snazzyp4 config`. Settings are grouped in
 - **General** — a gold **Never show version update messages** toggle (stops the changelog
   popup after each update), Role (Support / DPS), UI scale, auto-place `/mk` markers with a
   **choice of head marker per role and set** (attack / bind / ignore / shapes, always placed
-  on yourself), **settings profiles** (copy your whole setup to the clipboard or paste one in
-  — handy for sharing a layout), and the reset buttons (**Reset layout to defaults** /
-  **Restore ALL settings to defaults**).
+  on yourself), then the **layout options** — show toolbar, detached windows, edit layout,
+  Move All, floating **Hide** / **Reset** / **Undo** buttons, **Acceleration on the same line**
+  as Spread/Stack (`Spread on X and MOVE`), **combine the First and Second sets** into one panel
+  (stacked or side by side, with a pinnable divider), and **bring all windows on-screen** —
+  followed by **settings profiles** (copy your whole setup to the clipboard or paste one in) and
+  the reset buttons (**Reset layout to defaults** / **Restore ALL settings to defaults**).
 - **Chat** — a full announcement system, gated behind a master **Enable chat announcements**
   toggle (off by default). It has two mutually-exclusive modes: **Party Mode** (default) sends
   only the party-safe callouts — gaze and Inferno/Tsunami — so it is safe to broadcast to your
@@ -150,23 +153,17 @@ Open with the **Settings** button or `/snazzyp4 config`. Settings are grouped in
   box** mode (one chat line per message). Settings are kept **per channel** (Party, Say,
   Linkshells, Echo for testing, and more) with a **Copy settings to...** option, and Personal
   Mode can even route each announcement to its own channel.
-- **Appearance** — Use Universal Settings (one look for everything) or per-section
-  background opacity / hide title bar / hide labels / button opacity, plus **click-through
-  (display-only)** mode. Values are kept **separately for windowed and detached mode**, and
-  only the current mode's controls are shown.
+- **Layout** — **Appearance** (Use Universal Settings for one look, or per-section background
+  opacity / hide title bar / hide labels / button opacity, plus **click-through (display-only)**
+  mode; values are kept **separately for windowed and detached mode**) and **per-section
+  position, scale and appearance** for the current mode.
 - **Colors** — recolour every element, with one-click **colourblind palette presets**
   (Deuteranopia / Protanopia / Tritanopia) as starting points you can fine-tune.
 - **Text** — rename any panel label, section header, resolution callout (spread/stack, gaze,
   acceleration, chaos, Thunder/Blizzard), the **A/B/C/D target letters** or any button to your
   own custom text; blank keeps the default.
-- **Layout** — show toolbar, detached windows, edit layout, Move All, floating **Hide**,
-  **Reset** and **Undo** buttons, put **Acceleration on the same line** as Spread/Stack
-  (`Spread on X and MOVE`), **combine the First and Second sets** into one panel (stacked or
-  side by side, with a pinnable, customisable divider), and **bring all windows on-screen**.
 - **Controller** — hide the macro buttons and copy the per-button slash commands
   (see [Controller Players](#controller-players)).
-- **Sections** — per-section position, scale and (when not universal) appearance for the
-  current mode.
 - **Hidden** — the unlock field for the optional Last Fake resolver (see below).
 
 By default Snazzy P4 runs in **detached** mode — each panel is its own floating window — at a

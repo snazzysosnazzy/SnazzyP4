@@ -114,11 +114,13 @@ public class ConfigWindow : Window, IDisposable
             }
         }
 
-        using (var tab = ImRaii.TabItem("Appearance"))
+        using (var tab = ImRaii.TabItem("Layout"))
         {
             if (tab)
             {
                 DrawAppearance();
+                ImGui.Separator();
+                DrawSections();
             }
         }
 
@@ -138,27 +140,11 @@ public class ConfigWindow : Window, IDisposable
             }
         }
 
-        using (var tab = ImRaii.TabItem("Layout"))
-        {
-            if (tab)
-            {
-                DrawLayout();
-            }
-        }
-
         using (var tab = ImRaii.TabItem("Controller"))
         {
             if (tab)
             {
                 DrawControllerSettings();
-            }
-        }
-
-        using (var tab = ImRaii.TabItem("Sections"))
-        {
-            if (tab)
-            {
-                DrawSections();
             }
         }
 
@@ -172,7 +158,7 @@ public class ConfigWindow : Window, IDisposable
     }
 
     /// <summary>
-    /// Draws the General tab with scale, role, party chat, settings profiles and the reset buttons.
+    /// Draws the General tab with scale, role, markers, layout options, settings profiles and the reset buttons.
     /// </summary>
     private void DrawGeneralTab()
     {
@@ -181,6 +167,8 @@ public class ConfigWindow : Window, IDisposable
         DrawUiScale();
         ImGui.Separator();
         DrawRole();
+        ImGui.Separator();
+        DrawLayout();
         ImGui.Separator();
         DrawProfileImportExport();
         ImGui.Separator();
