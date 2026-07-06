@@ -27,6 +27,12 @@ public class AnnouncementSlot
     /// and always fire regardless of which mechanic was pressed.
     /// </summary>
     public bool IsCustom { get; set; }
+
+    /// <summary>
+    /// Personal Mode per-announcement channel override. Empty means "use the selected channel".
+    /// Only consulted when per-channel announcements are enabled.
+    /// </summary>
+    public string Channel { get; set; } = string.Empty;
 }
 
 /// <summary>
@@ -94,6 +100,12 @@ public static class AnnouncementData
 
     /// <summary>The ordered Chaos announcement slot ids for the second set, which always resolves Tsunami.</summary>
     public static readonly string[] ChaosSecondSlots = { "title", "tsunami" };
+
+    /// <summary>
+    /// Whether a slot is safe to broadcast to party chat: the gaze and the two chaos callouts.
+    /// Party Mode sends only these; Personal Mode blocks everything else from party chat unless overridden.
+    /// </summary>
+    public static bool IsPartySafe(string slotId) => slotId is "gaze" or "inferno" or "tsunami";
 
     /// <summary>
     /// Returns the display label for a slot id.
@@ -195,7 +207,8 @@ public static class AnnouncementData
                 }
             }
 
-            leaf.Slots.Insert(insertAt, new AnnouncementSlot { Id = id });
+            // New built-in slots start enabled, except the title, so a fresh setup announces everything but the titles.
+            leaf.Slots.Insert(insertAt, new AnnouncementSlot { Id = id, Enabled = id != "title" });
         }
 
         // Remove only stale built-in slots; user-added custom slots are always kept.

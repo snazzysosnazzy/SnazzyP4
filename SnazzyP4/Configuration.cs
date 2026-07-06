@@ -184,6 +184,35 @@ public class Configuration : IPluginConfiguration
     public bool AnnouncementsEnabled { get; set; }
 
     /// <summary>
+    /// Whether the advanced Personal Mode option is revealed in the Chat tab. Hidden by default so only Party Mode shows.
+    /// </summary>
+    public bool ShowPersonalMode { get; set; }
+
+    /// <summary>
+    /// Whether Personal Mode is selected. Personal Mode allows every announcement (debuffs, gaze, chaos) but blocks the
+    /// non-party-safe ones from party (/p) chat unless the override is on. Party Mode (the default) sends only gaze and
+    /// Inferno/Tsunami. Only takes effect while <see cref="ShowPersonalMode"/> is true; see <see cref="IsPersonalMode"/>.
+    /// </summary>
+    public bool PersonalMode { get; set; }
+
+    /// <summary>
+    /// The dangerous override that lets Personal Mode send its non-party-safe announcements (debuffs, titles, custom) to
+    /// party (/p) chat. Off by default; enabling it can spam your party, so Party Mode is the intended way to talk to party.
+    /// </summary>
+    public bool PersonalModePartyOverride { get; set; }
+
+    /// <summary>
+    /// Personal Mode only: when true, each ordered announcement can be routed to its own channel instead of the single selected channel.
+    /// </summary>
+    public bool PerChannelAnnouncements { get; set; }
+
+    /// <summary>
+    /// The effective mode: Personal only when it is both revealed and selected; otherwise Party Mode.
+    /// </summary>
+    [Newtonsoft.Json.JsonIgnore]
+    public bool IsPersonalMode => ShowPersonalMode && PersonalMode;
+
+    /// <summary>
     /// When true, per-press announcements are suppressed and instead a single chronological list of every
     /// enabled announcement is sent to the selected channel once the full sequence and both chaos presses are complete.
     /// The list order is: first-set debuffs, 1st gaze, Inferno, second-set debuffs, 2nd gaze, Tsunami.

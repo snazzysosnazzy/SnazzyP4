@@ -443,6 +443,10 @@ public class ConfigWindow : Window, IDisposable
 
         ImGui.TextDisabled("Master switch. When off, nothing below is sent no matter which announcements are toggled on.");
 
+        ImGui.Separator();
+        DrawAnnouncementModeSection();
+        ImGui.Separator();
+
         var chronological = Configuration.AnnouncementChronological;
         if (ImGui.Checkbox("Chronological summary (one ordered list, sent when everything is pressed)", ref chronological))
         {
@@ -477,6 +481,90 @@ public class ConfigWindow : Window, IDisposable
         var announcements = Configuration.GetAnnouncements(Configuration.AnnouncementChannel);
         DrawAnnounceCategory("Announce Exdeath", announcements.Exdeath, "exdeath");
         DrawAnnounceCategory("Announce Chaos", announcements.Chaos, "chaos");
+    }
+
+    /// <summary>
+    /// Draws the Party / Personal mode selector, its warnings and the Personal-only options (party override, per-channel).
+    /// </summary>
+    private void DrawAnnouncementModeSection()
+    {
+        var green = new Vector4(0.45f, 0.85f, 0.45f, 1f);
+        var red = new Vector4(0.96f, 0.35f, 0.32f, 1f);
+        var gold = new Vector4(1f, 0.84f, 0f, 1f);
+
+        ImGui.TextUnformatted("Mode");
+
+        if (Configuration.ShowPersonalMode)
+        {
+            var personal = Configuration.PersonalMode;
+            if (ImGui.RadioButton("Party Mode", !personal) && personal)
+            {
+                Configuration.PersonalMode = false;
+                Configuration.Save();
+            }
+
+            ImGui.SameLine();
+            if (ImGui.RadioButton("Personal Mode", personal) && !personal)
+            {
+                Configuration.PersonalMode = true;
+                Configuration.Save();
+            }
+        }
+        else
+        {
+            ImGui.TextColored(green, "Party Mode");
+        }
+
+        if (Configuration.IsPersonalMode)
+        {
+            using (ImRaii.PushColor(ImGuiCol.Text, red))
+            {
+                ImGui.TextWrapped("PERSONAL MODE - not for party play. Your debuff, title and custom callouts are blocked from /p "
+                                  + "(party) chat; only gaze and Inferno/Tsunami reach party. To broadcast to your party, use Party Mode.");
+            }
+
+            var perChannel = Configuration.PerChannelAnnouncements;
+            if (ImGui.Checkbox("Per-channel announcements (set a channel per announcement)", ref perChannel))
+            {
+                Configuration.PerChannelAnnouncements = perChannel;
+                Configuration.Save();
+            }
+
+            var over = Configuration.PersonalModePartyOverride;
+            if (ImGui.Checkbox("OVERRIDE: allow personal announcements in /p party chat", ref over))
+            {
+                Configuration.PersonalModePartyOverride = over;
+                Configuration.Save();
+            }
+
+            using (ImRaii.PushColor(ImGuiCol.Text, red))
+            {
+                ImGui.TextWrapped("!! DO NOT ENABLE THE OVERRIDE unless you really mean it. It sends all your personal callouts to your "
+                                  + "PARTY, which will spam them. Use Party Mode instead.");
+            }
+        }
+        else
+        {
+            ImGui.TextColored(green, "Sends only gaze and Inferno/Tsunami callouts - safe to broadcast to your party.");
+        }
+
+        var showPersonal = Configuration.ShowPersonalMode;
+        if (ImGui.Checkbox("Show Personal Mode (advanced)", ref showPersonal))
+        {
+            Configuration.ShowPersonalMode = showPersonal;
+            if (!showPersonal)
+            {
+                // Hiding the option reverts to Party Mode behaviour.
+                Configuration.PersonalMode = false;
+            }
+
+            Configuration.Save();
+        }
+
+        if (Configuration.IsPersonalMode)
+        {
+            ImGui.TextColored(gold, "Tip: switch to Party Mode before broadcasting to your party.");
+        }
     }
 
     /// <summary>
@@ -712,6 +800,13 @@ public class ConfigWindow : Window, IDisposable
         for (var index = 0; index < leaf.Slots.Count; index++)
         {
             var slot = leaf.Slots[index];
+
+            // Party Mode only shows the party-safe slots (gaze, Inferno, Tsunami); the rest are Personal Mode only.
+            if (!Configuration.IsPersonalMode && !AnnouncementData.IsPartySafe(slot.Id))
+            {
+                continue;
+            }
+
             using (ImRaii.PushId($"{key}_{slot.Id}"))
             {
                 if (ImGui.ArrowButton("up", ImGuiDir.Up) && index > 0)
@@ -743,6 +838,11 @@ public class ConfigWindow : Window, IDisposable
                     {
                         removeIndex = index;
                     }
+                }
+
+                if (Configuration.IsPersonalMode && Configuration.PerChannelAnnouncements)
+                {
+                    DrawSlotChannelCombo(slot);
                 }
 
                 ImGui.Indent();
@@ -779,7 +879,8 @@ public class ConfigWindow : Window, IDisposable
             }
         }
 
-        if (ImGui.Button($"+ Add custom message##addcustom_{key}"))
+        // Custom messages are not party-safe, so they are only offered in Personal Mode.
+        if (Configuration.IsPersonalMode && ImGui.Button($"+ Add custom message##addcustom_{key}"))
         {
             leaf.Slots.Add(AnnouncementData.NewCustomSlot());
             Configuration.Save();
@@ -939,6 +1040,45 @@ public class ConfigWindow : Window, IDisposable
             if (ImGui.Selectable(label, current == value))
             {
                 Configuration.LastFakeAnnounceDockSide = value;
+                Configuration.Save();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Draws a compact per-announcement channel dropdown, with a "(selected channel)" entry that clears the override.
+    /// </summary>
+    private void DrawSlotChannelCombo(AnnouncementSlot slot)
+    {
+        var current = slot.Channel;
+        var preview = "(selected channel)";
+        foreach (var (channelLabel, prefix) in ChatChannels)
+        {
+            if (prefix == current && !string.IsNullOrEmpty(current))
+            {
+                preview = channelLabel;
+                break;
+            }
+        }
+
+        ImGui.SetNextItemWidth(240f);
+        using var combo = ImRaii.Combo("Channel##slotchan", preview);
+        if (!combo)
+        {
+            return;
+        }
+
+        if (ImGui.Selectable("(selected channel)", string.IsNullOrEmpty(current)))
+        {
+            slot.Channel = string.Empty;
+            Configuration.Save();
+        }
+
+        foreach (var (channelLabel, prefix) in ChatChannels)
+        {
+            if (ImGui.Selectable(channelLabel, current == prefix))
+            {
+                slot.Channel = prefix;
                 Configuration.Save();
             }
         }

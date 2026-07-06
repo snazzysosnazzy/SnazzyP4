@@ -3,6 +3,21 @@
 All notable changes to Snazzy P4 are listed here. Versions match the `vX.Y.Z.W`
 release tags.
 
+## v1.0.2.0
+
+- **Party Mode / Personal Mode** — announcements now have two mutually-exclusive modes.
+  - **Party Mode** (new default) sends only the party-safe callouts — **gaze and
+    Inferno/Tsunami** — so it is safe to broadcast to your party. By default everything is
+    enabled except the titles.
+  - **Personal Mode** is the old full behaviour (all debuffs, titles, custom callouts). It is
+    **hidden by default** — tick **Show Personal Mode (advanced)** to reveal it. It blocks its
+    non-party-safe callouts from `/p` party chat and suggests Party Mode, with a heavily-warned
+    **override** if you insist on sending them to party anyway.
+- **Per-channel announcements** (Personal Mode) — route each announcement to its own channel
+  instead of the single selected channel.
+- Built-in announcements now start **enabled (except titles)** on a fresh setup, so Party Mode
+  works out of the box once the master switch is on.
+
 ## v1.0.1.1
 
 - **Quick toggle buttons** now size to fit their labels, so the text no longer clips.

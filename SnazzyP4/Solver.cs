@@ -1408,7 +1408,7 @@ public class Solver
             return;
         }
 
-        var channel = configuration.AnnouncementChannel;
+        var globalChannel = configuration.AnnouncementChannel;
         var leaf = category.GetLeaf(isFirst, isReal);
 
         if (category.Ordered)
@@ -1424,6 +1424,12 @@ public class Solver
                 // the title and any custom slots always fire when enabled.
                 var isMechanic = slot.Id != "title" && !slot.IsCustom;
                 if (onlySlot != null && isMechanic && slot.Id != onlySlot)
+                {
+                    continue;
+                }
+
+                var channel = SlotChannel(slot, globalChannel);
+                if (!SlotAllowed(slot.Id, channel))
                 {
                     continue;
                 }
@@ -1444,10 +1450,45 @@ public class Solver
             return;
         }
 
+        // Simple mode has no per-mechanic split; treat the whole leaf by category (Chaos is party-safe, Exdeath is not).
+        if (!SlotAllowed(categoryId == "chaos" ? "inferno" : "spread", globalChannel))
+        {
+            return;
+        }
+
         foreach (var line in leaf.SimpleText.Replace("\r", string.Empty).Split('\n'))
         {
-            SendAnnouncement(channel, line);
+            SendAnnouncement(globalChannel, line);
         }
+    }
+
+    /// <summary>
+    /// Resolves the channel a slot is sent to: its own channel when per-channel announcements are on (Personal Mode) and set, otherwise the selected channel.
+    /// </summary>
+    private string SlotChannel(AnnouncementSlot slot, string globalChannel)
+        => configuration.IsPersonalMode && configuration.PerChannelAnnouncements && !string.IsNullOrEmpty(slot.Channel)
+            ? slot.Channel
+            : globalChannel;
+
+    /// <summary>
+    /// Whether a slot may be sent to a channel under the current mode.
+    /// Party Mode only allows party-safe slots (gaze, Inferno, Tsunami). Personal Mode allows everything, but blocks
+    /// non-party-safe slots from party (/p) chat unless the party override is enabled.
+    /// </summary>
+    private bool SlotAllowed(string slotId, string channel)
+    {
+        var partySafe = AnnouncementData.IsPartySafe(slotId);
+        if (!configuration.IsPersonalMode)
+        {
+            return partySafe;
+        }
+
+        if (partySafe)
+        {
+            return true;
+        }
+
+        return channel != "/p" || configuration.PersonalModePartyOverride;
     }
 
     /// <summary>
@@ -1507,17 +1548,17 @@ public class Solver
         var showSet = configuration.AnnouncementShowSetNumber;
 
         // 1. First set Exdeath debuffs (everything enabled except the gaze).
-        CollectLeafMessages(messages, exdeath, "exdeath", true, firstExdeathReal, includeGaze: false, includeNonGaze: true, showSet);
+        CollectLeafMessages(messages, exdeath, "exdeath", true, firstExdeathReal, includeGaze: false, includeNonGaze: true, showSet, channel);
         // 2. First gaze.
-        CollectLeafMessages(messages, exdeath, "exdeath", true, firstExdeathReal, includeGaze: true, includeNonGaze: false, showSet);
+        CollectLeafMessages(messages, exdeath, "exdeath", true, firstExdeathReal, includeGaze: true, includeNonGaze: false, showSet, channel);
         // 3. Inferno (first set chaos).
-        CollectLeafMessages(messages, chaos, "chaos", true, infernoReal, includeGaze: false, includeNonGaze: true, showSet);
+        CollectLeafMessages(messages, chaos, "chaos", true, infernoReal, includeGaze: false, includeNonGaze: true, showSet, channel);
         // 4. Second set Exdeath debuffs (everything enabled except the gaze).
-        CollectLeafMessages(messages, exdeath, "exdeath", false, secondExdeathReal, includeGaze: false, includeNonGaze: true, showSet);
+        CollectLeafMessages(messages, exdeath, "exdeath", false, secondExdeathReal, includeGaze: false, includeNonGaze: true, showSet, channel);
         // 5. Second gaze.
-        CollectLeafMessages(messages, exdeath, "exdeath", false, secondExdeathReal, includeGaze: true, includeNonGaze: false, showSet);
+        CollectLeafMessages(messages, exdeath, "exdeath", false, secondExdeathReal, includeGaze: true, includeNonGaze: false, showSet, channel);
         // 6. Tsunami (second set chaos).
-        CollectLeafMessages(messages, chaos, "chaos", false, tsunamiReal, includeGaze: false, includeNonGaze: true, showSet);
+        CollectLeafMessages(messages, chaos, "chaos", false, tsunamiReal, includeGaze: false, includeNonGaze: true, showSet, channel);
 
         foreach (var message in messages)
         {
@@ -1530,12 +1571,13 @@ public class Solver
     /// The gaze slot is separated out via <paramref name="includeGaze"/>/<paramref name="includeNonGaze"/> so it can be placed after the other debuffs.
     /// Simple-mode leaves have no per-mechanic split, so their text is added only on the non-gaze pass.
     /// </summary>
-    private static void CollectLeafMessages(List<string> output, AnnouncementCategory category, string categoryId, bool isFirst, bool isReal, bool includeGaze, bool includeNonGaze, bool includeSetNumber)
+    private void CollectLeafMessages(List<string> output, AnnouncementCategory category, string categoryId, bool isFirst, bool isReal, bool includeGaze, bool includeNonGaze, bool includeSetNumber, string channel)
     {
         var leaf = category.GetLeaf(isFirst, isReal);
         if (!category.Ordered)
         {
-            if (!includeNonGaze)
+            // Simple mode has no per-mechanic split; allow it by category (Chaos party-safe, Exdeath not) on the non-gaze pass.
+            if (!includeNonGaze || !SlotAllowed(categoryId == "chaos" ? "inferno" : "spread", channel))
             {
                 return;
             }
@@ -1560,6 +1602,11 @@ public class Solver
 
             var isGaze = slot.Id == "gaze";
             if (isGaze ? !includeGaze : !includeNonGaze)
+            {
+                continue;
+            }
+
+            if (!SlotAllowed(slot.Id, channel))
             {
                 continue;
             }

@@ -137,13 +137,17 @@ Open with the **Settings** button or `/snazzyp4 config`. Settings are grouped in
   — handy for sharing a layout), and the reset buttons (**Reset layout to defaults** /
   **Restore ALL settings to defaults**).
 - **Chat** — a full announcement system, gated behind a master **Enable chat announcements**
-  toggle (off by default). **Announce Exdeath** fires when you press an Exdeath
-  Real/Fake button and **Announce Chaos** when you press a chaos button, each split by
-  First/Second set and Real/Fake. Choose **ordered-list** mode (reorderable per-mechanic
-  toggles with custom, reorderable message lists, an optional **Announce Title** line, and a
-  **+ Add custom message** button for your own extra entries) or **simple text box** mode (one
-  chat line per message). Settings are kept **per channel** (Party, Say, Linkshells, Echo for
-  testing, and more) with a **Copy settings to...** option.
+  toggle (off by default). It has two mutually-exclusive modes: **Party Mode** (default) sends
+  only the party-safe callouts — gaze and Inferno/Tsunami — so it is safe to broadcast to your
+  party, while **Personal Mode** (advanced, hidden until you reveal it) adds your debuff, title
+  and custom callouts but blocks those from `/p` party chat unless you flip a heavily-warned
+  override. **Announce Exdeath** fires when you press an Exdeath Real/Fake button and **Announce
+  Chaos** when you press a chaos button, each split by First/Second set and Real/Fake. Choose
+  **ordered-list** mode (reorderable per-mechanic toggles with custom, reorderable message lists,
+  an optional **Announce Title** line, and a **+ Add custom message** button) or **simple text
+  box** mode (one chat line per message). Settings are kept **per channel** (Party, Say,
+  Linkshells, Echo for testing, and more) with a **Copy settings to...** option, and Personal
+  Mode can even route each announcement to its own channel.
 - **Appearance** — Use Universal Settings (one look for everything) or per-section
   background opacity / hide title bar / hide labels / button opacity, plus **click-through
   (display-only)** mode. Values are kept **separately for windowed and detached mode**, and

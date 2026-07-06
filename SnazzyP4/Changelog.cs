@@ -18,6 +18,13 @@ public static class Changelog
     /// </summary>
     public static readonly Entry[] Entries =
     {
+        new("1.0.2.0", new[]
+        {
+            "Announcements now have two mutually-exclusive modes. PARTY MODE (the new default) sends only the party-safe callouts - gaze and Inferno/Tsunami - so it is safe to broadcast to your party. By default it has everything enabled except the titles.",
+            "PERSONAL MODE is the old full behaviour with every announcement (debuffs, titles, custom). It is hidden by default; tick \"Show Personal Mode (advanced)\" to reveal it. It blocks its non-party-safe callouts from /p party chat and suggests using Party Mode - there is a heavily-warned override that WILL send them to party anyway if you insist.",
+            "Personal Mode also adds \"Per-channel announcements\", which lets each announcement be routed to its own channel instead of the single selected channel.",
+            "On a fresh setup, built-in announcements now start enabled (except the titles) so Party Mode works out of the box once you turn the master switch on.",
+        }),
         new("1.0.1.1", new[]
         {
             "Fixed the Quick toggle buttons clipping their text - they now size to fit their labels.",
