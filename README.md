@@ -135,7 +135,7 @@ Open with the **Settings** button or `/snazzyp4 config`. Settings are grouped in
 - **General** — a gold **Never show version update messages** toggle (stops the changelog
   popup after each update), Role (Support / DPS), UI scale, auto-place `/mk` markers with a
   **choice of head marker per role and set** (attack / bind / ignore / shapes, always placed
-  on yourself), then the **layout options** — show toolbar, detached windows, edit layout,
+  on yourself), then a **General Settings** group — show toolbar, detached windows, edit layout,
   Move All, floating **Hide** / **Reset** / **Undo** buttons, **Acceleration on the same line**
   as Spread/Stack (`Spread on X and MOVE`), **combine the First and Second sets** into one panel
   (stacked or side by side, with a pinnable divider), and **bring all windows on-screen** —

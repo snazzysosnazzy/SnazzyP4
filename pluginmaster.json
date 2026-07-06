@@ -4,9 +4,9 @@
     "Name": "Snazzy P4",
     "Punchline": "A robust custom macro system for the Kefka UMAD/DMU Phase 4 mechanics.",
     "Description": "A robust custom macro system for the Kefka UMAD/DMU Phase 4 mechanics. Press the buttons for what you see in the fight and it lays out clean, colour-coded callouts. Open with /snazzyp4.",
-    "Changelog": "Settings tabs reorganised: the old Layout options move to General (below markers), and Appearance absorbs Sections and is renamed Layout. See CHANGELOG.md.",
+    "Changelog": "The changelog now shows each version's release date, and the General tab's \"Layout\" heading is renamed \"General Settings\" to avoid clashing with the Layout tab. See CHANGELOG.md.",
     "InternalName": "SnazzyP4",
-    "AssemblyVersion": "1.0.3.0",
+    "AssemblyVersion": "1.0.3.1",
     "RepoUrl": "https://github.com/snazzysosnazzy/SnazzyP4",
     "ApplicableVersion": "any",
     "Tags": [
@@ -31,11 +31,11 @@
     "DalamudApiLevel": 15,
     "IconUrl": "https://raw.githubusercontent.com/snazzysosnazzy/SnazzyP4/main/SnazzyP4/images/icon.png",
     "ImageUrls": [],
-    "DownloadLinkInstall": "https://github.com/snazzysosnazzy/SnazzyP4/releases/download/v1.0.3.0/latest.zip",
+    "DownloadLinkInstall": "https://github.com/snazzysosnazzy/SnazzyP4/releases/download/v1.0.3.1/latest.zip",
     "IsHide": false,
     "IsTestingExclusive": false,
-    "DownloadLinkTesting": "https://github.com/snazzysosnazzy/SnazzyP4/releases/download/v1.0.3.0/latest.zip",
-    "DownloadLinkUpdate": "https://github.com/snazzysosnazzy/SnazzyP4/releases/download/v1.0.3.0/latest.zip",
+    "DownloadLinkTesting": "https://github.com/snazzysosnazzy/SnazzyP4/releases/download/v1.0.3.1/latest.zip",
+    "DownloadLinkUpdate": "https://github.com/snazzysosnazzy/SnazzyP4/releases/download/v1.0.3.1/latest.zip",
     "DownloadCount": 0,
     "LastUpdate": "1783301537"
   }

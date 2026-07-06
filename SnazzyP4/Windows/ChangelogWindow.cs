@@ -43,6 +43,12 @@ public class ChangelogWindow : Window, IDisposable
         foreach (var entry in entries)
         {
             ImGui.TextColored(new Vector4(1f, 0.84f, 0f, 1f), $"v{entry.Version}");
+            if (!string.IsNullOrEmpty(entry.Date))
+            {
+                ImGui.SameLine();
+                ImGui.TextDisabled($"- {entry.Date}");
+            }
+
             foreach (var change in entry.Changes)
             {
                 ImGui.TextWrapped($"•  {change}");

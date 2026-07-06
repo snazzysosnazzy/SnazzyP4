@@ -3,7 +3,14 @@
 All notable changes to Snazzy P4 are listed here. Versions match the `vX.Y.Z.W`
 release tags.
 
-## v1.0.3.0
+## v1.0.3.1 — 2026-07-06
+
+- The changelog now shows each version's **release date**, both in the update popup and the
+  full changelog window.
+- Renamed the in-app **Layout** heading on the General tab to **General Settings** so it no
+  longer clashes with the Layout tab.
+
+## v1.0.3.0 — 2026-07-06
 
 - **Settings tabs reorganised.** The old **Layout** tab's options (toolbar, detached windows,
   edit layout, Move All, floating Hide/Reset/Undo, Acceleration on the same line, combine sets,
@@ -12,12 +19,12 @@ release tags.
   separate Appearance and Sections tabs are gone. Tabs are now: General, Chat, Layout, Colors,
   Text, Controller, Hidden.
 
-## v1.0.2.1
+## v1.0.2.1 — 2026-07-06
 
 - The **Edit Layout** preview now shows **INFERNO TWISTER** in the first set (and Tsunami in the
   second), matching the static chaos sets, instead of Tsunami in both.
 
-## v1.0.2.0
+## v1.0.2.0 — 2026-07-06
 
 - **Party Mode / Personal Mode** — announcements now have two mutually-exclusive modes.
   - **Party Mode** (new default) sends only the party-safe callouts — **gaze and
@@ -32,7 +39,7 @@ release tags.
 - Built-in announcements now start **enabled (except titles)** on a fresh setup, so Party Mode
   works out of the box once the master switch is on.
 
-## v1.0.1.1
+## v1.0.1.1 — 2026-07-06
 
 - **Quick toggle buttons** now size to fit their labels, so the text no longer clips.
 - The **set-title** Quick toggles only affect the 1st/2nd set (Exdeath) titles now, leaving
@@ -40,7 +47,7 @@ release tags.
 - New Chat-tab setting **Include [1st] / [2nd] prefix in default messages** (on by default).
   Turn it off and a default reads `Lightning - Spread` instead of `[1st] Lightning - Spread`.
 
-## v1.0.1.0
+## v1.0.1.0 — 2026-07-06
 
 - **Inferno/Tsunami terminology** — the words "Fire" and "Water" are gone. The resolution text
   panel reads **INFERNO TWISTER / INFERNO DONUT / TSUNAMI DONUT / TSUNAMI TWISTER**, and the
@@ -52,7 +59,7 @@ release tags.
 - **Real/Fake in set titles** — First/Second set announcement titles now include the state,
   e.g. `---------- 2nd Set : FAKE ----------`.
 
-## v1.0.0.22
+## v1.0.0.22 — 2026-07-06
 
 - **Quick toggles** (Chat tab) — **Turn on / off all announcements** (everything except titles)
   and **Turn on / off set titles**, each applied across the whole selected channel (both
@@ -61,13 +68,13 @@ release tags.
   or `[2nd] Acceleration - Move`. Only the generated defaults change; customised messages are
   left alone.
 
-## v1.0.0.21
+## v1.0.0.21 — 2026-07-06
 
 - **Chronological summary follows the selected channel** — it now sends to whichever channel
   is chosen in the Chat tab (using that channel's configured messages), instead of always
   going to Party (/p).
 
-## v1.0.0.20
+## v1.0.0.20 — 2026-07-05
 
 - **Chronological party-chat summary** — a new Chat-tab option. When on, the per-press
   announcements are held back and the whole announcement list is instead sent to **Party
@@ -76,7 +83,7 @@ release tags.
   Tsunami. It uses the Party (/p) channel's configured messages, sends once per pull, and
   re-arms after a Reset or Undo.
 
-## v1.0.0.19
+## v1.0.0.19 — 2026-07-05
 
 - **Static Chaos sets** — Inferno always resolves in the **First Set** and Tsunami always in
   the **Second Set**, regardless of press order.
@@ -86,7 +93,7 @@ release tags.
   Default Chaos announcement messages no longer carry a set number, and the Chaos
   announcement sections are now named **Inferno** and **Tsunami** instead of First/Second set.
 
-## v1.0.0.18
+## v1.0.0.18 — 2026-07-05
 
 - **Floating Undo button** — the Undo button can now float as its own panel like Hide and
   Reset. A new **Floating Undo button** setting sits next to the Floating Hide/Reset options,
@@ -95,7 +102,7 @@ release tags.
   Stack/Spread** setting is now **on out of the box** (e.g. "Spread on X and MOVE"). Turn it
   off to put Acceleration back on its own line.
 
-## v1.0.0.17
+## v1.0.0.17 — 2026-07-05
 
 - **Master announcements toggle** — an **Enable chat announcements** checkbox at the top of the
   **Chat** tab, **off by default**. While off, nothing is sent no matter which per-mechanic
@@ -104,7 +111,7 @@ release tags.
   button press and its resolution text, one press at a time. Also available as
   `/snazzyp4 undo`. Chat announcements and markers already sent for that press are not recalled.
 
-## v1.0.0.16
+## v1.0.0.16 — 2026-07-05
 
 - **Dock ANNOUNCE to any side** — when the Last Fake ANNOUNCE button is docked, a new
   **Dock side** dropdown anchors it to the **Top**, **Bottom**, **Left** or **Right** of the
@@ -120,7 +127,7 @@ release tags.
   (and a matching button on the update popup) stops the changelog appearing after each
   release. The full changelog stays available from the title-bar button.
 
-## v1.0.0.15
+## v1.0.0.15 — 2026-07-05
 
 - **Extended chat announcements** — the Chat tab replaces the old Gaze/Chaos toggles
   with a full system. **Announce Exdeath** fires on an Exdeath Real/Fake press,
@@ -133,7 +140,7 @@ release tags.
   Kefka panel) posts the current Kefka values to a channel. Use `{KefkaThunder}` /
   `{KefkaBlizzard}` in the message (current value, REAL/FAKE customisable, `?` if unpressed).
 
-## v1.0.0.14
+## v1.0.0.14 — 2026-07-05
 
 - **Update notice** — the first time you open the plugin after an update, a window
   shows which version you came from, which you're on now, and a detailed changelog
@@ -142,7 +149,7 @@ release tags.
 - **Changelog button** — the clipboard icon in the settings title bar opens the full,
   detailed changelog for every version, browsable any time.
 
-## v1.0.0.13
+## v1.0.0.13 — 2026-07-05
 
 - **Customisable auto-markers** — choose which head marker is placed for each
   role and set (attack 1-8, bind 1-3, ignore 1-2, the shapes, or none). Shown
@@ -150,27 +157,27 @@ release tags.
 - **Customisable target letters** — the A/B/C/D spread/stack letters shown in the
   resolutions can now be renamed in the Text tab (per role).
 
-## v1.0.0.12
+## v1.0.0.12 — 2026-07-05
 
 - **Custom text** — a new **Text** settings tab lets you rename every panel label,
   section header, resolution callout (spread/stack, gaze, acceleration, chaos,
   Thunder/Blizzard) and button to whatever text you want. Leave a field blank to
   keep the default.
 
-## v1.0.0.11
+## v1.0.0.11 — 2026-07-04
 
 - The chat announcements moved to their own **Chat** settings tab (renamed from
   "Party chat messages" to **Chat Messages**).
 - Added more channels: **Tell** (current target), **Free Company**, **Linkshells
   1-8** and **Cross-world Linkshells 1-8**.
 
-## v1.0.0.10
+## v1.0.0.10 — 2026-07-03
 
 - **Chat channel selector** — the gaze and chaos announcements can now be sent to
   a channel of your choice (Party, Say, Yell, Shout, Alliance, or **Echo** so only
   you see it, which is handy for testing).
 
-## v1.0.0.9
+## v1.0.0.9 — 2026-07-03
 
 - **Tabbed settings** — the settings window is now organised into General,
   Appearance, Colors, Layout, Controller, Sections and Hidden tabs.
@@ -186,17 +193,17 @@ release tags.
   divider.
 - Added an MIT `LICENSE` and this changelog.
 
-## v1.0.0.8
+## v1.0.0.8 — 2026-07-03
 
 - Added the pinned-divider mode for the combined set panel: the divider holds a
   fixed position while the sets grow outward and the text stays left-aligned.
 - Renamed the previous right-align behaviour to the "Mirror the sets" option.
 
-## v1.0.0.7
+## v1.0.0.7 — 2026-07-03
 
 - Added the expand-from-divider (mirror) option for combined sets.
 
-## v1.0.0.6
+## v1.0.0.6 — 2026-07-03
 
 - **Acceleration on the same line** — option to append MOVE / STAND STILL to the
   Spread/Stack line ("Spread on X and MOVE").
@@ -204,31 +211,31 @@ release tags.
 - **Combined set panel** — option to draw the First and Second sets in one panel,
   stacked or side by side with a divider.
 
-## v1.0.0.5
+## v1.0.0.5 — 2026-07-03
 
 - Highlighted the Hide macro buttons setting in Controller Settings so it is
   easier to find.
 
-## v1.0.0.4
+## v1.0.0.4 — 2026-07-03
 
 - **Controller support** — every button now has a `/snazzyp4 <button>` slash
   command that performs the same action.
 - Added the Controller Settings section with copyable commands and a Hide macro
   buttons option that keeps only the text panels.
 
-## v1.0.0.3
+## v1.0.0.3 — 2026-07-03
 
 - Softened the wording of the hidden Last Fake unlock warning.
 
-## v1.0.0.2
+## v1.0.0.2 — 2026-07-03
 
 - Added kefka / phase search tags.
 
-## v1.0.0.1
+## v1.0.0.1 — 2026-07-03
 
 - The Floating Hide button is now enabled by default.
 
-## v1.0.0.0
+## v1.0.0.0 — 2026-07-03
 
 - Initial release of Snazzy P4 as a Dalamud plugin distributed through a custom
   repository, with a tag-triggered release workflow and Ko-fi support link.

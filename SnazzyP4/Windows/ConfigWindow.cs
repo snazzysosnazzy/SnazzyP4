@@ -1116,7 +1116,7 @@ public class ConfigWindow : Window, IDisposable
     /// </summary>
     private void DrawLayout()
     {
-        ImGui.TextUnformatted("Layout");
+        ImGui.TextUnformatted("General Settings");
 
         var showToolbar = Configuration.ShowToolbar;
         if (ImGui.Checkbox("Show toolbar (Edit / Detached / Move All / Reset)", ref showToolbar))
