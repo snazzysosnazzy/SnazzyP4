@@ -3,6 +3,15 @@
 All notable changes to Snazzy P4 are listed here. Versions match the `vX.Y.Z.W`
 release tags.
 
+## v1.0.0.22
+
+- **Quick toggles** (Chat tab) — **Turn on / off all announcements** (everything except titles)
+  and **Turn on / off set titles**, each applied across the whole selected channel (both
+  Exdeath and Chaos, every set and real/fake).
+- **New default message format** — `[set] Debuff - Resolvement`, e.g. `[1st] Lightning - Spread`
+  or `[2nd] Acceleration - Move`. Only the generated defaults change; customised messages are
+  left alone.
+
 ## v1.0.0.21
 
 - **Chronological summary follows the selected channel** — it now sends to whichever channel

@@ -18,6 +18,11 @@ public static class Changelog
     /// </summary>
     public static readonly Entry[] Entries =
     {
+        new("1.0.0.22", new[]
+        {
+            "Chat tab: new Quick toggles. \"Turn on all announcements\" / \"Turn off all announcements\" flip every announcement except the titles, and \"Turn on set titles\" / \"Turn off set titles\" flip just the titles. They apply across the whole selected channel (both Exdeath and Chaos, every set and real/fake).",
+            "Announcement default messages are reformatted to \"[set] Debuff - Resolvement\", for example \"[1st] Lightning - Spread\" or \"[2nd] Acceleration - Move\". This only affects the generated defaults; any messages you have customised are left as they are.",
+        }),
         new("1.0.0.21", new[]
         {
             "The Chronological summary now sends to whichever channel is selected in the Chat tab (using that channel's configured messages), instead of always going to Party (/p).",

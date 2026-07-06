@@ -135,22 +135,23 @@ public static class AnnouncementData
                 : (isFirst ? "---------- Inferno ----------" : "---------- Tsunami ----------");
         }
 
+        // Format: "[set] Debuff - Resolvement", for example "[1st] Lightning - Spread".
         if (categoryId == "exdeath")
         {
             return slotId switch
             {
-                "gaze" => isReal ? $"{set} Gaze REAL - look away" : $"{set} Gaze FAKE - look",
-                "spread" => $"{set} Spread",
-                "drop" => $"{set} Water Drop",
-                "accel" => isReal ? $"{set} Acceleration - stand still" : $"{set} Acceleration - move",
+                "gaze" => isReal ? $"[{set}] Gaze - Look Away" : $"[{set}] Gaze - Look",
+                "spread" => isReal ? $"[{set}] Lightning - Spread" : $"[{set}] Lightning - Stack",
+                "drop" => isReal ? $"[{set}] Water Drop - Stack" : $"[{set}] Water Drop - Spread",
+                "accel" => isReal ? $"[{set}] Acceleration - Stand Still" : $"[{set}] Acceleration - Move",
                 _ => string.Empty,
             };
         }
 
         return slotId switch
         {
-            "inferno" => isReal ? "Inferno REAL - twister (get out)" : "Inferno FAKE - donut (get in)",
-            "tsunami" => isReal ? "Tsunami REAL - donut (get in)" : "Tsunami FAKE - twister (get out)",
+            "inferno" => isReal ? "Inferno - Twister (get out)" : "Inferno - Donut (get in)",
+            "tsunami" => isReal ? "Tsunami - Donut (get in)" : "Tsunami - Twister (get out)",
             _ => string.Empty,
         };
     }

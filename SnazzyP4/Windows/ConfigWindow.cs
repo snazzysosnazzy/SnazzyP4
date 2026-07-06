@@ -457,6 +457,7 @@ public class ConfigWindow : Window, IDisposable
 
         DrawChannelSelector();
         DrawCopyToChannel();
+        DrawAnnouncementBulkToggles();
         if (!string.IsNullOrEmpty(chatStatus))
         {
             ImGui.TextDisabled(chatStatus);
@@ -467,6 +468,82 @@ public class ConfigWindow : Window, IDisposable
         var announcements = Configuration.GetAnnouncements(Configuration.AnnouncementChannel);
         DrawAnnounceCategory("Announce Exdeath", announcements.Exdeath, "exdeath");
         DrawAnnounceCategory("Announce Chaos", announcements.Chaos, "chaos");
+    }
+
+    /// <summary>
+    /// Draws the bulk enable/disable buttons for the selected channel: all announcements (except titles) and the set titles.
+    /// </summary>
+    private void DrawAnnouncementBulkToggles()
+    {
+        ImGui.TextUnformatted("Quick toggles (this channel)");
+
+        var buttonSize = new Vector2(210f, 0f);
+        if (ImGui.Button("Turn on all announcements", buttonSize))
+        {
+            SetAllAnnouncementSlots(enabled: true, titlesOnly: false);
+        }
+
+        ImGui.SameLine();
+        if (ImGui.Button("Turn off all announcements", buttonSize))
+        {
+            SetAllAnnouncementSlots(enabled: false, titlesOnly: false);
+        }
+
+        if (ImGui.Button("Turn on set titles", buttonSize))
+        {
+            SetAllAnnouncementSlots(enabled: true, titlesOnly: true);
+        }
+
+        ImGui.SameLine();
+        if (ImGui.Button("Turn off set titles", buttonSize))
+        {
+            SetAllAnnouncementSlots(enabled: false, titlesOnly: true);
+        }
+    }
+
+    /// <summary>
+    /// Enables or disables announcement slots across both categories and every set/real-fake leaf for the selected channel.
+    /// When <paramref name="titlesOnly"/> is true only the title slots are affected; otherwise every non-title slot is.
+    /// </summary>
+    private void SetAllAnnouncementSlots(bool enabled, bool titlesOnly)
+    {
+        var announcements = Configuration.GetAnnouncements(Configuration.AnnouncementChannel);
+        ApplyAnnouncementToggle(announcements.Exdeath, "exdeath", enabled, titlesOnly);
+        ApplyAnnouncementToggle(announcements.Chaos, "chaos", enabled, titlesOnly);
+        Configuration.Save();
+
+        chatStatus = titlesOnly
+            ? (enabled ? "Turned on all set titles." : "Turned off all set titles.")
+            : (enabled ? "Turned on all announcements (except titles)." : "Turned off all announcements (except titles).");
+    }
+
+    /// <summary>
+    /// Applies an enable/disable to the matching slots of every leaf in one category, ensuring the leaf's slots exist first.
+    /// </summary>
+    private static void ApplyAnnouncementToggle(AnnouncementCategory category, string categoryId, bool enabled, bool titlesOnly)
+    {
+        for (var f = 0; f < 2; f++)
+        {
+            var isFirst = f == 0;
+            var slotIds = categoryId == "chaos"
+                ? (isFirst ? AnnouncementData.ChaosFirstSlots : AnnouncementData.ChaosSecondSlots)
+                : AnnouncementData.ExdeathSlots;
+
+            for (var r = 0; r < 2; r++)
+            {
+                var leaf = category.GetLeaf(isFirst, r == 0);
+                AnnouncementData.EnsureSlots(leaf, slotIds);
+                foreach (var slot in leaf.Slots)
+                {
+                    if (titlesOnly != (slot.Id == "title"))
+                    {
+                        continue;
+                    }
+
+                    slot.Enabled = enabled;
+                }
+            }
+        }
     }
 
     /// <summary>
