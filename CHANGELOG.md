@@ -3,6 +3,11 @@
 All notable changes to Snazzy P4 are listed here. Versions match the `vX.Y.Z.W`
 release tags.
 
+## v1.0.2.1
+
+- The **Edit Layout** preview now shows **INFERNO TWISTER** in the first set (and Tsunami in the
+  second), matching the static chaos sets, instead of Tsunami in both.
+
 ## v1.0.2.0
 
 - **Party Mode / Personal Mode** — announcements now have two mutually-exclusive modes.

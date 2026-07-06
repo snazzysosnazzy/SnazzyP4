@@ -558,7 +558,11 @@ public class Solver
             }
 
             lines.Add(new List<SetRun> { ColorRun(configuration.GetText(TextLabels.GazeReal), GazeRealColor) });
-            lines.Add(new List<SetRun> { ColorRun(configuration.GetText(TextLabels.TsunamiReal), WaterColor) });
+
+            // Chaos is static: the first set resolves Inferno, the second resolves Tsunami.
+            lines.Add(isShort
+                ? new List<SetRun> { ColorRun(configuration.GetText(TextLabels.InfernoReal), FireColor) }
+                : new List<SetRun> { ColorRun(configuration.GetText(TextLabels.TsunamiReal), WaterColor) });
             return lines;
         }
 

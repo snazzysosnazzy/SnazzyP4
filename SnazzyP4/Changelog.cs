@@ -18,6 +18,10 @@ public static class Changelog
     /// </summary>
     public static readonly Entry[] Entries =
     {
+        new("1.0.2.1", new[]
+        {
+            "The Edit Layout preview now shows INFERNO TWISTER in the first set (and Tsunami in the second), matching the static chaos sets, instead of Tsunami in both.",
+        }),
         new("1.0.2.0", new[]
         {
             "Announcements now have two mutually-exclusive modes. PARTY MODE (the new default) sends only the party-safe callouts - gaze and Inferno/Tsunami - so it is safe to broadcast to your party. By default it has everything enabled except the titles.",
