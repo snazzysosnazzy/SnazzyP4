@@ -3,6 +3,12 @@
 All notable changes to Snazzy P4 are listed here. Versions match the `vX.Y.Z.W`
 release tags.
 
+## v1.0.3.2 — 2026-07-06
+
+- Fixed the **Layout** tab showing in the wrong place (after Text) instead of between **Chat**
+  and **Colors** — ImGui was remembering the old Layout tab's saved position. Tab order is now
+  General, Chat, Layout, Colors, Text, Controller, Hidden as intended.
+
 ## v1.0.3.1 — 2026-07-06
 
 - The changelog now shows each version's **release date**, both in the update popup and the

@@ -19,6 +19,10 @@ public static class Changelog
     /// </summary>
     public static readonly Entry[] Entries =
     {
+        new("1.0.3.2", "2026-07-06", new[]
+        {
+            "Fixed the Layout tab appearing in the wrong place (after Text) instead of between Chat and Colors - ImGui was remembering the old Layout tab's saved position. It now sits in the intended order: General, Chat, Layout, Colors, Text, Controller, Hidden.",
+        }),
         new("1.0.3.1", "2026-07-06", new[]
         {
             "The changelog now shows each version's release date, both in the update popup and the full changelog window.",

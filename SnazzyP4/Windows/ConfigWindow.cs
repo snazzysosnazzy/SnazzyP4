@@ -92,7 +92,8 @@ public class ConfigWindow : Window, IDisposable
     {
         DrawTitleAndCredit();
 
-        using var tabs = ImRaii.TabBar("##snazzyp4_settings_tabs");
+        // The bar id is versioned so ImGui discards any saved tab order (a previous "Layout" tab held a stale slot) and lays tabs out in submission order.
+        using var tabs = ImRaii.TabBar("##snazzyp4_settings_tabs_v2");
         if (!tabs)
         {
             return;
