@@ -56,8 +56,10 @@ as one window or as separate floating panels.
                            2. Move / Stand Still
                            3. Gaze
                            4. Twister / Donut
-- **Chat Callouts** — Optional announcements for Gazes and Chaos, sent to a chat channel of
-                      your choice (party, linkshell, free company, echo for testing, and more).
+- **Chat Callouts** — Optional announcements sent to a chat channel of your choice (party,
+                      linkshell, free company, echo for testing, and more). A party-safe
+                      **Party Mode** (gaze + Inferno/Tsunami only) is the default; an advanced
+                      **Personal Mode** adds your debuff/title/custom callouts.
 - **Self Marked Spreads** — Optional Self marking for spread markers based on role.
 
 ## Installation
@@ -157,8 +159,8 @@ Open with the **Settings** button or `/snazzyp4 config`. Settings are grouped in
 - **Text** — rename any panel label, section header, resolution callout (spread/stack, gaze,
   acceleration, chaos, Thunder/Blizzard), the **A/B/C/D target letters** or any button to your
   own custom text; blank keeps the default.
-- **Layout** — show toolbar, detached windows, edit layout, Move All, floating **Hide** and
-  **Reset** buttons, put **Acceleration on the same line** as Spread/Stack
+- **Layout** — show toolbar, detached windows, edit layout, Move All, floating **Hide**,
+  **Reset** and **Undo** buttons, put **Acceleration on the same line** as Spread/Stack
   (`Spread on X and MOVE`), **combine the First and Second sets** into one panel (stacked or
   side by side, with a pinnable, customisable divider), and **bring all windows on-screen**.
 - **Controller** — hide the macro buttons and copy the per-button slash commands
