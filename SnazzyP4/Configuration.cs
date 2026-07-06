@@ -185,9 +185,9 @@ public class Configuration : IPluginConfiguration
 
     /// <summary>
     /// When true, per-press announcements are suppressed and instead a single chronological list of every
-    /// enabled announcement is sent to party chat (/p) once the full sequence and both chaos presses are complete.
+    /// enabled announcement is sent to the selected channel once the full sequence and both chaos presses are complete.
     /// The list order is: first-set debuffs, 1st gaze, Inferno, second-set debuffs, 2nd gaze, Tsunami.
-    /// Uses the Party (/p) channel's configured announcement messages.
+    /// Uses the currently selected channel's configured announcement messages.
     /// </summary>
     public bool AnnouncementChronological { get; set; }
 

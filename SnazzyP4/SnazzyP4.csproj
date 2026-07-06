@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Dalamud.NET.Sdk/15.0.0">
   <PropertyGroup>
-    <Version>1.0.0.20</Version>
+    <Version>1.0.0.21</Version>
     <Description>In-game solver/cheat-sheet for the Exdeath mechanics (Exdeath real/fake, short/long spread-stack-move, gaze, fire/water twisters, thunder/blizzard).</Description>
     <PackageProjectUrl>https://github.com/</PackageProjectUrl>
     <IsPackable>false</IsPackable>

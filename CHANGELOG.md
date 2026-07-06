@@ -3,6 +3,12 @@
 All notable changes to Snazzy P4 are listed here. Versions match the `vX.Y.Z.W`
 release tags.
 
+## v1.0.0.21
+
+- **Chronological summary follows the selected channel** — it now sends to whichever channel
+  is chosen in the Chat tab (using that channel's configured messages), instead of always
+  going to Party (/p).
+
 ## v1.0.0.20
 
 - **Chronological party-chat summary** — a new Chat-tab option. When on, the per-press

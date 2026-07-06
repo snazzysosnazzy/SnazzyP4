@@ -1492,13 +1492,13 @@ public class Solver
     }
 
     /// <summary>
-    /// Builds and sends the chronological announcement list to party chat in resolution order:
+    /// Builds and sends the chronological announcement list, in resolution order, to the currently selected channel:
     /// first-set debuffs, 1st gaze, Inferno, second-set debuffs, 2nd gaze, Tsunami.
-    /// It reads the Party (/p) channel's configured announcement messages.
+    /// It reads the selected channel's configured announcement messages.
     /// </summary>
     private void SendChronological()
     {
-        const string channel = "/p";
+        var channel = configuration.AnnouncementChannel;
         var announcements = configuration.GetAnnouncements(channel);
         var exdeath = announcements.Exdeath;
         var chaos = announcements.Chaos;

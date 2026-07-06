@@ -444,15 +444,15 @@ public class ConfigWindow : Window, IDisposable
         ImGui.TextDisabled("Master switch. When off, nothing below is sent no matter which announcements are toggled on.");
 
         var chronological = Configuration.AnnouncementChronological;
-        if (ImGui.Checkbox("Chronological party-chat summary (one ordered list, sent when everything is pressed)", ref chronological))
+        if (ImGui.Checkbox("Chronological summary (one ordered list, sent when everything is pressed)", ref chronological))
         {
             Configuration.AnnouncementChronological = chronological;
             Configuration.Save();
         }
 
         ImGui.TextDisabled("When on, the per-press announcements are held back. Instead, once both Exdeaths, both debuff picks and both\n"
-                           + "chaos are pressed, the whole list is sent to Party (/p) in resolution order: 1st-set debuffs, 1st gaze, Inferno,\n"
-                           + "2nd-set debuffs, 2nd gaze, Tsunami. Configure the messages on the Party (/p) channel below.");
+                           + "chaos are pressed, the whole list is sent to the selected channel in resolution order: 1st-set debuffs,\n"
+                           + "1st gaze, Inferno, 2nd-set debuffs, 2nd gaze, Tsunami.");
         ImGui.Separator();
 
         DrawChannelSelector();

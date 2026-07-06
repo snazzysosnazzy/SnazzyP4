@@ -18,6 +18,10 @@ public static class Changelog
     /// </summary>
     public static readonly Entry[] Entries =
     {
+        new("1.0.0.21", new[]
+        {
+            "The Chronological summary now sends to whichever channel is selected in the Chat tab (using that channel's configured messages), instead of always going to Party (/p).",
+        }),
         new("1.0.0.20", new[]
         {
             "New \"Chronological party-chat summary\" option on the Chat tab. When on, the per-press announcements are held back and the whole announcement list is instead sent to Party (/p) as one ordered list, only once both Exdeaths, both debuff picks and both chaos have been pressed.",
