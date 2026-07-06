@@ -171,9 +171,73 @@ public class ConfigWindow : Window, IDisposable
         ImGui.Separator();
         DrawLayout();
         ImGui.Separator();
+        DrawAutomationSettings();
+        ImGui.Separator();
         DrawProfileImportExport();
         ImGui.Separator();
         DrawResetButtons();
+    }
+
+    /// <summary>
+    /// Draws the optional game-state automation toggles: auto open/close on a captured duty, and reset/hide behaviours.
+    /// </summary>
+    private void DrawAutomationSettings()
+    {
+        ImGui.TextUnformatted("Automation");
+
+        var autoDuty = Configuration.AutoOpenCloseOnDuty;
+        if (ImGui.Checkbox("Auto Open/Close SnazzyP4 upon Enter/Exit of Duty", ref autoDuty))
+        {
+            Configuration.AutoOpenCloseOnDuty = autoDuty;
+            Configuration.Save();
+        }
+
+        ImGui.Indent();
+        var current = Plugin.ClientState.TerritoryType;
+        ImGui.TextDisabled(Configuration.AutoDutyTerritoryId == 0
+            ? "No instance captured yet. Enter Dancing Mad (Ultimate), then click the button below."
+            : $"Trigger instance id: {Configuration.AutoDutyTerritoryId}  (you are currently in zone {current}).");
+
+        if (ImGui.Button("Use current instance as the trigger"))
+        {
+            Configuration.AutoDutyTerritoryId = current;
+            Configuration.Save();
+        }
+
+        if (Configuration.AutoDutyTerritoryId != 0)
+        {
+            ImGui.SameLine();
+            if (ImGui.Button("Clear##autoduty"))
+            {
+                Configuration.AutoDutyTerritoryId = 0;
+                Configuration.Save();
+            }
+        }
+
+        ImGui.Unindent();
+
+        var resetOnHide = Configuration.ResetOnHide;
+        if (ImGui.Checkbox("Reset on Hide Button Press", ref resetOnHide))
+        {
+            Configuration.ResetOnHide = resetOnHide;
+            Configuration.Save();
+        }
+
+        var resetOnWipe = Configuration.ResetOnWipe;
+        if (ImGui.Checkbox("Reset on Wipe", ref resetOnWipe))
+        {
+            Configuration.ResetOnWipe = resetOnWipe;
+            Configuration.Save();
+        }
+
+        var hideOnWipe = Configuration.HideOnWipe;
+        if (ImGui.Checkbox("Hide on Wipe", ref hideOnWipe))
+        {
+            Configuration.HideOnWipe = hideOnWipe;
+            Configuration.Save();
+        }
+
+        ImGui.TextDisabled("Wipe detection uses the game's duty state and fires when the whole party is defeated.");
     }
 
     /// <summary>

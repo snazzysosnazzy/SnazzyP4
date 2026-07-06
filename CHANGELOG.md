@@ -3,6 +3,18 @@
 All notable changes to Snazzy P4 are listed here. Versions match the `vX.Y.Z.W`
 release tags.
 
+## v1.0.4.0 — 2026-07-06
+
+- **Automation settings** (General tab, all **off by default**):
+  - **Auto Open/Close SnazzyP4 upon Enter/Exit of Duty** — opens the overlay when you enter a
+    captured instance and closes it when you leave. Click **Use current instance** while inside
+    Dancing Mad (Ultimate) to set the trigger zone.
+  - **Reset on Hide Button Press** — runs Reset whenever you press the Hide button.
+  - **Reset on Wipe** / **Hide on Wipe** — run Reset / Hide when the party wipes, via the game's
+    duty-state wipe detection.
+- These are the only game state the plugin reads, and it's non-combat (which duty you're in, and
+  whether the party wiped) — nothing about the fight itself is read or resolved.
+
 ## v1.0.3.3 — 2026-07-06
 
 - Minor internal cleanup and changelog wording tidy-up.

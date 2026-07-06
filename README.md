@@ -17,8 +17,12 @@ I made this plugin ultimately to cut down on macro bloat and make it easier to r
 a solution for the community that would persuade them to avoid ever adopting Auto-Markers for this phase.
 
 What Snazzy P4 does ***NOT*** do:
-1. Does not read the game in any way or parse combat data in anyway.
+1. Does not parse combat data, read your debuffs, or resolve any mechanic for you.
 2. Does not resolve the mechanic for you.
+
+The only game state it ever reads is optional and non-combat: the **Automation** settings can
+check which duty you're in and whether the party wiped, purely to auto open/close/reset the
+overlay. Nothing about the fight itself is read or resolved for you. These are all off by default.
 
 I have tried my best to stay true to this.
 
@@ -139,8 +143,12 @@ Open with the **Settings** button or `/snazzyp4 config`. Settings are grouped in
   Move All, floating **Hide** / **Reset** / **Undo** buttons, **Acceleration on the same line**
   as Spread/Stack (`Spread on X and MOVE`), **combine the First and Second sets** into one panel
   (stacked or side by side, with a pinnable divider), and **bring all windows on-screen** —
-  followed by **settings profiles** (copy your whole setup to the clipboard or paste one in) and
-  the reset buttons (**Reset layout to defaults** / **Restore ALL settings to defaults**).
+  an **Automation** group (all off by default): **Auto Open/Close on Enter/Exit of Duty** (open
+  the overlay when you enter a captured instance and close it when you leave — click "Use current
+  instance" while inside Dancing Mad to set it), **Reset on Hide Button Press**, **Reset on Wipe**
+  and **Hide on Wipe** (wipe detection uses the game's duty state) — followed by **settings
+  profiles** (copy your whole setup to the clipboard or paste one in) and the reset buttons
+  (**Reset layout to defaults** / **Restore ALL settings to defaults**).
 - **Chat** — a full announcement system, gated behind a master **Enable chat announcements**
   toggle (off by default). It has two mutually-exclusive modes: **Party Mode** (default) sends
   only the party-safe callouts — gaze and Inferno/Tsunami — so it is safe to broadcast to your

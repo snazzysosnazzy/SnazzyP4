@@ -45,6 +45,16 @@ public sealed class Plugin : IDalamudPlugin
     [PluginService] internal static IPluginLog Log { get; private set; } = null!;
 
     /// <summary>
+    /// The Dalamud client-state service, used for the current territory and territory-change notifications.
+    /// </summary>
+    [PluginService] internal static IClientState ClientState { get; private set; } = null!;
+
+    /// <summary>
+    /// The Dalamud duty-state service, used to detect a party wipe.
+    /// </summary>
+    [PluginService] internal static IDutyState DutyState { get; private set; } = null!;
+
+    /// <summary>
     /// The slash command that opens the plugin.
     /// </summary>
     private const string CommandName = "/snazzyp4";
@@ -123,6 +133,11 @@ public sealed class Plugin : IDalamudPlugin
     /// Whether the update-notice check has already run this session.
     /// </summary>
     private bool updateChecked;
+
+    /// <summary>
+    /// The last known territory id, used to detect leaving the captured auto-open/close duty.
+    /// </summary>
+    private uint lastTerritory;
 
     /// <summary>
     /// The group move delta published for the current frame.
@@ -211,6 +226,11 @@ public sealed class Plugin : IDalamudPlugin
         PluginInterface.UiBuilder.OpenMainUi += ToggleMainUi;
         PluginInterface.UiBuilder.OpenConfigUi += ToggleConfigUi;
 
+        // Optional game-state automation: auto open/close on the captured duty, and reset/hide on a party wipe.
+        lastTerritory = ClientState.TerritoryType;
+        ClientState.TerritoryChanged += OnTerritoryChanged;
+        DutyState.DutyWiped += OnDutyWiped;
+
         Log.Information("Snazzy P4 loaded. Use /snazzyp4 to open.");
     }
 
@@ -223,6 +243,8 @@ public sealed class Plugin : IDalamudPlugin
         PluginInterface.UiBuilder.Draw -= WindowSystem.Draw;
         PluginInterface.UiBuilder.OpenMainUi -= ToggleMainUi;
         PluginInterface.UiBuilder.OpenConfigUi -= ToggleConfigUi;
+        ClientState.TerritoryChanged -= OnTerritoryChanged;
+        DutyState.DutyWiped -= OnDutyWiped;
 
         WindowSystem.RemoveAllWindows();
         MainWindow.Dispose();
@@ -233,6 +255,42 @@ public sealed class Plugin : IDalamudPlugin
         }
 
         CommandManager.RemoveHandler(CommandName);
+    }
+
+    /// <summary>
+    /// Opens the plugin window when entering, and closes it when leaving, the captured auto-open/close duty.
+    /// </summary>
+    private void OnTerritoryChanged(uint territory)
+    {
+        if (Configuration.AutoOpenCloseOnDuty && Configuration.AutoDutyTerritoryId != 0)
+        {
+            if (territory == Configuration.AutoDutyTerritoryId)
+            {
+                MainWindow.IsOpen = true;
+            }
+            else if (lastTerritory == Configuration.AutoDutyTerritoryId)
+            {
+                MainWindow.IsOpen = false;
+            }
+        }
+
+        lastTerritory = territory;
+    }
+
+    /// <summary>
+    /// Runs the optional Reset and Hide actions when the party wipes.
+    /// </summary>
+    private void OnDutyWiped(Dalamud.Game.DutyState.IDutyStateEventArgs args)
+    {
+        if (Configuration.ResetOnWipe)
+        {
+            Solver.ResetAll();
+        }
+
+        if (Configuration.HideOnWipe)
+        {
+            Solver.SetHidden(true);
+        }
     }
 
     /// <summary>
@@ -423,8 +481,7 @@ public sealed class Plugin : IDalamudPlugin
                 Solver.Undo();
                 break;
             case "hide":
-                Configuration.Hidden = !Configuration.Hidden;
-                Configuration.Save();
+                Solver.SetHidden(!Configuration.Hidden);
                 break;
             case "lastthunderreal" when Configuration.ShowLastFake:
                 Solver.CommandLastThunder(false);

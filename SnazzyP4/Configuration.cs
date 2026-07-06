@@ -178,6 +178,31 @@ public class Configuration : IPluginConfiguration
     public string LastFakeAnnounceFakeText { get; set; } = "FAKE";
 
     /// <summary>
+    /// Whether the plugin window auto-opens on entering, and auto-closes on leaving, the captured duty (see <see cref="AutoDutyTerritoryId"/>). Off by default.
+    /// </summary>
+    public bool AutoOpenCloseOnDuty { get; set; }
+
+    /// <summary>
+    /// The territory id captured for <see cref="AutoOpenCloseOnDuty"/>. Zero means none captured yet.
+    /// </summary>
+    public uint AutoDutyTerritoryId { get; set; }
+
+    /// <summary>
+    /// Whether pressing the Hide button also runs Reset. Off by default.
+    /// </summary>
+    public bool ResetOnHide { get; set; }
+
+    /// <summary>
+    /// Whether a party wipe runs Reset. Off by default.
+    /// </summary>
+    public bool ResetOnWipe { get; set; }
+
+    /// <summary>
+    /// Whether a party wipe hides the display. Off by default.
+    /// </summary>
+    public bool HideOnWipe { get; set; }
+
+    /// <summary>
     /// The master switch for the Exdeath and Chaos chat announcements. When false, no announcement fires on any button press.
     /// Disabled by default so nothing is sent to chat until the user opts in.
     /// </summary>

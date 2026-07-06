@@ -19,6 +19,13 @@ public static class Changelog
     /// </summary>
     public static readonly Entry[] Entries =
     {
+        new("1.0.4.0", "2026-07-06", new[]
+        {
+            "New Automation settings on the General tab (all off by default). \"Auto Open/Close SnazzyP4 upon Enter/Exit of Duty\" opens the overlay when you enter a captured instance and closes it when you leave - click \"Use current instance\" while standing in Dancing Mad (Ultimate) to set the trigger.",
+            "\"Reset on Hide Button Press\" runs Reset whenever you press the Hide button.",
+            "\"Reset on Wipe\" and \"Hide on Wipe\" run Reset / Hide when the party wipes, using the game's duty-state wipe detection.",
+            "Note: the wipe and duty automation are the only game state the plugin ever reads, and it is non-combat (which duty you are in, and whether the party wiped) - nothing about the fight itself is read or resolved.",
+        }),
         new("1.0.3.3", "2026-07-06", new[]
         {
             "Minor internal cleanup and changelog wording tidy-up.",

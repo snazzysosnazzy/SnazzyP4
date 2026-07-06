@@ -171,8 +171,7 @@ public class MainWindow : Window, IDisposable
             // The toolbar provides the unhide button only when the Hide control is not floating.
             if (!Configuration.FloatingHideButton && ImGui.Button("Show"))
             {
-                Configuration.Hidden = false;
-                Configuration.Save();
+                plugin.Solver.SetHidden(false);
             }
 
             return;
@@ -208,8 +207,7 @@ public class MainWindow : Window, IDisposable
         {
             if (ImGui.Button("Hide"))
             {
-                Configuration.Hidden = true;
-                Configuration.Save();
+                plugin.Solver.SetHidden(true);
             }
 
             ImGui.SameLine();

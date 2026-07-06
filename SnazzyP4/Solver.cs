@@ -852,9 +852,28 @@ public class Solver
         {
             if (ImGui.Button(configuration.GetText(configuration.Hidden ? TextLabels.ShowButton : TextLabels.HideButton), new Vector2(90, 34) * scale))
             {
-                configuration.Hidden = !configuration.Hidden;
-                configuration.Save();
+                SetHidden(!configuration.Hidden);
             }
+        }
+    }
+
+    /// <summary>
+    /// Sets the hidden state and persists it. When it becomes hidden and "Reset on Hide" is enabled, it also runs Reset.
+    /// All Hide/Show buttons and the /snazzyp4 hide command route through here so the behaviour is consistent.
+    /// </summary>
+    public void SetHidden(bool hidden)
+    {
+        if (configuration.Hidden == hidden)
+        {
+            return;
+        }
+
+        configuration.Hidden = hidden;
+        configuration.Save();
+
+        if (hidden && configuration.ResetOnHide)
+        {
+            ResetAll();
         }
     }
 
