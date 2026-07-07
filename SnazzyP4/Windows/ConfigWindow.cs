@@ -169,9 +169,9 @@ public class ConfigWindow : Window, IDisposable
         ImGui.Separator();
         DrawRole();
         ImGui.Separator();
-        DrawLayout();
-        ImGui.Separator();
         DrawAutomationSettings();
+        ImGui.Separator();
+        DrawLayout();
         ImGui.Separator();
         DrawProfileImportExport();
         ImGui.Separator();

@@ -3,6 +3,11 @@
 All notable changes to Snazzy P4 are listed here. Versions match the `vX.Y.Z.W`
 release tags.
 
+## v1.0.4.1 — 2026-07-06
+
+- Moved the **Automation** section on the General tab to sit **above General Settings** (just
+  below Role).
+
 ## v1.0.4.0 — 2026-07-06
 
 - **Automation settings** (General tab, all **off by default**):

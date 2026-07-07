@@ -19,6 +19,10 @@ public static class Changelog
     /// </summary>
     public static readonly Entry[] Entries =
     {
+        new("1.0.4.1", "2026-07-06", new[]
+        {
+            "Moved the Automation section on the General tab to sit above the General Settings section (just below Role).",
+        }),
         new("1.0.4.0", "2026-07-06", new[]
         {
             "New Automation settings on the General tab (all off by default). \"Auto Open/Close SnazzyP4 upon Enter/Exit of Duty\" opens the overlay when you enter a captured instance and closes it when you leave - click \"Use current instance\" while standing in Dancing Mad (Ultimate) to set the trigger.",
