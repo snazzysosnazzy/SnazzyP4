@@ -24,8 +24,6 @@ The only game state it ever reads is optional and non-combat: the **Automation**
 check which duty you're in and whether the party wiped, purely to auto open/close/reset the
 overlay. Nothing about the fight itself is read or resolved for you. These are all off by default.
 
-I have tried my best to stay true to this.
-
 This means you must still:
 1. Read your debuffs.
 2. Press macros appropriately.
