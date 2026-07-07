@@ -139,8 +139,8 @@ Open with the **Settings** button or `/snazzyp4 config`. Settings are grouped in
 ### General
 
 - **Never show version update messages** — gold toggle; stops the changelog popup after each update.
-- **Role** — Support or DPS.
 - **UI scale**.
+- **Role** — Support or DPS.
 - **Markers** — auto-place `/mk` markers, with a choice of head marker per role and set (attack /
   bind / ignore / shapes). Always placed on yourself.
 - **Automation** — all off by default:
@@ -159,22 +159,24 @@ Open with the **Settings** button or `/snazzyp4 config`. Settings are grouped in
 
 ### Chat
 
-A full announcement system, gated behind a master **Enable chat announcements** toggle (off by default).
-
-- **Modes** (mutually exclusive):
+- **Enable chat announcements** — master switch, off by default; nothing is sent while it's off.
+- **Mode** (mutually exclusive):
   - **Party Mode** (default) — sends only the party-safe callouts (gaze and Inferno/Tsunami), so
     it's safe to broadcast to your party.
   - **Personal Mode** (advanced, hidden until you reveal it) — adds your debuff, title and custom
     callouts, but blocks them from `/p` party chat unless you flip a heavily-warned override. Can
     route each announcement to its own channel.
-- **Triggers** — **Announce Exdeath** fires on an Exdeath Real/Fake press; **Announce Chaos** on a
-  chaos press. Each is split by First/Second set and Real/Fake.
-- **Message style** (per category):
+- **Chronological summary** — hold the per-press announcements back and instead send the whole
+  list, in fight order, once everything is pressed.
+- **Include [1st] / [2nd] prefix** in the default messages.
+- **Channel** — pick the active channel (Party, Say, Linkshells, Echo for testing, and more),
+  **Copy settings to...** another channel, and **Quick toggles** to turn all announcements (or just
+  the set titles) on/off for that channel.
+- **Announce Exdeath** (fires on an Exdeath Real/Fake press) and **Announce Chaos** (fires on a
+  chaos press) — each split by First/Second set and Real/Fake, and each set/branch uses:
   - **Ordered list** — reorderable per-mechanic toggles with custom, reorderable message lists, an
     optional **Announce Title** line, and a **+ Add custom message** button.
   - **Simple text box** — one chat line per message.
-- **Channels** — kept **per channel** (Party, Say, Linkshells, Echo for testing, and more), with a
-  **Copy settings to...** option.
 
 ### Layout
 
@@ -185,9 +187,9 @@ A full announcement system, gated behind a master **Enable chat announcements** 
 
 ### Colors
 
-- Recolour every element.
 - One-click **colourblind palette presets** (Deuteranopia / Protanopia / Tritanopia) as starting
-  points you can fine-tune.
+  points.
+- Then **recolour every element** individually to fine-tune.
 
 ### Text
 
