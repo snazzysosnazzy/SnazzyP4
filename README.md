@@ -134,49 +134,79 @@ a short/long before its Exdeath) is simply ignored, exactly like a greyed-out bu
 
 ## Configuration Settings
 
-Open with the **Settings** button or `/snazzyp4 config`. Settings are grouped into tabs:
+Open with the **Settings** button or `/snazzyp4 config`. Settings are grouped into tabs.
 
-- **General** — a gold **Never show version update messages** toggle (stops the changelog
-  popup after each update), Role (Support / DPS), UI scale, auto-place `/mk` markers with a
-  **choice of head marker per role and set** (attack / bind / ignore / shapes, always placed
-  on yourself), then a **General Settings** group — show toolbar, detached windows, edit layout,
-  Move All, floating **Hide** / **Reset** / **Undo** buttons, **Acceleration on the same line**
-  as Spread/Stack (`Spread on X and MOVE`), **combine the First and Second sets** into one panel
-  (stacked or side by side, with a pinnable divider), and **bring all windows on-screen** —
-  an **Automation** group (all off by default): **Auto Open/Close on Enter/Exit of Duty** (open
-  the overlay when you enter a captured instance and close it when you leave — click "Use current
-  instance" while inside Dancing Mad to set it), **Reset on Hide Button Press**, **Reset on Wipe**
-  and **Hide on Wipe** (wipe detection uses the game's duty state) — followed by **settings
-  profiles** (copy your whole setup to the clipboard or paste one in) and the reset buttons
-  (**Reset layout to defaults** / **Restore ALL settings to defaults**).
-- **Chat** — a full announcement system, gated behind a master **Enable chat announcements**
-  toggle (off by default). It has two mutually-exclusive modes: **Party Mode** (default) sends
-  only the party-safe callouts — gaze and Inferno/Tsunami — so it is safe to broadcast to your
-  party, while **Personal Mode** (advanced, hidden until you reveal it) adds your debuff, title
-  and custom callouts but blocks those from `/p` party chat unless you flip a heavily-warned
-  override. **Announce Exdeath** fires when you press an Exdeath Real/Fake button and **Announce
-  Chaos** when you press a chaos button, each split by First/Second set and Real/Fake. Choose
-  **ordered-list** mode (reorderable per-mechanic toggles with custom, reorderable message lists,
-  an optional **Announce Title** line, and a **+ Add custom message** button) or **simple text
-  box** mode (one chat line per message). Settings are kept **per channel** (Party, Say,
-  Linkshells, Echo for testing, and more) with a **Copy settings to...** option, and Personal
-  Mode can even route each announcement to its own channel.
-- **Layout** — **Appearance** (Use Universal Settings for one look, or per-section background
-  opacity / hide title bar / hide labels / button opacity, plus **click-through (display-only)**
-  mode; values are kept **separately for windowed and detached mode**) and **per-section
-  position, scale and appearance** for the current mode.
-- **Colors** — recolour every element, with one-click **colourblind palette presets**
-  (Deuteranopia / Protanopia / Tritanopia) as starting points you can fine-tune.
-- **Text** — rename any panel label, section header, resolution callout (spread/stack, gaze,
-  acceleration, chaos, Thunder/Blizzard), the **A/B/C/D target letters** or any button to your
-  own custom text; blank keeps the default.
-- **Controller** — hide the macro buttons and copy the per-button slash commands
-  (see [Controller Players](#controller-players)).
-- **Hidden** — the unlock field for the optional Last Fake resolver (see below).
+### General
+
+- **Never show version update messages** — gold toggle; stops the changelog popup after each update.
+- **Role** — Support or DPS.
+- **UI scale**.
+- **Markers** — auto-place `/mk` markers, with a choice of head marker per role and set (attack /
+  bind / ignore / shapes). Always placed on yourself.
+- **Automation** — all off by default:
+  - **Auto Open/Close on Enter/Exit of Duty** — opens the overlay when you enter a captured
+    instance and closes it when you leave. Click **Use current instance** while inside Dancing Mad
+    to set the trigger.
+  - **Reset on Hide Button Press** — runs Reset whenever you press Hide.
+  - **Reset on Wipe** / **Hide on Wipe** — run Reset / Hide when the party wipes (uses the game's
+    duty state).
+- **General Settings** — show toolbar, detached windows, edit layout, Move All; floating
+  **Hide** / **Reset** / **Undo** buttons; **Acceleration on the same line** as Spread/Stack
+  (`Spread on X and MOVE`); **combine the First and Second sets** into one panel (stacked or side
+  by side, with a pinnable divider); **bring all windows on-screen**.
+- **Settings profiles** — copy your whole setup to the clipboard, or paste one in.
+- **Reset** — **Reset layout to defaults** / **Restore ALL settings to defaults**.
+
+### Chat
+
+A full announcement system, gated behind a master **Enable chat announcements** toggle (off by default).
+
+- **Modes** (mutually exclusive):
+  - **Party Mode** (default) — sends only the party-safe callouts (gaze and Inferno/Tsunami), so
+    it's safe to broadcast to your party.
+  - **Personal Mode** (advanced, hidden until you reveal it) — adds your debuff, title and custom
+    callouts, but blocks them from `/p` party chat unless you flip a heavily-warned override. Can
+    route each announcement to its own channel.
+- **Triggers** — **Announce Exdeath** fires on an Exdeath Real/Fake press; **Announce Chaos** on a
+  chaos press. Each is split by First/Second set and Real/Fake.
+- **Message style** (per category):
+  - **Ordered list** — reorderable per-mechanic toggles with custom, reorderable message lists, an
+    optional **Announce Title** line, and a **+ Add custom message** button.
+  - **Simple text box** — one chat line per message.
+- **Channels** — kept **per channel** (Party, Say, Linkshells, Echo for testing, and more), with a
+  **Copy settings to...** option.
+
+### Layout
+
+- **Appearance** — Use Universal Settings for one look, or set per-section background opacity /
+  hide title bar / hide labels / button opacity, plus **click-through (display-only)** mode. Values
+  are kept separately for windowed and detached mode.
+- **Sections** — per-section position, scale and appearance for the current mode.
+
+### Colors
+
+- Recolour every element.
+- One-click **colourblind palette presets** (Deuteranopia / Protanopia / Tritanopia) as starting
+  points you can fine-tune.
+
+### Text
+
+- Rename any panel label, section header, resolution callout (spread/stack, gaze, acceleration,
+  chaos, Thunder/Blizzard), the **A/B/C/D target letters**, or any button.
+- Leave a field blank to keep its default.
+
+### Controller
+
+- Hide the macro buttons and copy the per-button slash commands (see
+  [Controller Players](#controller-players)).
+
+### Hidden
+
+- The unlock field for the optional Last Fake resolver (see below).
 
 By default Snazzy P4 runs in **detached** mode — each panel is its own floating window — at a
-compact scale. Use **Edit Layout** (drag any panel) or the **Sections** tab to arrange them,
-and **Bring all windows on-screen** in the Layout tab if anything ends up off-screen.
+compact scale. Use **Edit Layout** (drag any panel) or the **Layout** tab to arrange them, and
+**Bring all windows on-screen** (General tab) if anything ends up off-screen.
 
 ## Hidden Settings
 
