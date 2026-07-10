@@ -17,8 +17,9 @@ I made this plugin ultimately to cut down on macro bloat and make it easier to r
 a solution for the community that would persuade them to avoid ever adopting Auto-Markers for this phase.
 
 What Snazzy P4 does ***NOT*** do:
-1. Does not parse combat data, read your debuffs, or resolve any mechanic for you.
-2. Does not resolve the mechanic for you.
+1. Does not parse combat data.
+2. Does not read your debuffs.
+3. Does not resolve any mechanic for you.
 
 The only game state it ever reads is optional and non-combat: the **Automation** settings can
 check which duty you're in and whether the party wiped, purely to auto open/close/reset the
