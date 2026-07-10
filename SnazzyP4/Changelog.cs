@@ -19,6 +19,10 @@ public static class Changelog
     /// </summary>
     public static readonly Entry[] Entries =
     {
+        new("1.0.4.3", "2026-07-06", new[]
+        {
+            "Implemented issue #1: a debuff kind can no longer be picked twice in a pull. Once you press a Lightning (spread), Drop (stack) or Acceleration, both its Short and Long buttons grey out until Reset, since the fight never gives you the same one twice. Previously only duplicates within a single set were blocked.",
+        }),
         new("1.0.4.2", "2026-07-06", new[]
         {
             "Fixed a bug (issue #2) where an announcement only started working after you opened its dropdown in the Chat tab. Each set's announcement slots now get their default enabled state as soon as the channel is used, so every enabled callout fires without you having to open each set first.",

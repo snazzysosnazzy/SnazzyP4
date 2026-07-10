@@ -3,6 +3,13 @@
 All notable changes to Snazzy P4 are listed here. Versions match the `vX.Y.Z.W`
 release tags.
 
+## v1.0.4.3 — 2026-07-06
+
+- Implemented [#1](https://github.com/snazzysosnazzy/SnazzyP4/issues/1): a debuff kind can no
+  longer be picked twice in a pull. Once you press a Lightning (spread), Drop (stack) or
+  Acceleration, **both its Short and Long buttons grey out** until Reset — the fight never gives
+  you the same one twice. Previously only duplicates within a single set were blocked.
+
 ## v1.0.4.2 — 2026-07-06
 
 - Fixed [#2](https://github.com/snazzysosnazzy/SnazzyP4/issues/2): an announcement only started

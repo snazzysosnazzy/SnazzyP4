@@ -401,7 +401,24 @@ public class Solver
             return false;
         }
 
-        return !SlotFilled(isShort, kind == MechanicKind.Acceleration);
+        // A debuff kind never repeats across the two sets, so once it is picked anywhere both of its buttons lock.
+        return !KindPicked(kind) && !SlotFilled(isShort, kind == MechanicKind.Acceleration);
+    }
+
+    /// <summary>
+    /// Whether a mechanic kind has already been picked in either set. Each kind (Lightning, Drop, Acceleration) can only be picked once per pull.
+    /// </summary>
+    private bool KindPicked(MechanicKind kind)
+    {
+        foreach (var selection in selections)
+        {
+            if (selection.Kind == kind)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /// <summary>
