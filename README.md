@@ -26,7 +26,7 @@ check which duty you're in and whether the party wiped, purely to auto open/clos
 overlay. Nothing about the fight itself is read or resolved for you. These are all off by default.
 
 This means you must still:
-1. Read your debuffs.
+1. Read your debuffs and understand what they do.
 2. Press macros appropriately.
 3. Know whether you are the Gaze shooter.
 4. Resolve Anti-Light by looking at debuffs.
