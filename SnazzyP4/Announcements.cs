@@ -102,6 +102,12 @@ public static class AnnouncementData
     public static readonly string[] ChaosSecondSlots = { "title", "tsunami" };
 
     /// <summary>
+    /// Returns the ordered slot ids for a category and set. Chaos is static, so the first set is Inferno and the second is Tsunami.
+    /// </summary>
+    public static string[] SlotIdsFor(string categoryId, bool isFirst)
+        => categoryId == "chaos" ? (isFirst ? ChaosFirstSlots : ChaosSecondSlots) : ExdeathSlots;
+
+    /// <summary>
     /// Whether a slot is safe to broadcast to party chat: the gaze and the two chaos callouts.
     /// Party Mode sends only these; Personal Mode blocks everything else from party chat unless overridden.
     /// </summary>

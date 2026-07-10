@@ -563,7 +563,22 @@ public class Configuration : IPluginConfiguration
             Announcements[channel] = channelAnnouncements;
         }
 
+        // Populate each leaf's slots (with their default enabled state) on every access, so a fresh
+        // channel or an un-opened set announces its defaults without the user first opening the dropdown.
+        EnsureCategorySlots(channelAnnouncements.Exdeath, "exdeath");
+        EnsureCategorySlots(channelAnnouncements.Chaos, "chaos");
         return channelAnnouncements;
+    }
+
+    /// <summary>
+    /// Ensures all four leaves (first/second set, real/fake) of a category have their slots.
+    /// </summary>
+    private static void EnsureCategorySlots(AnnouncementCategory category, string categoryId)
+    {
+        AnnouncementData.EnsureSlots(category.GetLeaf(true, true), AnnouncementData.SlotIdsFor(categoryId, true));
+        AnnouncementData.EnsureSlots(category.GetLeaf(true, false), AnnouncementData.SlotIdsFor(categoryId, true));
+        AnnouncementData.EnsureSlots(category.GetLeaf(false, true), AnnouncementData.SlotIdsFor(categoryId, false));
+        AnnouncementData.EnsureSlots(category.GetLeaf(false, false), AnnouncementData.SlotIdsFor(categoryId, false));
     }
 
     /// <summary>

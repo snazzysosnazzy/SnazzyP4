@@ -3,6 +3,13 @@
 All notable changes to Snazzy P4 are listed here. Versions match the `vX.Y.Z.W`
 release tags.
 
+## v1.0.4.2 — 2026-07-06
+
+- Fixed [#2](https://github.com/snazzysosnazzy/SnazzyP4/issues/2): an announcement only started
+  working after you opened its dropdown in the Chat tab. Each set's announcement slots now get
+  their default enabled state as soon as the channel is used, so every enabled callout fires
+  without having to open each set first.
+
 ## v1.0.4.1 — 2026-07-06
 
 - Moved the **Automation** section on the General tab to sit **above General Settings** (just
