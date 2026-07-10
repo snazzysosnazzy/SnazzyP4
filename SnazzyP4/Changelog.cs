@@ -19,6 +19,10 @@ public static class Changelog
     /// </summary>
     public static readonly Entry[] Entries =
     {
+        new("1.0.4.4", "2026-07-10", new[]
+        {
+            "Fixed a brief lag spike when the window first opened (most noticeable with the auto-open on entering the duty). All button icons are now loaded once when the plugin starts and kept in memory (well under 1 MB), instead of being reloaded from disk and uploaded to the GPU in one burst on the zone-in frame.",
+        }),
         new("1.0.4.3", "2026-07-06", new[]
         {
             "Implemented issue #1: a debuff kind can no longer be picked twice in a pull. Once you press a Lightning (spread), Drop (stack) or Acceleration, both its Short and Long buttons grey out until Reset, since the fight never gives you the same one twice. Previously only duplicates within a single set were blocked.",

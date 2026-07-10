@@ -1275,7 +1275,9 @@ public class Solver
         using (ImRaii.Disabled(!enabled || LayoutEditActive))
         using (ImRaii.PushId(id))
         {
-            var texture = Plugin.TextureProvider.GetFromFile(Plugin.Icon(iconFile)).GetWrapOrDefault();
+            // The preloaded lifetime wrap avoids any disk/GPU work at draw time; the shared texture is only a fallback while it loads.
+            var texture = Plugin.PreloadedIcon(iconFile)
+                          ?? Plugin.TextureProvider.GetFromFile(Plugin.Icon(iconFile)).GetWrapOrDefault();
             if (texture != null)
             {
                 return ImGui.ImageButton(texture.Handle, size);

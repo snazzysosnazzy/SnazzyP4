@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Numerics;
+using Dalamud.Interface.Textures.TextureWraps;
 using Dalamud.Bindings.ImGui;
 using Dalamud.Game.Command;
 using Dalamud.Interface.Windowing;
@@ -161,6 +163,18 @@ public sealed class Plugin : IDalamudPlugin
     public static string IconDir { get; private set; } = string.Empty;
 
     /// <summary>
+    /// The icon textures preloaded at plugin load and held for the plugin's lifetime, keyed by file name.
+    /// Holding rented wraps keeps them resident so a window opening (for example the auto-open on entering the duty)
+    /// never has to reload every icon from disk and upload them to the GPU in one burst on the zone-in frame.
+    /// </summary>
+    private static readonly Dictionary<string, IDalamudTextureWrap> PreloadedIcons = new();
+
+    /// <summary>
+    /// Whether the plugin has been disposed, used to release any icon rent that completes after unload.
+    /// </summary>
+    private static bool iconsDisposed;
+
+    /// <summary>
     /// Whether the layout is being edited, which is true when Edit Layout or Move All is on.
     /// </summary>
     public bool LayoutEditActive => Configuration.EditMode || Configuration.MoveAllActive;
@@ -171,6 +185,7 @@ public sealed class Plugin : IDalamudPlugin
     public Plugin()
     {
         IconDir = Path.Combine(PluginInterface.AssemblyLocation.Directory?.FullName!, "Icons");
+        PreloadIconTextures();
 
         Configuration = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
 
@@ -255,6 +270,73 @@ public sealed class Plugin : IDalamudPlugin
         }
 
         CommandManager.RemoveHandler(CommandName);
+
+        // Release the preloaded icon textures last, after every draw hook is unregistered.
+        lock (PreloadedIcons)
+        {
+            iconsDisposed = true;
+            foreach (var wrap in PreloadedIcons.Values)
+            {
+                wrap.Dispose();
+            }
+
+            PreloadedIcons.Clear();
+        }
+    }
+
+    /// <summary>
+    /// Starts loading every button icon into a rented texture wrap held for the plugin's lifetime.
+    /// This runs once at plugin load (login or enable - a calm moment), so the icons are already resident
+    /// by the time any window opens and can never be evicted from the cache while the windows are closed.
+    /// </summary>
+    private static void PreloadIconTextures()
+    {
+        iconsDisposed = false;
+        string[] files;
+        try
+        {
+            files = Directory.GetFiles(IconDir, "*.png");
+        }
+        catch (Exception exception)
+        {
+            Log.Warning(exception, "Could not enumerate the icon directory; icons will load on demand instead.");
+            return;
+        }
+
+        foreach (var path in files)
+        {
+            var name = Path.GetFileName(path);
+            TextureProvider.GetFromFile(path).RentAsync().ContinueWith(task =>
+            {
+                if (!task.IsCompletedSuccessfully)
+                {
+                    // Reading task.Exception also marks a faulted task as observed.
+                    Log.Warning(task.Exception, $"Could not preload icon {name}; it will load on demand instead.");
+                    return;
+                }
+
+                lock (PreloadedIcons)
+                {
+                    // A rent that lands after unload (or a duplicate) is released immediately so nothing leaks.
+                    if (iconsDisposed || !PreloadedIcons.TryAdd(name, task.Result))
+                    {
+                        task.Result.Dispose();
+                    }
+                }
+            });
+        }
+    }
+
+    /// <summary>
+    /// Returns a preloaded icon texture by file name, or null while it is still loading (or failed to load),
+    /// in which case the caller falls back to the on-demand shared texture.
+    /// </summary>
+    public static IDalamudTextureWrap? PreloadedIcon(string file)
+    {
+        lock (PreloadedIcons)
+        {
+            return PreloadedIcons.TryGetValue(file, out var wrap) ? wrap : null;
+        }
     }
 
     /// <summary>

@@ -3,6 +3,13 @@
 All notable changes to Snazzy P4 are listed here. Versions match the `vX.Y.Z.W`
 release tags.
 
+## v1.0.4.4 — 2026-07-10
+
+- Fixed a **brief lag spike when the window first opened** (most noticeable with the auto-open
+  on entering the duty). All button icons are now **preloaded once at plugin start** and kept in
+  memory (well under 1 MB), instead of being reloaded from disk and uploaded to the GPU in one
+  burst on the zone-in frame.
+
 ## v1.0.4.3 — 2026-07-06
 
 - Implemented [#1](https://github.com/snazzysosnazzy/SnazzyP4/issues/1): a debuff kind can no
