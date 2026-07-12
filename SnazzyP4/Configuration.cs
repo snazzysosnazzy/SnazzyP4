@@ -31,9 +31,19 @@ namespace SnazzyP4
         public bool SuppressUpdateNotices { get; set; }
 
         /// <summary>
-        /// The user-facing scale multiplier applied on top of Dalamud's global scale.
+        /// The global scale multiplier applied to everything the plugin draws, on top of Dalamud's global scale.
         /// </summary>
         public float UiScale { get; set; } = 0.5f;
+
+        /// <summary>
+        /// The scale multiplier applied to the quick-settings toolbar, layered on top of the global scale.
+        /// </summary>
+        public float ToolbarScale { get; set; } = 1.0f;
+
+        /// <summary>
+        /// The scale multiplier applied to the macro buttons and text panels, layered on top of the global scale.
+        /// </summary>
+        public float MacroUiScale { get; set; } = 1.0f;
 
         /// <summary>
         /// Whether the player is playing a Support role.

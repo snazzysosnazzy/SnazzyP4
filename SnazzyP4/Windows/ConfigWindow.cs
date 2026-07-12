@@ -340,35 +340,51 @@ namespace SnazzyP4.Windows
         /// </summary>
         private void DrawUiScale()
         {
-            ImGui.TextUnformatted("UI Scale");
-            var scale = Configuration.UiScale;
+            DrawScaleSlider("Global UI Scale", "##globalscale", () => Configuration.UiScale, value => Configuration.UiScale = value);
+            ImGui.TextDisabled("Multiplies everything the plugin draws.");
+            DrawScaleSlider("Settings Toolbar Scale", "##toolbarscale", () => Configuration.ToolbarScale, value => Configuration.ToolbarScale = value);
+            ImGui.TextDisabled("Multiplies the quick-settings toolbar, on top of the global scale.");
+            DrawScaleSlider("Macro UI Scale", "##macroscale", () => Configuration.MacroUiScale, value => Configuration.MacroUiScale = value);
+            ImGui.TextDisabled("Multiplies the macro buttons and text panels, on top of the global scale.");
+        }
+
+        /// <summary>
+        /// Draws one labelled scale slider with its percentage presets, persisting the clamped value.
+        /// </summary>
+        private void DrawScaleSlider(string label, string id, Func<float> getScale, Action<float> setScale)
+        {
+            ImGui.TextUnformatted(label);
+            var scale = getScale();
             ImGui.SetNextItemWidth(220f);
-            if (ImGui.SliderFloat("##uiscale", ref scale, 0.5f, 3.0f, "%.2fx"))
+            if (ImGui.SliderFloat(id, ref scale, 0.5f, 3.0f, "%.2fx"))
             {
-                SetScale(scale);
+                SetScale(setScale, scale);
             }
 
-            if (ImGui.Button("50%"))
+            using (ImRaii.PushId(id))
             {
-                SetScale(0.5f);
-            }
+                if (ImGui.Button("50%"))
+                {
+                    SetScale(setScale, 0.5f);
+                }
 
-            ImGui.SameLine();
-            if (ImGui.Button("100%"))
-            {
-                SetScale(1.0f);
-            }
+                ImGui.SameLine();
+                if (ImGui.Button("100%"))
+                {
+                    SetScale(setScale, 1.0f);
+                }
 
-            ImGui.SameLine();
-            if (ImGui.Button("150%"))
-            {
-                SetScale(1.5f);
-            }
+                ImGui.SameLine();
+                if (ImGui.Button("150%"))
+                {
+                    SetScale(setScale, 1.5f);
+                }
 
-            ImGui.SameLine();
-            if (ImGui.Button("200%"))
-            {
-                SetScale(2.0f);
+                ImGui.SameLine();
+                if (ImGui.Button("200%"))
+                {
+                    SetScale(setScale, 2.0f);
+                }
             }
         }
 
@@ -2035,11 +2051,11 @@ namespace SnazzyP4.Windows
         }
 
         /// <summary>
-        /// Sets and persists the clamped UI scale.
+        /// Applies a clamped value through a scale setter and persists it.
         /// </summary>
-        private void SetScale(float value)
+        private void SetScale(Action<float> setScale, float value)
         {
-            Configuration.UiScale = Math.Clamp(value, 0.5f, 3.0f);
+            setScale(Math.Clamp(value, 0.5f, 3.0f));
             Configuration.Save();
         }
 

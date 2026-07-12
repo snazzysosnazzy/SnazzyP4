@@ -47,9 +47,9 @@ namespace SnazzyP4.Windows
         private Configuration Configuration => plugin.Configuration;
 
         /// <summary>
-        /// The combined user and global scale multiplier.
+        /// The combined global, macro and Dalamud scale multiplier applied to the positioned sections.
         /// </summary>
-        private float Scaled => Configuration.UiScale * ImGuiHelpers.GlobalScale;
+        private float Scaled => Configuration.UiScale * Configuration.MacroUiScale * ImGuiHelpers.GlobalScale;
 
         /// <summary>
         /// Disposes the window. There is nothing to release.
@@ -145,7 +145,7 @@ namespace SnazzyP4.Windows
         public override void Draw()
         {
             plugin.MaybeShowUpdateNotice();
-            ImGui.SetWindowFontScale(Configuration.UiScale);
+            ImGui.SetWindowFontScale(Configuration.UiScale * Configuration.ToolbarScale);
             DrawToolbar();
 
             if (Configuration.Detached)
@@ -345,9 +345,9 @@ namespace SnazzyP4.Windows
 
                 using (ImRaii.Group())
                 {
-                    ImGui.SetWindowFontScale(Configuration.UiScale * sectionScale);
+                    ImGui.SetWindowFontScale(Configuration.UiScale * Configuration.MacroUiScale * sectionScale);
                     plugin.Solver.CurrentSection = section.Id;
-                    plugin.Solver.CurrentFontScale = Configuration.UiScale * sectionScale;
+                    plugin.Solver.CurrentFontScale = Configuration.UiScale * Configuration.MacroUiScale * sectionScale;
                     PushSectionStyle(Configuration.EffectiveButtonAlpha(section.Id));
                     section.Draw(scale * sectionScale);
                     PopSectionStyle();

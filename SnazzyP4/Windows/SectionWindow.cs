@@ -150,11 +150,11 @@ namespace SnazzyP4.Windows
             }
 
             var sectionScale = configuration.GetSectionScale(definition.Id);
-            ImGui.SetWindowFontScale(configuration.UiScale * sectionScale);
+            ImGui.SetWindowFontScale(configuration.UiScale * configuration.MacroUiScale * sectionScale);
             plugin.Solver.CurrentSection = definition.Id;
-            plugin.Solver.CurrentFontScale = configuration.UiScale * sectionScale;
+            plugin.Solver.CurrentFontScale = configuration.UiScale * configuration.MacroUiScale * sectionScale;
             MainWindow.PushSectionStyle(configuration.EffectiveButtonAlpha(definition.Id));
-            definition.Draw(configuration.UiScale * ImGuiHelpers.GlobalScale * sectionScale);
+            definition.Draw(configuration.UiScale * configuration.MacroUiScale * ImGuiHelpers.GlobalScale * sectionScale);
             MainWindow.PopSectionStyle();
 
             if (configuration.ClickThrough)

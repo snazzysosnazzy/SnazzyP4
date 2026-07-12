@@ -3,6 +3,15 @@
 All notable changes to Snazzy P4 are listed here. Versions match the `vX.Y.Z.W`
 release tags.
 
+## v1.0.6.0 — 2026-07-12
+
+- **UI Scale is renamed Global UI Scale** and still multiplies everything the plugin draws.
+- **Two new scale sliders** sit right below it, each with 50/100/150/200% presets and both
+  defaulting to 1.00×:
+  - **Settings Toolbar Scale** — multiplies just the quick-settings toolbar.
+  - **Macro UI Scale** — multiplies the macro buttons and text panels (on top of the global
+    scale and the per-section scales).
+
 ## v1.0.5.1 — 2026-07-10
 
 - **Hide Resolved Buttons no longer shifts the remaining buttons** — a hidden chaos or Kefka

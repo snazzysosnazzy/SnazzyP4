@@ -138,7 +138,8 @@ Open with the **Settings** button or `/snazzyp4 config`. Settings are grouped in
 ### General
 
 - **Never show version update messages** — gold toggle; stops the changelog popup after each update.
-- **UI scale**.
+- **Scales** — **Global UI Scale** (multiplies everything), **Settings Toolbar Scale** (just the
+  quick toolbar) and **Macro UI Scale** (buttons and text panels), each with percentage presets.
 - **Role** — Support or DPS.
 - **Markers** — auto-place `/mk` markers, with a choice of head marker per role and set (attack /
   bind / ignore / shapes). Always placed on yourself.
