@@ -3,6 +3,17 @@
 All notable changes to Snazzy P4 are listed here. Versions match the `vX.Y.Z.W`
 release tags.
 
+## v1.0.5.0 — 2026-07-10
+
+- **One body debuff per pull** ([#1](https://github.com/snazzysosnazzy/SnazzyP4/issues/1)
+  follow-up) — picking Lightning **or** Drop now locks **all** Lightning and Drop buttons, since
+  the fight only ever assigns one of the two. After a body pick, only Acceleration remains
+  selectable.
+- **Hide Resolved Buttons Until Reset** — new General Settings option (off by default). The
+  Exdeath buttons hide once both sets are fully entered, each chaos pair hides once pressed, and
+  each Kefka pair hides once pressed. Everything returns on Reset. Text panels and the Last Fake
+  toggles are never affected.
+
 ## v1.0.4.4 — 2026-07-10
 
 - Fixed a **brief lag spike when the window first opened** (most noticeable with the auto-open

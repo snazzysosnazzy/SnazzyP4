@@ -150,9 +150,10 @@ Open with the **Settings** button or `/snazzyp4 config`. Settings are grouped in
   - **Reset on Wipe** / **Hide on Wipe** — run Reset / Hide when the party wipes (uses the game's
     duty state).
 - **General Settings** — show toolbar, detached windows, edit layout, Move All; floating
-  **Hide** / **Reset** / **Undo** buttons; **Acceleration on the same line** as Spread/Stack
-  (`Spread on X and MOVE`); **combine the First and Second sets** into one panel (stacked or side
-  by side, with a pinnable divider); **bring all windows on-screen**.
+  **Hide** / **Reset** / **Undo** buttons; **Hide Resolved Buttons Until Reset** (each button
+  group disappears once fully entered and returns on Reset); **Acceleration on the same line**
+  as Spread/Stack (`Spread on X and MOVE`); **combine the First and Second sets** into one panel
+  (stacked or side by side, with a pinnable divider); **bring all windows on-screen**.
 - **Settings profiles** — copy your whole setup to the clipboard, or paste one in.
 - **Reset** — **Reset layout to defaults** / **Restore ALL settings to defaults**.
 
