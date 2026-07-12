@@ -1008,16 +1008,18 @@ namespace SnazzyP4
                 ImGui.TextUnformatted(configuration.GetText(TextLabels.KefkaButtonsHeader));
             }
 
+            // Thunder and Blizzard each lock after their press until the next reset, like the chaos pairs.
+            // The Last Fake toggles are a separate control and stay usable regardless.
             if (!HideResolvedActive || !thunderPressed)
             {
-                if (IconButton("##Thunder", "Thunder.png", true, scale))
+                if (IconButton("##Thunder", "Thunder.png", !thunderPressed, scale))
                 {
                     OnThunder(true);
                 }
 
                 ImGui.SameLine();
 
-                if (IconButton("##FakeThunder", "FakeThunder.png", true, scale))
+                if (IconButton("##FakeThunder", "FakeThunder.png", !thunderPressed, scale))
                 {
                     OnThunder(false);
                 }
@@ -1029,14 +1031,14 @@ namespace SnazzyP4
 
             if (!HideResolvedActive || !blizzardPressed)
             {
-                if (IconButton("##Blizzard", "Blizzard.png", true, scale))
+                if (IconButton("##Blizzard", "Blizzard.png", !blizzardPressed, scale))
                 {
                     OnBlizzard(true);
                 }
 
                 ImGui.SameLine();
 
-                if (IconButton("##FakeBlizzard", "FakeBlizzard.png", true, scale))
+                if (IconButton("##FakeBlizzard", "FakeBlizzard.png", !blizzardPressed, scale))
                 {
                     OnBlizzard(false);
                 }
@@ -1060,9 +1062,15 @@ namespace SnazzyP4
 
         /// <summary>
         /// Records a Thunder press (real or fake), capturing an undo point first.
+        /// Further presses are ignored until reset, matching the disabled buttons.
         /// </summary>
         private void OnThunder(bool real)
         {
+            if (thunderPressed)
+            {
+                return;
+            }
+
             PushUndo();
             thunderPressed = true;
             thunderReal = real;
@@ -1070,9 +1078,15 @@ namespace SnazzyP4
 
         /// <summary>
         /// Records a Blizzard press (real or fake), capturing an undo point first.
+        /// Further presses are ignored until reset, matching the disabled buttons.
         /// </summary>
         private void OnBlizzard(bool real)
         {
+            if (blizzardPressed)
+            {
+                return;
+            }
+
             PushUndo();
             blizzardPressed = true;
             blizzardReal = real;

@@ -3,6 +3,12 @@
 All notable changes to Snazzy P4 are listed here. Versions match the `vX.Y.Z.W`
 release tags.
 
+## v1.0.6.1 — 2026-07-12
+
+- **Thunder and Blizzard buttons lock after being pressed**, matching the chaos buttons: press
+  a Thunder (real or fake) and both Thunder buttons disable until Reset; same for Blizzard. Use
+  **Undo** to take back a mispress. The **Last Fake toggles are unaffected** and stay usable.
+
 ## v1.0.6.0 — 2026-07-12
 
 - **UI Scale is renamed Global UI Scale** and still multiplies everything the plugin draws.
