@@ -1206,6 +1206,22 @@ namespace SnazzyP4.Windows
                 Configuration.Save();
             }
 
+            var hideToolbarWhenHidden = Configuration.HideToolbarWhenHidden;
+            if (ImGui.Checkbox("Hide Settings toolbar when UI is hidden", ref hideToolbarWhenHidden))
+            {
+                Configuration.HideToolbarWhenHidden = hideToolbarWhenHidden;
+                Configuration.Save();
+            }
+
+            var persistCollapsed = Configuration.PersistToolbarCollapsed;
+            if (ImGui.Checkbox("Persistent Settings Collapsed State", ref persistCollapsed))
+            {
+                Configuration.PersistToolbarCollapsed = persistCollapsed;
+                Configuration.Save();
+            }
+
+            ImGui.TextDisabled("Keeps the toolbar's collapsed state unchanged when Hide/Show is pressed.");
+
             var detached = Configuration.Detached;
             if (ImGui.Checkbox("Detached windows (each section is its own window)", ref detached))
             {

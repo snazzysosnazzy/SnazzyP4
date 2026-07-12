@@ -316,6 +316,18 @@ namespace SnazzyP4
         public bool HideResolvedButtons { get; set; }
 
         /// <summary>
+        /// When true, the quick-settings toolbar disappears entirely while the display is hidden,
+        /// instead of showing in its collapsed state. Off by default.
+        /// </summary>
+        public bool HideToolbarWhenHidden { get; set; }
+
+        /// <summary>
+        /// When true, the toolbar's collapsed state is left untouched by the Hide and Show buttons,
+        /// instead of collapsing on hide and expanding on show. Off by default.
+        /// </summary>
+        public bool PersistToolbarCollapsed { get; set; }
+
+        /// <summary>
         /// Whether the macro button sections are hidden so only the resolution text panels remain.
         /// This is for controller players who drive the plugin through the slash commands instead of clicking.
         /// </summary>

@@ -19,6 +19,12 @@ namespace SnazzyP4
         /// </summary>
         public static readonly Entry[] Entries =
         {
+            new("1.0.7.0", "2026-07-12", new[]
+            {
+                "Hiding the UI no longer reduces the toolbar to an empty black square. The toolbar now collapses when you press Hide and expands when you press Show, and its expand/collapse arrows keep working while the UI is hidden - so a collapsed toolbar stays collapsed, and you can expand it any time.",
+                "New General Settings option \"Hide Settings toolbar when UI is hidden\" (off by default): the toolbar disappears completely while the UI is hidden instead of showing collapsed, and the hub window goes fully invisible and click-through.",
+                "New General Settings option \"Persistent Settings Collapsed State\" (off by default): the toolbar's collapsed state ignores Hide/Show presses and only changes when you use the arrows. The hide-entirely option above still wins while the UI is hidden.",
+            }),
             new("1.0.6.1", "2026-07-12", new[]
             {
                 "The Thunder and Blizzard buttons now lock after being pressed, matching the chaos buttons: press a Thunder (real or fake) and both Thunder buttons disable until Reset; same for Blizzard. Use Undo to take back a mispress. The Last Fake toggles are unaffected and stay usable.",

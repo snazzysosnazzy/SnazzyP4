@@ -936,6 +936,13 @@ namespace SnazzyP4
             }
 
             configuration.Hidden = hidden;
+
+            // The toolbar follows the display (collapse on hide, expand on show) unless the persistent option keeps its state.
+            if (!configuration.PersistToolbarCollapsed)
+            {
+                configuration.ToolbarCollapsed = hidden;
+            }
+
             configuration.Save();
 
             if (hidden && configuration.ResetOnHide)

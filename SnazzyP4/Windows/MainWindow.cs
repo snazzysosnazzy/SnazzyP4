@@ -64,8 +64,10 @@ namespace SnazzyP4.Windows
         public override void PreDraw()
         {
             // The hub always uses the universal appearance values.
-            ImGui.SetNextWindowBgAlpha(Configuration.BackgroundAlpha);
-            var overlay = OverlayFlags(Configuration.NoTitleBar, Configuration.ClickThrough);
+            // With the toolbar hidden entirely, the hub renders nothing, so the window itself goes invisible and click-through.
+            var toolbarGone = Configuration.Hidden && Configuration.HideToolbarWhenHidden;
+            ImGui.SetNextWindowBgAlpha(toolbarGone ? 0f : Configuration.BackgroundAlpha);
+            var overlay = OverlayFlags(Configuration.NoTitleBar || toolbarGone, Configuration.ClickThrough || toolbarGone);
             if (Configuration.Detached || Configuration.Hidden)
             {
                 Flags = ImGuiWindowFlags.AlwaysAutoResize | overlay;
@@ -166,19 +168,20 @@ namespace SnazzyP4.Windows
         /// </summary>
         private void DrawToolbar()
         {
-            if (Configuration.Hidden)
+            var hidden = Configuration.Hidden;
+            if (hidden && Configuration.HideToolbarWhenHidden)
             {
-                // The toolbar provides the unhide button only when the Hide control is not floating.
-                if (!Configuration.FloatingHideButton && ImGui.Button("Show"))
-                {
-                    plugin.Solver.SetHidden(false);
-                }
-
                 return;
             }
 
             if (!Configuration.ShowToolbar)
             {
+                // The Show fallback keeps the display recoverable when the toolbar is off and the Hide control is not floating.
+                if (hidden && !Configuration.FloatingHideButton && ImGui.Button("Show"))
+                {
+                    plugin.Solver.SetHidden(false);
+                }
+
                 return;
             }
 
@@ -205,9 +208,9 @@ namespace SnazzyP4.Windows
 
             if (!Configuration.FloatingHideButton)
             {
-                if (ImGui.Button("Hide"))
+                if (ImGui.Button(hidden ? "Show" : "Hide"))
                 {
-                    plugin.Solver.SetHidden(true);
+                    plugin.Solver.SetHidden(!hidden);
                 }
 
                 ImGui.SameLine();

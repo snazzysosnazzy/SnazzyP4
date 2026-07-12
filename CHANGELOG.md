@@ -3,6 +3,18 @@
 All notable changes to Snazzy P4 are listed here. Versions match the `vX.Y.Z.W`
 release tags.
 
+## v1.0.7.0 — 2026-07-12
+
+- **Hiding the UI no longer leaves an empty black square.** The toolbar now **collapses when
+  you press Hide and expands when you press Show**, and the expand/collapse arrows keep working
+  while the UI is hidden — a collapsed toolbar stays collapsed, and you can expand it any time.
+- **Hide Settings toolbar when UI is hidden** (General Settings, off by default) — the toolbar
+  disappears completely while the UI is hidden instead of showing collapsed; the hub window
+  goes fully invisible and click-through.
+- **Persistent Settings Collapsed State** (General Settings, off by default) — the toolbar's
+  collapsed state ignores Hide/Show presses and only changes via the arrows. The hide-entirely
+  option still wins while the UI is hidden.
+
 ## v1.0.6.1 — 2026-07-12
 
 - **Thunder and Blizzard buttons lock after being pressed**, matching the chaos buttons: press
