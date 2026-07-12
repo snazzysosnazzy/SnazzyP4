@@ -65,7 +65,8 @@ namespace SnazzyP4.Windows
         {
             // The hub always uses the universal appearance values.
             // With the toolbar hidden entirely, the hub renders nothing, so the window itself goes invisible and click-through.
-            var toolbarGone = Configuration.Hidden && Configuration.HideToolbarWhenHidden;
+            // The toolbar never fully hides while the floating Hide button is off, since it is then the only way to unhide.
+            var toolbarGone = Configuration.Hidden && Configuration.HideToolbarWhenHidden && Configuration.FloatingHideButton;
             ImGui.SetNextWindowBgAlpha(toolbarGone ? 0f : Configuration.BackgroundAlpha);
             var overlay = OverlayFlags(Configuration.NoTitleBar || toolbarGone, Configuration.ClickThrough || toolbarGone);
             if (Configuration.Detached || Configuration.Hidden)
@@ -169,19 +170,18 @@ namespace SnazzyP4.Windows
         private void DrawToolbar()
         {
             var hidden = Configuration.Hidden;
-            if (hidden && Configuration.HideToolbarWhenHidden)
+
+            // Without the floating Hide button the toolbar is the only way to bring the display back,
+            // so it always renders and the hide-toolbar and show-toolbar options are overridden.
+            var alwaysShown = !Configuration.FloatingHideButton;
+
+            if (hidden && Configuration.HideToolbarWhenHidden && !alwaysShown)
             {
                 return;
             }
 
-            if (!Configuration.ShowToolbar)
+            if (!Configuration.ShowToolbar && !alwaysShown)
             {
-                // The Show fallback keeps the display recoverable when the toolbar is off and the Hide control is not floating.
-                if (hidden && !Configuration.FloatingHideButton && ImGui.Button("Show"))
-                {
-                    plugin.Solver.SetHidden(false);
-                }
-
                 return;
             }
 

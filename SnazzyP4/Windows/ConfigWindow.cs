@@ -1213,6 +1213,8 @@ namespace SnazzyP4.Windows
                 Configuration.Save();
             }
 
+            ImGui.TextDisabled("Ignored while the Floating Hide button is off, since the toolbar is then the only way to bring the display back.");
+
             var persistCollapsed = Configuration.PersistToolbarCollapsed;
             if (ImGui.Checkbox("Persistent Settings Collapsed State", ref persistCollapsed))
             {

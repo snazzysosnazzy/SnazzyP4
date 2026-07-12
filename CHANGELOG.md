@@ -3,6 +3,13 @@
 All notable changes to Snazzy P4 are listed here. Versions match the `vX.Y.Z.W`
 release tags.
 
+## v1.0.7.1 — 2026-07-12
+
+- While the **Floating Hide button is off**, the settings toolbar now **always shows**
+  (collapsible as normal) and is never hidden — it is the only way to bring the display back in
+  that setup, so **Hide Settings toolbar when UI is hidden** and **Show toolbar** off are
+  overridden to prevent a confusing lock-out.
+
 ## v1.0.7.0 — 2026-07-12
 
 - **Hiding the UI no longer leaves an empty black square.** The toolbar now **collapses when

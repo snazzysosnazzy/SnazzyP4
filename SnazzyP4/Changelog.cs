@@ -19,6 +19,10 @@ namespace SnazzyP4
         /// </summary>
         public static readonly Entry[] Entries =
         {
+            new("1.0.7.1", "2026-07-12", new[]
+            {
+                "While the Floating Hide button is off, the settings toolbar now always shows (collapsible as normal) and is never hidden - it is the only way to bring the display back in that setup, so \"Hide Settings toolbar when UI is hidden\" and \"Show toolbar\" off are overridden to prevent a confusing lock-out.",
+            }),
             new("1.0.7.0", "2026-07-12", new[]
             {
                 "Hiding the UI no longer reduces the toolbar to an empty black square. The toolbar now collapses when you press Hide and expands when you press Show, and its expand/collapse arrows keep working while the UI is hidden - so a collapsed toolbar stays collapsed, and you can expand it any time.",
