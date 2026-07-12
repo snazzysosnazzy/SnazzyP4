@@ -365,9 +365,12 @@ namespace SnazzyP4
 
             if (!labelsHidden)
             {
+                // SetCursorPosX is used instead of SameLine's offset because the latter re-adds the group offset,
+                // which pushed the second column right by the section's position in windowed mode.
                 var headerStartX = ImGui.GetCursorPosX();
                 ImGui.TextUnformatted(configuration.GetText(TextLabels.RealColumnHeader));
-                ImGui.SameLine(headerStartX + columnStride);
+                ImGui.SameLine();
+                ImGui.SetCursorPosX(headerStartX + columnStride);
                 ImGui.TextUnformatted(configuration.GetText(TextLabels.FakeColumnHeader));
             }
 
@@ -389,7 +392,8 @@ namespace SnazzyP4
             {
                 var headerStartX = ImGui.GetCursorPosX();
                 ImGui.TextUnformatted(configuration.GetText(TextLabels.ShortColumnHeader));
-                ImGui.SameLine(headerStartX + columnStride);
+                ImGui.SameLine();
+                ImGui.SetCursorPosX(headerStartX + columnStride);
                 ImGui.TextUnformatted(configuration.GetText(TextLabels.LongColumnHeader));
             }
 
@@ -968,6 +972,11 @@ namespace SnazzyP4
                     OnChaos(configuration.GetText(TextLabels.InfernoFake), FireColor, "inferno", false);
                 }
             }
+            else
+            {
+                // A hidden pair keeps its footprint so the remaining buttons do not shift.
+                DrawHiddenPairPlaceholder(scale);
+            }
 
             if (!HideResolvedActive || tsunamiEnabled)
             {
@@ -982,6 +991,10 @@ namespace SnazzyP4
                 {
                     OnChaos(configuration.GetText(TextLabels.TsunamiFake), WaterColor, "tsunami", false);
                 }
+            }
+            else
+            {
+                DrawHiddenPairPlaceholder(scale);
             }
         }
 
@@ -1009,6 +1022,10 @@ namespace SnazzyP4
                     OnThunder(false);
                 }
             }
+            else
+            {
+                DrawHiddenPairPlaceholder(scale);
+            }
 
             if (!HideResolvedActive || !blizzardPressed)
             {
@@ -1024,6 +1041,21 @@ namespace SnazzyP4
                     OnBlizzard(false);
                 }
             }
+            else
+            {
+                DrawHiddenPairPlaceholder(scale);
+            }
+        }
+
+        /// <summary>
+        /// Reserves the exact footprint of a hidden button pair so the remaining buttons keep their positions.
+        /// </summary>
+        private static void DrawHiddenPairPlaceholder(float scale)
+        {
+            var style = ImGui.GetStyle();
+            var buttonWidth = IconButtonSize * scale + style.FramePadding.X * 2f;
+            var buttonHeight = IconButtonSize * scale + style.FramePadding.Y * 2f;
+            ImGui.Dummy(new Vector2(buttonWidth * 2f + style.ItemSpacing.X, buttonHeight));
         }
 
         /// <summary>
@@ -1103,7 +1135,8 @@ namespace SnazzyP4
                 ImGui.TextUnformatted(configuration.GetText(TextLabels.KefkaLabel));
                 if (inlineToggles && (LayoutEditActive || thunderPressed || blizzardPressed))
                 {
-                    ImGui.SameLine(startX + toggleColumn);
+                    ImGui.SameLine();
+                    ImGui.SetCursorPosX(startX + toggleColumn);
                     ImGui.TextUnformatted(configuration.GetText(TextLabels.LastFakeHeader));
                 }
             }
@@ -1151,7 +1184,8 @@ namespace SnazzyP4
             ImGui.TextColored(color, $"{name} {configuration.GetText(effectiveReal ? TextLabels.RealWord : TextLabels.FakeWord)}");
             if (drawToggleInline)
             {
-                ImGui.SameLine(startX + toggleColumn);
+                ImGui.SameLine();
+                ImGui.SetCursorPosX(startX + toggleColumn);
                 DrawToggle(ref lastFake, idSuffix);
             }
         }
@@ -1170,7 +1204,8 @@ namespace SnazzyP4
             ImGui.TextColored(color, sample);
             if (drawToggleInline)
             {
-                ImGui.SameLine(startX + toggleColumn);
+                ImGui.SameLine();
+                ImGui.SetCursorPosX(startX + toggleColumn);
                 DrawToggle(ref lastFake, idSuffix);
             }
         }

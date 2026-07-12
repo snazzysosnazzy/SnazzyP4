@@ -19,6 +19,11 @@ namespace SnazzyP4
         /// </summary>
         public static readonly Entry[] Entries =
         {
+            new("1.0.5.1", "2026-07-10", new[]
+            {
+                "Hide Resolved Buttons no longer shifts the remaining buttons: a hidden chaos or Kefka pair keeps its exact spot, so pressing Inferno no longer moves the Tsunami buttons up (and likewise for Thunder/Blizzard).",
+                "Fixed misaligned text in windowed (non-detached) mode: the Real/Fake and Short/Long column headers and the Last Fake column were pushed right by the panel's position. They now line up the same as in detached mode.",
+            }),
             new("1.0.5.0", "2026-07-10", new[]
             {
                 "Picking Lightning or Drop now locks ALL Lightning and Drop buttons, not just the picked one (issue #1 follow-up). The fight only ever assigns one of the two body debuffs per pull, so after a body pick only Acceleration remains selectable.",

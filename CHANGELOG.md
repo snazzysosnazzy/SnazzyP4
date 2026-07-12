@@ -3,6 +3,15 @@
 All notable changes to Snazzy P4 are listed here. Versions match the `vX.Y.Z.W`
 release tags.
 
+## v1.0.5.1 — 2026-07-10
+
+- **Hide Resolved Buttons no longer shifts the remaining buttons** — a hidden chaos or Kefka
+  pair keeps its exact spot, so pressing Inferno no longer moves the Tsunami buttons up (and
+  likewise for Thunder/Blizzard).
+- **Fixed misaligned text in windowed (non-detached) mode** — the Real/Fake and Short/Long
+  column headers and the Last Fake column were pushed right by the panel's position. They now
+  line up the same as in detached mode.
+
 ## v1.0.5.0 — 2026-07-10
 
 - **One body debuff per pull** ([#1](https://github.com/snazzysosnazzy/SnazzyP4/issues/1)
