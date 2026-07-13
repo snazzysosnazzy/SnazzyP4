@@ -358,8 +358,10 @@ namespace SnazzyP4.Windows
             ImGui.TextDisabled("Multiplies everything the plugin draws.");
             DrawScaleSlider("Toolbar Scale", "##toolbarscale", () => Configuration.ToolbarScale, value => Configuration.ToolbarScale = value);
             ImGui.TextDisabled("Multiplies the quick-settings toolbar, on top of the global scale.");
-            DrawScaleSlider("Macro UI Scale", "##macroscale", () => Configuration.MacroUiScale, value => Configuration.MacroUiScale = value);
-            ImGui.TextDisabled("Multiplies the macro buttons and text panels, on top of the global scale.");
+            DrawScaleSlider("Button UI Scale", "##buttonscale", () => Configuration.ButtonUiScale, value => Configuration.ButtonUiScale = value);
+            ImGui.TextDisabled("Multiplies the macro button panels, on top of the global scale.");
+            DrawScaleSlider("Text Panel UI Scale", "##textscale", () => Configuration.TextUiScale, value => Configuration.TextUiScale = value);
+            ImGui.TextDisabled("Multiplies the text panels, on top of the global scale.");
         }
 
         /// <summary>
@@ -377,6 +379,97 @@ namespace SnazzyP4.Windows
             DrawFloatSlider("Button Opacity##globalbutton", () => Configuration.ButtonAlpha, value => Configuration.ButtonAlpha = value, 0f, 1f);
             DrawFloatSlider("Text Opacity##globaltext", () => Configuration.TextAlpha, value => Configuration.TextAlpha = value, 0f, 1f);
             ImGui.TextDisabled("Global multipliers. Each section's own opacity below multiplies on top.");
+        }
+
+        /// <summary>
+        /// Draws the collapsible group of position sliders: the Move All UI shift, the toolbar position,
+        /// and the group shifts for the button and text panels.
+        /// </summary>
+        private void DrawPositionSettings()
+        {
+            if (!ImGui.CollapsingHeader("Position"))
+            {
+                return;
+            }
+
+            DrawShiftSliders("Move All UI", "##posall",
+                             () => Configuration.GlobalUiOffset,
+                             value => Configuration.GlobalUiOffset = value,
+                             delta => plugin.ShiftSections(delta, true, true));
+            Tooltip("Shifts every section together, exactly like a Move All drag; Move All drags update these values live.");
+
+            DrawToolbarPositionSliders();
+
+            DrawShiftSliders("Button Panels", "##posbuttons",
+                             () => Configuration.ButtonPanelsOffset,
+                             value => Configuration.ButtonPanelsOffset = value,
+                             delta => plugin.ShiftSections(delta, true, false));
+            Tooltip("Shifts all the macro button panels together.");
+
+            DrawShiftSliders("Text Panels", "##postext",
+                             () => Configuration.TextPanelsOffset,
+                             value => Configuration.TextPanelsOffset = value,
+                             delta => plugin.ShiftSections(delta, false, true));
+            Tooltip("Shifts all the text panels together.");
+        }
+
+        /// <summary>
+        /// Draws a labelled X/Y slider pair whose changes shift a section group by the difference.
+        /// </summary>
+        /// <param name="label">The heading shown above the sliders.</param>
+        /// <param name="id">The ImGui id keeping the sliders unique.</param>
+        /// <param name="getOffset">Reads the accumulated shift.</param>
+        /// <param name="setOffset">Writes the accumulated shift.</param>
+        /// <param name="shift">Applies a pixel delta to the group.</param>
+        private void DrawShiftSliders(string label, string id, Func<Vector2> getOffset, Action<Vector2> setOffset, Action<Vector2> shift)
+        {
+            var limit = ImGui.GetMainViewport().WorkSize;
+            var offset = getOffset();
+            ImGui.TextUnformatted(label);
+
+            var offsetX = offset.X;
+            ImGui.SetNextItemWidth(220f);
+            if (ImGui.SliderFloat($"X{id}", ref offsetX, -limit.X, limit.X, "%.0f"))
+            {
+                shift(new Vector2(offsetX - offset.X, 0f));
+                setOffset(new Vector2(offsetX, offset.Y));
+                Configuration.Save();
+            }
+
+            var offsetY = offset.Y;
+            ImGui.SetNextItemWidth(220f);
+            if (ImGui.SliderFloat($"Y{id}", ref offsetY, -limit.Y, limit.Y, "%.0f"))
+            {
+                shift(new Vector2(0f, offsetY - offset.Y));
+                setOffset(new Vector2(offset.X, offsetY));
+                Configuration.Save();
+            }
+        }
+
+        /// <summary>
+        /// Draws the X/Y sliders that move the toolbar window, mirroring its live screen position.
+        /// </summary>
+        private void DrawToolbarPositionSliders()
+        {
+            var limit = ImGui.GetMainViewport().WorkSize;
+            var position = plugin.ToolbarPosition();
+            ImGui.TextUnformatted("Toolbar");
+
+            var positionX = position.X;
+            ImGui.SetNextItemWidth(220f);
+            if (ImGui.SliderFloat("X##postoolbar", ref positionX, 0f, limit.X, "%.0f"))
+            {
+                plugin.MoveToolbar(new Vector2(positionX, position.Y));
+            }
+
+            var positionY = position.Y;
+            ImGui.SetNextItemWidth(220f);
+            if (ImGui.SliderFloat("Y##postoolbar", ref positionY, 0f, limit.Y, "%.0f"))
+            {
+                plugin.MoveToolbar(new Vector2(position.X, positionY));
+            }
+
+            Tooltip("Moves the toolbar window; the sliders follow it when you drag it by hand.");
         }
 
         /// <summary>
@@ -1476,6 +1569,7 @@ namespace SnazzyP4.Windows
             ImGui.TextUnformatted("Global Layout Settings");
             DrawUiScale();
             DrawOpacitySettings();
+            DrawPositionSettings();
         }
 
         /// <summary>

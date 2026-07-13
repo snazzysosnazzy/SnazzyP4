@@ -41,9 +41,34 @@ namespace SnazzyP4
         public float ToolbarScale { get; set; } = 1.0f;
 
         /// <summary>
-        /// The scale multiplier applied to the macro buttons and text panels, layered on top of the global scale.
+        /// The scale multiplier the button and text scales replaced, kept only so old settings migrate into both.
         /// </summary>
         public float MacroUiScale { get; set; } = 1.0f;
+
+        /// <summary>
+        /// The scale multiplier applied to the macro button panels, layered on top of the global scale.
+        /// </summary>
+        public float ButtonUiScale { get; set; } = 1.0f;
+
+        /// <summary>
+        /// The scale multiplier applied to the text panels, layered on top of the global scale.
+        /// </summary>
+        public float TextUiScale { get; set; } = 1.0f;
+
+        /// <summary>
+        /// The accumulated shift applied to every section by the Move All UI sliders and Move All drags, in screen pixels.
+        /// </summary>
+        public Vector2 GlobalUiOffset { get; set; }
+
+        /// <summary>
+        /// The accumulated shift applied to the macro button panels by their position sliders, in screen pixels.
+        /// </summary>
+        public Vector2 ButtonPanelsOffset { get; set; }
+
+        /// <summary>
+        /// The accumulated shift applied to the text panels by their position sliders, in screen pixels.
+        /// </summary>
+        public Vector2 TextPanelsOffset { get; set; }
 
         /// <summary>
         /// Whether the player is playing a Support role.

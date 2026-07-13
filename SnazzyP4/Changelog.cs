@@ -19,6 +19,11 @@ namespace SnazzyP4
         /// </summary>
         public static readonly Entry[] Entries =
         {
+            new("1.0.12.0", "2026-07-13", new[]
+            {
+                "New Position dropdown under Global Layout Settings. \"Move All UI\" X/Y sliders shift every section together, exactly like a Move All drag - and Move All drags update the sliders live. There are also sliders for the toolbar's screen position (they follow it when you drag it by hand), plus group sliders that shift all the macro button panels or all the text panels together.",
+                "Macro UI Scale is split into Button UI Scale and Text Panel UI Scale so the button panels and text panels can be scaled separately. An existing Macro UI Scale value carries over into both.",
+            }),
             new("1.0.11.1", "2026-07-13", new[]
             {
                 "Setting tooltips now wrap onto multiple lines at a comfortable width instead of stretching across the screen.",

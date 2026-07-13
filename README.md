@@ -194,11 +194,14 @@ Open with the **Settings** button or `/snazzyp4 config`. Settings are grouped in
 
 ### Layout
 
-- **Global Layout Settings** — two collapsible groups:
-  - **Scaling** — **Global UI Scale** (multiplies everything), **Toolbar Scale** (just the quick
-    toolbar) and **Macro UI Scale** (buttons and text panels), each with percentage presets.
+- **Global Layout Settings** — three collapsible groups:
+  - **Scaling** — **Global UI Scale** (multiplies everything), **Toolbar Scale**, **Button UI
+    Scale** and **Text Panel UI Scale**, each with percentage presets.
   - **Opacity** — global **Background**, **Toolbar**, **Button** and **Text** opacity
     multipliers; each section's own opacity below multiplies on top.
+  - **Position** — **Move All UI** X/Y sliders (shift everything together; Move All drags update
+    them live), **Toolbar** position sliders, and group sliders for the **Button Panels** and
+    **Text Panels**.
 - **Sections** — fine-tune per section: position, scale, background opacity, hide title bar /
   labels, and button or text opacity for the current mode (windowed and detached keep separate
   values).

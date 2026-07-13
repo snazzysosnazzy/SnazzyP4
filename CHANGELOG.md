@@ -3,6 +3,17 @@
 All notable changes to Snazzy P4 are listed here. Versions match the `vX.Y.Z.W`
 release tags.
 
+## v1.0.12.0 — 2026-07-13
+
+- **Position dropdown** under Global Layout Settings:
+  - **Move All UI** X/Y sliders shift every section together, exactly like a Move All drag —
+    and Move All drags update the sliders live.
+  - **Toolbar** X/Y sliders move the toolbar window and follow it when you drag it by hand.
+  - **Button Panels** and **Text Panels** sliders shift each group together.
+- **Macro UI Scale split** into **Button UI Scale** and **Text Panel UI Scale** so the button
+  panels and text panels scale separately. An existing Macro UI Scale value carries over into
+  both.
+
 ## v1.0.11.1 — 2026-07-13
 
 - Setting tooltips now **wrap onto multiple lines** at a comfortable width instead of

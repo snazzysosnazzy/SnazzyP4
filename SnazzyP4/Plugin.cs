@@ -189,6 +189,23 @@ namespace SnazzyP4
 
             Configuration = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
 
+            // Settings saved before the macro scale split carry that value into both of its replacements.
+            if (Configuration.MacroUiScale != 1.0f)
+            {
+                if (Configuration.ButtonUiScale == 1.0f)
+                {
+                    Configuration.ButtonUiScale = Configuration.MacroUiScale;
+                }
+
+                if (Configuration.TextUiScale == 1.0f)
+                {
+                    Configuration.TextUiScale = Configuration.MacroUiScale;
+                }
+
+                Configuration.MacroUiScale = 1.0f;
+                Configuration.Save();
+            }
+
             // The Edit Layout and Move All modes are transient interactions and must not carry across sessions.
             Configuration.EditMode = false;
             Configuration.MoveAllActive = false;
@@ -380,6 +397,56 @@ namespace SnazzyP4
         }
 
         /// <summary>
+        /// Shifts a group of sections by a pixel delta, moving the stored positions for the current layout mode.
+        /// Detached windows are marked dirty so they snap to their new positions on the next frame.
+        /// </summary>
+        /// <param name="delta">The shift in screen pixels.</param>
+        /// <param name="includeButtons">Whether the button sections move.</param>
+        /// <param name="includeText">Whether the text sections move.</param>
+        public void ShiftSections(Vector2 delta, bool includeButtons, bool includeText)
+        {
+            var scale = Configuration.UiScale * Dalamud.Interface.Utility.ImGuiHelpers.GlobalScale;
+            foreach (var section in Sections)
+            {
+                if (section.HasButtons ? !includeButtons : !includeText)
+                {
+                    continue;
+                }
+
+                if (Configuration.Detached)
+                {
+                    Configuration.SetDetachedPosition(section.Id, Configuration.GetDetachedPosition(section.Id, section.DefaultOffset) + delta);
+                    DetachedPositionDirty.Add(section.Id);
+                }
+                else
+                {
+                    // Windowed offsets are stored unscaled, so the pixel delta is converted back like a section drag.
+                    Configuration.SetOffset(section.Id, Configuration.GetOffset(section.Id, section.DefaultOffset) + delta / scale);
+                }
+            }
+
+            Configuration.Save();
+        }
+
+        /// <summary>
+        /// Returns the toolbar window's current screen position.
+        /// </summary>
+        /// <returns>The hub window's top-left corner in screen pixels.</returns>
+        public Vector2 ToolbarPosition()
+        {
+            return MainWindow.CurrentPosition;
+        }
+
+        /// <summary>
+        /// Moves the toolbar window to a screen position on the next frame.
+        /// </summary>
+        /// <param name="position">The new top-left corner in screen pixels.</param>
+        public void MoveToolbar(Vector2 position)
+        {
+            MainWindow.RequestedPosition = position;
+        }
+
+        /// <summary>
         /// Queues a move delta to be applied to the detached windows on the next frame.
         /// </summary>
         /// <param name="delta">The pixel distance every detached window moves.</param>
@@ -396,6 +463,12 @@ namespace SnazzyP4
         {
             GroupMove = pendingGroupMove;
             pendingGroupMove = Vector2.Zero;
+
+            // Move All drags feed the Move All UI sliders so they always show the accumulated shift.
+            if (Configuration.MoveAllActive && GroupMove != Vector2.Zero)
+            {
+                Configuration.GlobalUiOffset += GroupMove;
+            }
 
             // A group drag ends when the mouse is released; while it is active and Move All is on, feed the mouse delta into the group move.
             if (!ImGui.IsMouseDown(ImGuiMouseButton.Left))

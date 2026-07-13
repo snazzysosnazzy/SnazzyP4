@@ -154,11 +154,12 @@ namespace SnazzyP4.Windows
             }
 
             var sectionScale = configuration.GetSectionScale(definition.Id);
-            ImGui.SetWindowFontScale(configuration.UiScale * configuration.MacroUiScale * sectionScale);
+            var typeScale = definition.HasButtons ? configuration.ButtonUiScale : configuration.TextUiScale;
+            ImGui.SetWindowFontScale(configuration.UiScale * typeScale * sectionScale);
             plugin.Solver.CurrentSection = definition.Id;
-            plugin.Solver.CurrentFontScale = configuration.UiScale * configuration.MacroUiScale * sectionScale;
+            plugin.Solver.CurrentFontScale = configuration.UiScale * typeScale * sectionScale;
             MainWindow.PushSectionStyle(configuration.EffectiveButtonAlpha(definition.Id, definition.HasButtons));
-            definition.Draw(configuration.UiScale * configuration.MacroUiScale * ImGuiHelpers.GlobalScale * sectionScale);
+            definition.Draw(configuration.UiScale * typeScale * ImGuiHelpers.GlobalScale * sectionScale);
             MainWindow.PopSectionStyle();
 
             // The buttons are disabled during Move All, so a press anywhere on the window counts as the start of a group drag.

@@ -48,9 +48,19 @@ namespace SnazzyP4.Windows
         private Configuration Configuration => plugin.Configuration;
 
         /// <summary>
-        /// The combined global, macro and Dalamud scale multiplier applied to the positioned sections.
+        /// The combined global and Dalamud scale multiplier applied to the positioned sections.
         /// </summary>
-        private float Scaled => Configuration.UiScale * Configuration.MacroUiScale * ImGuiHelpers.GlobalScale;
+        private float Scaled => Configuration.UiScale * ImGuiHelpers.GlobalScale;
+
+        /// <summary>
+        /// The hub window's screen position observed on the last draw, read by the toolbar position sliders.
+        /// </summary>
+        public Vector2 CurrentPosition { get; private set; }
+
+        /// <summary>
+        /// A screen position the hub window moves to on the next frame, set by the toolbar position sliders.
+        /// </summary>
+        public Vector2? RequestedPosition { get; set; }
 
         /// <summary>
         /// Disposes the window. There is nothing to release.
@@ -64,6 +74,18 @@ namespace SnazzyP4.Windows
         /// </summary>
         public override void PreDraw()
         {
+            // A slider-requested position is applied for one frame so the window stays freely draggable afterwards.
+            if (RequestedPosition.HasValue)
+            {
+                Position = RequestedPosition.Value;
+                PositionCondition = ImGuiCond.Always;
+                RequestedPosition = null;
+            }
+            else
+            {
+                Position = null;
+            }
+
             // The hub always uses the universal appearance values.
             // With the toolbar hidden entirely, the hub renders nothing, so the window itself goes invisible and click-through.
             // The toolbar never fully hides while the floating Hide button is off, since it is then the only way to unhide.
@@ -154,6 +176,7 @@ namespace SnazzyP4.Windows
         public override void Draw()
         {
             plugin.MaybeShowUpdateNotice();
+            CurrentPosition = ImGui.GetWindowPos();
             ImGui.SetWindowFontScale(Configuration.UiScale * Configuration.ToolbarScale);
             ImGui.PushStyleVar(ImGuiStyleVar.Alpha, Configuration.ToolbarAlpha);
             DrawToolbar();
@@ -354,13 +377,14 @@ namespace SnazzyP4.Windows
                 var sectionScale = Configuration.GetSectionScale(section.Id);
                 ImGui.SetCursorPos(offset * scale);
 
+                var typeScale = section.HasButtons ? Configuration.ButtonUiScale : Configuration.TextUiScale;
                 using (ImRaii.Group())
                 {
-                    ImGui.SetWindowFontScale(Configuration.UiScale * Configuration.MacroUiScale * sectionScale);
+                    ImGui.SetWindowFontScale(Configuration.UiScale * typeScale * sectionScale);
                     plugin.Solver.CurrentSection = section.Id;
-                    plugin.Solver.CurrentFontScale = Configuration.UiScale * Configuration.MacroUiScale * sectionScale;
+                    plugin.Solver.CurrentFontScale = Configuration.UiScale * typeScale * sectionScale;
                     PushSectionStyle(Configuration.EffectiveButtonAlpha(section.Id, section.HasButtons));
-                    section.Draw(scale * sectionScale);
+                    section.Draw(scale * typeScale * sectionScale);
                     PopSectionStyle();
                 }
 
