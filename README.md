@@ -150,8 +150,10 @@ Open with the **Settings** button or `/snazzyp4 config`. Settings are grouped in
   - **Reset on Hide Button Press** — runs Reset whenever you press Hide.
   - **Reset on Wipe** / **Hide on Wipe** — run Reset / Hide when the party wipes (uses the game's
     duty state).
-- **General Settings** — show toolbar, **Hide Settings toolbar when UI is hidden**,
-  **Persistent Settings Collapsed State**, detached windows, edit layout, Move All; floating
+- **General Settings** — show toolbar (it collapses when you press Hide, expands on Show, and
+  its `<<`/`>>` arrows work any time), **Hide Settings toolbar when UI is hidden**,
+  **Persistent Settings Collapsed State** (Hide/Show leave the collapsed state alone), detached
+  windows, edit layout, Move All; floating
   **Hide** / **Reset** / **Undo** buttons; **Hide Resolved Buttons Until Reset** (each button
   group disappears once fully entered and returns on Reset); **Acceleration on the same line**
   as Spread/Stack (`Spread on X and MOVE`); **combine the First and Second sets** into one panel
