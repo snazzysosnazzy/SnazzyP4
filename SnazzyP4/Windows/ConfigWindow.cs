@@ -2200,14 +2200,21 @@ namespace SnazzyP4.Windows
 
         /// <summary>
         /// Shows a tooltip for the most recently drawn control while it is hovered, including while it is disabled.
+        /// The text wraps at a fixed width so long descriptions do not stretch across the screen.
         /// </summary>
         /// <param name="text">The tooltip text.</param>
         private static void Tooltip(string text)
         {
-            if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
+            if (!ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
             {
-                ImGui.SetTooltip(text);
+                return;
             }
+
+            ImGui.BeginTooltip();
+            ImGui.PushTextWrapPos(ImGui.GetFontSize() * 28f);
+            ImGui.TextUnformatted(text);
+            ImGui.PopTextWrapPos();
+            ImGui.EndTooltip();
         }
 
         /// <summary>

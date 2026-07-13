@@ -3,6 +3,11 @@
 All notable changes to Snazzy P4 are listed here. Versions match the `vX.Y.Z.W`
 release tags.
 
+## v1.0.11.1 — 2026-07-13
+
+- Setting tooltips now **wrap onto multiple lines** at a comfortable width instead of
+  stretching across the screen.
+
 ## v1.0.11.0 — 2026-07-13
 
 - **Renamed "Auto-place marker" to "Apply Marker on Macro Press"** to reflect what it does:

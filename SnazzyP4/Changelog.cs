@@ -19,6 +19,10 @@ namespace SnazzyP4
         /// </summary>
         public static readonly Entry[] Entries =
         {
+            new("1.0.11.1", "2026-07-13", new[]
+            {
+                "Setting tooltips now wrap onto multiple lines at a comfortable width instead of stretching across the screen.",
+            }),
             new("1.0.11.0", "2026-07-13", new[]
             {
                 "Renamed \"Auto-place marker\" to \"Apply Marker on Macro Press\" to reflect what it does: pressing the spread macro also runs the /mk self-mark for that set, the same as an in-game macro. Nothing is sent without your button press, and the wording across the settings now says so plainly.",
