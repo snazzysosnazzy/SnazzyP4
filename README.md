@@ -5,6 +5,8 @@ This does not achieve anything that can't already be achieved by in-game macros 
 
 You can criticize this plugin from the standpoint of it being a better UI, customization/organization of text, or that it has features to help reduce bloat of UI on screen, but to say that it's anything compared to cactbot is an unfair comparison and I urge you to try out the plugin or read the source code yourself to understand that this isn't doing any of those things.
 
+This ultimately is no different from using a tool like wtfdig.info's browser-based p4-helper or using in-game macros.
+
 ## Planned Updates
 
 1. Alternative mode: Combination macros. Cuts number of macros in half by doing "combination" button presses. Further cuts down buttons
