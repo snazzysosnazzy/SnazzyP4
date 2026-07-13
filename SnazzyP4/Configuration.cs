@@ -52,7 +52,7 @@ namespace SnazzyP4
         public bool IsSupport { get; set; }
 
         /// <summary>
-        /// Whether the plugin should place the spread marker on the player automatically once a spread is determined.
+        /// Whether pressing the spread macro also runs the /mk self-mark for the resolved set, like an in-game macro would.
         /// </summary>
         public bool AutoMarker { get; set; } = true;
 

@@ -19,6 +19,11 @@ namespace SnazzyP4
         /// </summary>
         public static readonly Entry[] Entries =
         {
+            new("1.0.11.0", "2026-07-13", new[]
+            {
+                "Renamed \"Auto-place marker\" to \"Apply Marker on Macro Press\" to reflect what it does: pressing the spread macro also runs the /mk self-mark for that set, the same as an in-game macro. Nothing is sent without your button press, and the wording across the settings now says so plainly.",
+                "The helper text on the General tab, the Chat tab and the Last Fake settings moved into hover tooltips on each setting, and every setting there now has a tooltip explaining what it does. The trigger-instance readout and the settings-profile description stay as visible text.",
+            }),
             new("1.0.10.0", "2026-07-13", new[]
             {
                 "The collapsible Scaling and Opacity groups moved from the General tab to the Layout tab, under a heading now named Global Layout Settings, so all layout tuning lives in one place.",
@@ -182,7 +187,7 @@ namespace SnazzyP4
             }),
             new("1.0.0.13", "2026-07-05", new[]
             {
-                "Customisable auto-markers: under Settings > General > Auto-place marker you can now choose which head marker is placed for each role and set (First/Second set for Support and DPS). Options include Attack 1-8, Bind 1-3, Ignore 1-2, the four shapes, or (none). The marker is always placed on yourself.",
+                "Customisable markers: under Settings > General > Apply Marker on Macro Press you can now choose which head marker is placed for each role and set (First/Second set for Support and DPS). Options include Attack 1-8, Bind 1-3, Ignore 1-2, the four shapes, or (none). The marker is always placed on yourself.",
                 "Customisable target letters: the A/B/C/D letters shown in the resolutions (\"Spread on B\") can be renamed per role in Settings > Text, under the new \"Target letters\" group.",
             }),
             new("1.0.0.12", "2026-07-05", new[]

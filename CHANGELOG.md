@@ -3,6 +3,17 @@
 All notable changes to Snazzy P4 are listed here. Versions match the `vX.Y.Z.W`
 release tags.
 
+## v1.0.11.0 — 2026-07-13
+
+- **Renamed "Auto-place marker" to "Apply Marker on Macro Press"** to reflect what it does:
+  pressing the spread macro also runs the `/mk` self-mark for that set, the same as an in-game
+  macro. Nothing is sent without your button press, and the wording across the settings now
+  says so plainly.
+- **Helper text became hover tooltips.** The descriptions on the General tab, the Chat tab and
+  the Last Fake settings moved into tooltips on each setting, and every setting there now has
+  one explaining what it does. The trigger-instance readout and the settings-profile description
+  stay as visible text.
+
 ## v1.0.10.0 — 2026-07-13
 
 - The collapsible **Scaling** and **Opacity** groups moved from the General tab to the

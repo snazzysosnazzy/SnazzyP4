@@ -191,6 +191,8 @@ namespace SnazzyP4.Windows
                 Configuration.Save();
             }
 
+            Tooltip("Opens the plugin when you enter the captured instance and closes it when you leave.");
+
             ImGui.Indent();
             var current = Plugin.ClientState.TerritoryType;
             ImGui.TextDisabled(Configuration.AutoDutyTerritoryId == 0
@@ -203,6 +205,8 @@ namespace SnazzyP4.Windows
                 Configuration.Save();
             }
 
+            Tooltip("Captures the zone you are standing in as the trigger instance.");
+
             if (Configuration.AutoDutyTerritoryId != 0)
             {
                 ImGui.SameLine();
@@ -211,6 +215,8 @@ namespace SnazzyP4.Windows
                     Configuration.AutoDutyTerritoryId = 0;
                     Configuration.Save();
                 }
+
+                Tooltip("Forgets the captured trigger instance.");
             }
 
             ImGui.Unindent();
@@ -222,12 +228,16 @@ namespace SnazzyP4.Windows
                 Configuration.Save();
             }
 
+            Tooltip("Runs Reset whenever the display is hidden.");
+
             var resetOnWipe = Configuration.ResetOnWipe;
             if (ImGui.Checkbox("Reset on Wipe", ref resetOnWipe))
             {
                 Configuration.ResetOnWipe = resetOnWipe;
                 Configuration.Save();
             }
+
+            Tooltip("Runs Reset when the party wipes. Wipe detection uses the game's duty state and fires when the whole party is defeated.");
 
             var hideOnWipe = Configuration.HideOnWipe;
             if (ImGui.Checkbox("Hide on Wipe", ref hideOnWipe))
@@ -236,7 +246,7 @@ namespace SnazzyP4.Windows
                 Configuration.Save();
             }
 
-            ImGui.TextDisabled("Wipe detection uses the game's duty state and fires when the whole party is defeated.");
+            Tooltip("Hides the display when the party wipes. Wipe detection uses the game's duty state and fires when the whole party is defeated.");
         }
 
         /// <summary>
@@ -254,7 +264,7 @@ namespace SnazzyP4.Windows
                 }
             }
 
-            ImGui.TextDisabled("Stops the changelog popup after each update. The changelog stays available from the title-bar button.");
+            Tooltip("Stops the changelog popup after each update. The changelog stays available from the title-bar button.");
         }
 
         /// <summary>
@@ -422,7 +432,9 @@ namespace SnazzyP4.Windows
             var role = Configuration.IsSupport ? 0 : 1;
             var roleChanged = false;
             roleChanged |= ImGui.RadioButton("Support (Ignore1 / Bind1)", ref role, 0);
+            Tooltip("Uses the Ignore1/Bind1 markers and the A (stack) / D (spread) target letters.");
             roleChanged |= ImGui.RadioButton("DPS (Ignore2 / Bind2)", ref role, 1);
+            Tooltip("Uses the Ignore2/Bind2 markers and the C (stack) / B (spread) target letters.");
             if (roleChanged)
             {
                 Configuration.IsSupport = role == 0;
@@ -430,13 +442,13 @@ namespace SnazzyP4.Windows
             }
 
             var autoMarker = Configuration.AutoMarker;
-            if (ImGui.Checkbox("Auto-place marker", ref autoMarker))
+            if (ImGui.Checkbox("Apply Marker on Macro Press", ref autoMarker))
             {
                 Configuration.AutoMarker = autoMarker;
                 Configuration.Save();
             }
 
-            ImGui.TextDisabled("Sends the /mk command to the game for you when a spread\nis determined. This issues input on your behalf - use at your\nown risk. Turn off to only Copy/Place manually.");
+            Tooltip("Runs the same /mk self-mark an in-game macro would when you press the spread macro for your set. Nothing is sent without your button press.");
 
             if (Configuration.AutoMarker)
             {
@@ -476,14 +488,11 @@ namespace SnazzyP4.Windows
         {
             ImGui.Indent();
             ImGui.TextUnformatted("Markers");
-            ImGui.TextDisabled("Only your own role's two markers are used; both roles are shown so a\nshared config covers everyone.");
 
             DrawMarkerDropdown("First set - Support", () => Configuration.MarkerFirstSetSupport, value => Configuration.MarkerFirstSetSupport = value);
             DrawMarkerDropdown("Second set - Support", () => Configuration.MarkerSecondSetSupport, value => Configuration.MarkerSecondSetSupport = value);
             DrawMarkerDropdown("First set - DPS", () => Configuration.MarkerFirstSetDps, value => Configuration.MarkerFirstSetDps = value);
             DrawMarkerDropdown("Second set - DPS", () => Configuration.MarkerSecondSetDps, value => Configuration.MarkerSecondSetDps = value);
-
-            ImGui.TextDisabled("The marker is always placed on yourself (<me>).");
             ImGui.Unindent();
         }
 
@@ -508,6 +517,7 @@ namespace SnazzyP4.Windows
 
             ImGui.SetNextItemWidth(200f);
             using var combo = ImRaii.Combo($"{label}##mk_{label}", preview);
+            Tooltip("The head marker placed on yourself (<me>) for this role and set. Only your own role's two markers are used; both roles are shown so a shared profile covers everyone.");
             if (!combo)
             {
                 return;
@@ -529,7 +539,6 @@ namespace SnazzyP4.Windows
         private void DrawChatMessages()
         {
             ImGui.TextUnformatted("Chat Messages");
-            ImGui.TextWrapped("Announcements are configured per channel. Pick a channel below; its Exdeath and Chaos announcements are sent to that channel when the matching button is pressed. This issues input on your behalf - use at your own risk.");
 
             var enabled = Configuration.AnnouncementsEnabled;
             if (ImGui.Checkbox("Enable chat announcements", ref enabled))
@@ -538,7 +547,7 @@ namespace SnazzyP4.Windows
                 Configuration.Save();
             }
 
-            ImGui.TextDisabled("Master switch. When off, nothing below is sent no matter which announcements are toggled on.");
+            Tooltip("Master switch. When off, nothing is sent no matter which announcements are toggled on. Announcements only fire from your own button presses, exactly like an in-game macro.");
 
             ImGui.Separator();
             DrawAnnouncementModeSection();
@@ -551,9 +560,7 @@ namespace SnazzyP4.Windows
                 Configuration.Save();
             }
 
-            ImGui.TextDisabled("When on, the per-press announcements are held back. Instead, once both Exdeaths, both debuff picks and both\n"
-                               + "chaos are pressed, the whole list is sent to the selected channel in resolution order: 1st-set debuffs,\n"
-                               + "1st gaze, Inferno, 2nd-set debuffs, 2nd gaze, Tsunami.");
+            Tooltip("Holds the per-press announcements back. Once both Exdeaths, both debuff picks and both chaos are pressed, the whole list is sent to the selected channel in resolution order: 1st-set debuffs, 1st gaze, Inferno, 2nd-set debuffs, 2nd gaze, Tsunami.");
 
             var showSetNumber = Configuration.AnnouncementShowSetNumber;
             if (ImGui.Checkbox("Include [1st] / [2nd] prefix in default messages", ref showSetNumber))
@@ -562,10 +569,11 @@ namespace SnazzyP4.Windows
                 Configuration.Save();
             }
 
-            ImGui.TextDisabled("Affects the generated default Exdeath messages (e.g. \"[1st] Lightning - Spread\" vs \"Lightning - Spread\").");
+            Tooltip("Affects the generated default Exdeath messages, for example \"[1st] Lightning - Spread\" versus \"Lightning - Spread\".");
             ImGui.Separator();
 
             DrawChannelSelector();
+            Tooltip("Announcements are stored per channel; the selected channel is the one used when a macro button is pressed.");
             DrawCopyToChannel();
             DrawAnnouncementBulkToggles();
             if (!string.IsNullOrEmpty(chatStatus))
@@ -586,8 +594,6 @@ namespace SnazzyP4.Windows
         private void DrawAnnouncementModeSection()
         {
             var green = new Vector4(0.45f, 0.85f, 0.45f, 1f);
-            var red = new Vector4(0.96f, 0.35f, 0.32f, 1f);
-            var gold = new Vector4(1f, 0.84f, 0f, 1f);
 
             ImGui.TextUnformatted("Mode");
 
@@ -600,32 +606,33 @@ namespace SnazzyP4.Windows
                     Configuration.Save();
                 }
 
+                Tooltip("Sends only the party-safe callouts: gaze and Inferno/Tsunami.");
+
                 ImGui.SameLine();
                 if (ImGui.RadioButton("Personal Mode", personal) && !personal)
                 {
                     Configuration.PersonalMode = true;
                     Configuration.Save();
                 }
+
+                Tooltip("Adds your debuff, title and custom callouts. They are kept out of /p party chat unless the override below is on; use Party Mode to send to your party.");
             }
             else
             {
                 ImGui.TextColored(green, "Party Mode");
+                Tooltip("Sends only the party-safe callouts: gaze and Inferno/Tsunami.");
             }
 
             if (Configuration.IsPersonalMode)
             {
-                using (ImRaii.PushColor(ImGuiCol.Text, red))
-                {
-                    ImGui.TextWrapped("PERSONAL MODE - not for party play. Your debuff, title and custom callouts are blocked from /p "
-                                      + "(party) chat; only gaze and Inferno/Tsunami reach party. To broadcast to your party, use Party Mode.");
-                }
-
                 var perChannel = Configuration.PerChannelAnnouncements;
                 if (ImGui.Checkbox("Per-channel announcements (set a channel per announcement)", ref perChannel))
                 {
                     Configuration.PerChannelAnnouncements = perChannel;
                     Configuration.Save();
                 }
+
+                Tooltip("Lets each announcement pick its own channel instead of the selected one.");
 
                 var over = Configuration.PersonalModePartyOverride;
                 if (ImGui.Checkbox("OVERRIDE: allow personal announcements in /p party chat", ref over))
@@ -634,15 +641,7 @@ namespace SnazzyP4.Windows
                     Configuration.Save();
                 }
 
-                using (ImRaii.PushColor(ImGuiCol.Text, red))
-                {
-                    ImGui.TextWrapped("!! DO NOT ENABLE THE OVERRIDE unless you really mean it. It sends all your personal callouts to your "
-                                      + "PARTY, which will spam them. Use Party Mode instead.");
-                }
-            }
-            else
-            {
-                ImGui.TextColored(green, "Sends only gaze and Inferno/Tsunami callouts - safe to broadcast to your party.");
+                Tooltip("Allows the personal callouts into /p party chat. This can flood your party's chat; Party Mode is the intended way to send to party.");
             }
 
             var showPersonal = Configuration.ShowPersonalMode;
@@ -658,10 +657,7 @@ namespace SnazzyP4.Windows
                 Configuration.Save();
             }
 
-            if (Configuration.IsPersonalMode)
-            {
-                ImGui.TextColored(gold, "Tip: switch to Party Mode before broadcasting to your party.");
-            }
+            Tooltip("Reveals the Personal Mode option next to Party Mode.");
         }
 
         /// <summary>
@@ -685,22 +681,30 @@ namespace SnazzyP4.Windows
                 SetAllAnnouncementSlots(enabled: true, titlesOnly: false);
             }
 
+            Tooltip("Turns on every announcement in this channel except the set titles.");
+
             ImGui.SameLine();
             if (ImGui.Button("Turn off all announcements", buttonSize))
             {
                 SetAllAnnouncementSlots(enabled: false, titlesOnly: false);
             }
 
+            Tooltip("Turns off every announcement in this channel except the set titles.");
+
             if (ImGui.Button("Turn on set titles", buttonSize))
             {
                 SetAllAnnouncementSlots(enabled: true, titlesOnly: true);
             }
+
+            Tooltip("Turns on the 1st/2nd set title lines in this channel.");
 
             ImGui.SameLine();
             if (ImGui.Button("Turn off set titles", buttonSize))
             {
                 SetAllAnnouncementSlots(enabled: false, titlesOnly: true);
             }
+
+            Tooltip("Turns off the 1st/2nd set title lines in this channel.");
         }
 
         /// <summary>
@@ -765,6 +769,7 @@ namespace SnazzyP4.Windows
         {
             ImGui.SetNextItemWidth(260f);
             using var combo = ImRaii.Combo("Copy settings to...##copychan", "Copy settings to another channel");
+            Tooltip("Copies this channel's whole announcement setup to another channel.");
             if (!combo)
             {
                 return;
@@ -809,12 +814,16 @@ namespace SnazzyP4.Windows
                 Configuration.Save();
             }
 
+            Tooltip("A reorderable list of per-mechanic lines, each with its own toggle and optional custom messages.");
+
             ImGui.SameLine();
             if (ImGui.RadioButton($"Simple text box##mode_{categoryId}", !ordered) && ordered)
             {
                 category.Ordered = false;
                 Configuration.Save();
             }
+
+            Tooltip("One growing text box per set and real/fake branch; each non-empty line is sent as its own chat message.");
 
             if (categoryId == "chaos")
             {
@@ -890,7 +899,6 @@ namespace SnazzyP4.Windows
         /// <param name="key">The ImGui id suffix keeping the text box unique.</param>
         private void DrawSimpleLeaf(AnnouncementLeaf leaf, string key)
         {
-            ImGui.TextDisabled("One chat message per line; empty lines are ignored.");
             var text = leaf.SimpleText;
             var rows = Math.Max(5, text.Split('\n').Length + 1);
             var size = new Vector2(360f, rows * ImGui.GetTextLineHeight() + ImGui.GetStyle().FramePadding.Y * 2f);
@@ -898,6 +906,8 @@ namespace SnazzyP4.Windows
             {
                 leaf.SimpleText = text;
             }
+
+            Tooltip("One chat message per line; empty lines are ignored.");
 
             if (ImGui.IsItemDeactivatedAfterEdit())
             {
@@ -955,6 +965,8 @@ namespace SnazzyP4.Windows
                         Configuration.Save();
                     }
 
+                    Tooltip("Sends this line to chat when the matching macro button for this set is pressed. The list order is the send order.");
+
                     if (slot.IsCustom)
                     {
                         ImGui.SameLine();
@@ -962,6 +974,8 @@ namespace SnazzyP4.Windows
                         {
                             removeIndex = index;
                         }
+
+                        Tooltip("Deletes this custom message from the list.");
                     }
 
                     if (Configuration.IsPersonalMode && Configuration.PerChannelAnnouncements)
@@ -989,6 +1003,8 @@ namespace SnazzyP4.Windows
                             Configuration.Save();
                         }
 
+                        Tooltip("Replaces the default message with your own reorderable list; blank boxes are skipped.");
+
                         if (slot.UseCustomMessage)
                         {
                             DrawMessageList(slot);
@@ -1004,10 +1020,15 @@ namespace SnazzyP4.Windows
             }
 
             // Custom messages are not party-safe, so they are only offered in Personal Mode.
-            if (Configuration.IsPersonalMode && ImGui.Button($"+ Add custom message##addcustom_{key}"))
+            if (Configuration.IsPersonalMode)
             {
-                leaf.Slots.Add(AnnouncementData.NewCustomSlot());
-                Configuration.Save();
+                if (ImGui.Button($"+ Add custom message##addcustom_{key}"))
+                {
+                    leaf.Slots.Add(AnnouncementData.NewCustomSlot());
+                    Configuration.Save();
+                }
+
+                Tooltip("Adds your own extra message into the list; it can be reordered and removed like any other entry.");
             }
 
             if (moveFrom >= 0)
@@ -1155,6 +1176,7 @@ namespace SnazzyP4.Windows
 
             ImGui.SetNextItemWidth(160f);
             using var combo = ImRaii.Combo("Dock side##lastfakedockside", preview);
+            Tooltip("Which side of the Kefka text panel the docked ANNOUNCE button sits on.");
             if (!combo)
             {
                 return;
@@ -1189,6 +1211,7 @@ namespace SnazzyP4.Windows
 
             ImGui.SetNextItemWidth(240f);
             using var combo = ImRaii.Combo("Channel##slotchan", preview);
+            Tooltip("Sends this announcement to its own channel; \"(selected channel)\" follows the channel picked at the top of the tab.");
             if (!combo)
             {
                 return;
@@ -1268,6 +1291,8 @@ namespace SnazzyP4.Windows
                 Configuration.Save();
             }
 
+            Tooltip("Shows the quick toolbar with the Hide, Settings, Edit layout, Detached, Move All, Undo and Reset controls.");
+
             var hideToolbarWhenHidden = Configuration.HideToolbarWhenHidden;
             if (ImGui.Checkbox("Hide Toolbar when UI is hidden", ref hideToolbarWhenHidden))
             {
@@ -1275,7 +1300,7 @@ namespace SnazzyP4.Windows
                 Configuration.Save();
             }
 
-            ImGui.TextDisabled("Ignored while the Floating Hide button is off, since the toolbar is then the only way to bring the display back.");
+            Tooltip("Hides the toolbar completely while the display is hidden, instead of showing it collapsed. Ignored while the Floating Hide button is off, since the toolbar is then the only way to bring the display back.");
 
             var persistCollapsed = Configuration.PersistToolbarCollapsed;
             if (ImGui.Checkbox("Persistent Toolbar Collapsed State", ref persistCollapsed))
@@ -1284,7 +1309,7 @@ namespace SnazzyP4.Windows
                 Configuration.Save();
             }
 
-            ImGui.TextDisabled("Keeps the toolbar's collapsed state unchanged when Hide/Show is pressed.");
+            Tooltip("Keeps the toolbar's collapsed state unchanged when Hide/Show is pressed; only the arrows change it.");
 
             var hideAllLabels = Configuration.HideLabels;
             if (ImGui.Checkbox("Hide all name labels", ref hideAllLabels))
@@ -1293,6 +1318,8 @@ namespace SnazzyP4.Windows
                 Configuration.Save();
             }
 
+            Tooltip("Hides every header and name label. While on, the per-section switches in the Layout tab are overridden and disabled.");
+
             var hideAllTitleBars = Configuration.NoTitleBar;
             if (ImGui.Checkbox("Hide all title bars", ref hideAllTitleBars))
             {
@@ -1300,7 +1327,7 @@ namespace SnazzyP4.Windows
                 Configuration.Save();
             }
 
-            ImGui.TextDisabled("While a global switch is on, the matching per-section switches in the Layout tab are overridden and disabled.");
+            Tooltip("Hides every window title bar. While on, the per-section switches in the Layout tab are overridden and disabled.");
 
             var detached = Configuration.Detached;
             if (ImGui.Checkbox("Detached windows (each section is its own window)", ref detached))
@@ -1309,11 +1336,15 @@ namespace SnazzyP4.Windows
                 Configuration.Save();
             }
 
+            Tooltip("Splits the display into one floating window per section instead of one hub window.");
+
             var editMode = Configuration.EditMode;
             if (ImGui.Checkbox("Edit layout (click a section to drag it)", ref editMode))
             {
                 plugin.SetEditMode(editMode);
             }
+
+            Tooltip("Fills every panel with sample text and lets you drag sections to reposition them. The buttons are locked while it is on.");
 
             if (Configuration.Detached)
             {
@@ -1322,6 +1353,8 @@ namespace SnazzyP4.Windows
                 {
                     plugin.SetMoveAll(moveAll);
                 }
+
+                Tooltip("Drags every detached window together so the whole layout keeps its shape.");
             }
 
             var floatingHide = Configuration.FloatingHideButton;
@@ -1331,12 +1364,16 @@ namespace SnazzyP4.Windows
                 Configuration.Save();
             }
 
+            Tooltip("Turns the Hide/Show control into its own repositionable panel.");
+
             var floatingReset = Configuration.FloatingResetButton;
             if (ImGui.Checkbox("Floating Reset button (floats as its own panel, otherwise docks to the toolbar)", ref floatingReset))
             {
                 Configuration.FloatingResetButton = floatingReset;
                 Configuration.Save();
             }
+
+            Tooltip("Turns the Reset button into its own repositionable panel.");
 
             var floatingUndo = Configuration.FloatingUndoButton;
             if (ImGui.Checkbox("Floating Undo button (floats as its own panel, otherwise docks to the toolbar)", ref floatingUndo))
@@ -1345,6 +1382,8 @@ namespace SnazzyP4.Windows
                 Configuration.Save();
             }
 
+            Tooltip("Turns the Undo button into its own repositionable panel.");
+
             var hideResolved = Configuration.HideResolvedButtons;
             if (ImGui.Checkbox("Hide Resolved Buttons Until Reset", ref hideResolved))
             {
@@ -1352,8 +1391,7 @@ namespace SnazzyP4.Windows
                 Configuration.Save();
             }
 
-            ImGui.TextDisabled("Hides a button group once fully entered: Exdeath after both sets resolve, each chaos pair and each Kefka pair\n"
-                               + "once pressed. Everything returns on Reset. Text panels and the Last Fake toggles are never affected.");
+            Tooltip("Hides a button group once fully entered: Exdeath after both sets resolve, each chaos pair and each Kefka pair once pressed. Everything returns on Reset. Text panels and the Last Fake toggles are never affected.");
 
             var accelerationSameLine = Configuration.AccelerationSameLine;
             if (ImGui.Checkbox("Acceleration text on same line as Stack/Spread", ref accelerationSameLine))
@@ -1362,12 +1400,16 @@ namespace SnazzyP4.Windows
                 Configuration.Save();
             }
 
+            Tooltip("Appends the movement word to the spread or stack line, for example \"Spread on X and MOVE\".");
+
             var combineSets = Configuration.CombineSets;
             if (ImGui.Checkbox("Combine First and Second set into one panel", ref combineSets))
             {
                 Configuration.CombineSets = combineSets;
                 Configuration.Save();
             }
+
+            Tooltip("Shows both sets in one panel, stacked or side by side, divided by a line.");
 
             if (Configuration.CombineSets)
             {
@@ -1379,6 +1421,8 @@ namespace SnazzyP4.Windows
                     Configuration.Save();
                 }
 
+                Tooltip("Places the two sets side by side instead of one above the other.");
+
                 if (Configuration.CombineSetsHorizontal)
                 {
                     ImGui.Indent();
@@ -1389,7 +1433,7 @@ namespace SnazzyP4.Windows
                         Configuration.Save();
                     }
 
-                    ImGui.TextDisabled("Drag the panel or use the CombinedSets X/Y sliders to move the divider.");
+                    Tooltip("Keeps the divider at a fixed position while the sets grow outward. Drag the panel or use the CombinedSets X/Y sliders to move the divider.");
                     ImGui.Unindent();
                 }
 
@@ -1400,10 +1444,14 @@ namespace SnazzyP4.Windows
                     Configuration.Save();
                 }
 
+                Tooltip("Right-aligns the first set against the divider so the two sets mirror each other.");
+
                 DrawFloatSlider("Divider thickness##combdiv", () => Configuration.CombineDividerThickness,
-                    value => Configuration.CombineDividerThickness = value, 0.5f, 6f);
+                                value => Configuration.CombineDividerThickness = value, 0.5f, 6f);
+                Tooltip("The thickness of the line between the two sets.");
                 DrawColorPicker("Divider colour##combdivcol", () => Configuration.CombineDividerColor,
-                    value => Configuration.CombineDividerColor = value);
+                                value => Configuration.CombineDividerColor = value);
+                Tooltip("The colour of the line between the two sets.");
 
                 ImGui.Unindent();
             }
@@ -1416,7 +1464,7 @@ namespace SnazzyP4.Windows
                     plugin.RecenterDetachedWindows();
                 }
 
-                ImGui.TextDisabled("Clamps every detached window back inside the screen.");
+                Tooltip("Clamps every detached window back inside the screen.");
             }
         }
 
@@ -1545,11 +1593,15 @@ namespace SnazzyP4.Windows
                 Configuration.Save();
             }
 
+            Tooltip("Resets every section position and scale; all other settings are kept.");
+
             ImGui.SameLine();
             if (ImGui.Button("Restore ALL settings to defaults"))
             {
                 plugin.RestoreAllDefaults();
             }
+
+            Tooltip("Restores every setting in every tab to its default value.");
         }
 
         /// <summary>
@@ -1571,6 +1623,8 @@ namespace SnazzyP4.Windows
                 Configuration.UseBasicToggles = basic;
                 Configuration.Save();
             }
+
+            Tooltip("Shows the Last Fake toggles as plain checkboxes instead of the coloured REAL/FAKE buttons.");
 
             if (!basic)
             {
@@ -1599,6 +1653,8 @@ namespace SnazzyP4.Windows
                 Configuration.Save();
             }
 
+            Tooltip("Adds an ANNOUNCE button that posts the current Kefka values to the channel below when you press it. Nothing is sent without your press.");
+
             if (!Configuration.LastFakeAnnounceEnabled)
             {
                 return;
@@ -1613,6 +1669,8 @@ namespace SnazzyP4.Windows
                 Configuration.Save();
             }
 
+            Tooltip("Attaches the ANNOUNCE button to a side of the Kefka text panel instead of floating as its own panel.");
+
             if (Configuration.LastFakeAnnounceDocked)
             {
                 ImGui.Indent();
@@ -1621,6 +1679,7 @@ namespace SnazzyP4.Windows
             }
 
             DrawChannelCombo("Channel##lastfakeannounce", () => Configuration.LastFakeAnnounceChannel, value => Configuration.LastFakeAnnounceChannel = value);
+            Tooltip("The chat channel the ANNOUNCE message is sent to.");
 
             var message = Configuration.LastFakeAnnounceMessage;
             ImGui.SetNextItemWidth(360f);
@@ -1629,15 +1688,12 @@ namespace SnazzyP4.Windows
                 Configuration.LastFakeAnnounceMessage = message;
             }
 
+            Tooltip("The message sent when you press ANNOUNCE. {KefkaThunder} and {KefkaBlizzard} are replaced with the current Thunder and Blizzard values; an unpressed mechanic shows as \"?\".");
+
             if (ImGui.IsItemDeactivatedAfterEdit())
             {
                 Configuration.Save();
             }
-
-            ImGui.TextWrapped("Use these macros in your message; they are replaced when you press ANNOUNCE:");
-            ImGui.BulletText("{KefkaThunder} - the current Thunder value");
-            ImGui.BulletText("{KefkaBlizzard} - the current Blizzard value");
-            ImGui.TextDisabled("An unpressed mechanic shows as \"?\".");
 
             var realText = Configuration.LastFakeAnnounceRealText;
             ImGui.SetNextItemWidth(120f);
@@ -1645,6 +1701,8 @@ namespace SnazzyP4.Windows
             {
                 Configuration.LastFakeAnnounceRealText = realText;
             }
+
+            Tooltip("What {KefkaThunder} and {KefkaBlizzard} resolve to when that mechanic is currently real.");
 
             if (ImGui.IsItemDeactivatedAfterEdit())
             {
@@ -1657,6 +1715,8 @@ namespace SnazzyP4.Windows
             {
                 Configuration.LastFakeAnnounceFakeText = fakeText;
             }
+
+            Tooltip("What {KefkaThunder} and {KefkaBlizzard} resolve to when that mechanic is currently fake.");
 
             if (ImGui.IsItemDeactivatedAfterEdit())
             {
@@ -1678,6 +1738,8 @@ namespace SnazzyP4.Windows
                 Configuration.Save();
             }
 
+            Tooltip("Replaces the REAL and FAKE button labels with your own text.");
+
             if (!customText)
             {
                 return;
@@ -1692,6 +1754,8 @@ namespace SnazzyP4.Windows
                 Configuration.CustomRealText = realText;
             }
 
+            Tooltip("The label shown while the toggle is in the REAL state. Leave it blank for a square button with no text.");
+
             if (ImGui.IsItemDeactivatedAfterEdit())
             {
                 Configuration.Save();
@@ -1704,12 +1768,13 @@ namespace SnazzyP4.Windows
                 Configuration.CustomFakeText = fakeText;
             }
 
+            Tooltip("The label shown while the toggle is in the FAKE state. Leave it blank for a square button with no text.");
+
             if (ImGui.IsItemDeactivatedAfterEdit())
             {
                 Configuration.Save();
             }
 
-            ImGui.TextDisabled("Leave a label blank for a square button with no text.");
             ImGui.Unindent();
         }
 
@@ -1725,6 +1790,8 @@ namespace SnazzyP4.Windows
                 Configuration.Save();
             }
 
+            Tooltip("Sizes the toggle buttons from the Kefka text panel's scale and opacity instead of the sliders below.");
+
             if (shared)
             {
                 return;
@@ -1732,9 +1799,13 @@ namespace SnazzyP4.Windows
 
             ImGui.Indent();
             DrawFloatSlider("Button scale X##togsx", () => Configuration.ToggleButtonScaleX, value => Configuration.ToggleButtonScaleX = value, 0.5f, 4f);
+            Tooltip("The toggle buttons' width multiplier.");
             DrawFloatSlider("Button scale Y##togsy", () => Configuration.ToggleButtonScaleY, value => Configuration.ToggleButtonScaleY = value, 0.5f, 4f);
+            Tooltip("The toggle buttons' height multiplier.");
             DrawFloatSlider("Text scale##togts", () => Configuration.ToggleTextScale, value => Configuration.ToggleTextScale = value, 0.5f, 3f);
+            Tooltip("The toggle button labels' text size multiplier.");
             DrawFloatSlider("Opacity##togop", () => Configuration.ToggleButtonAlpha, value => Configuration.ToggleButtonAlpha = value, 0f, 1f);
+            Tooltip("The toggle buttons' opacity.");
             ImGui.Unindent();
         }
 
@@ -1750,6 +1821,8 @@ namespace SnazzyP4.Windows
                 Configuration.Save();
             }
 
+            Tooltip("Pulls the Last Fake toggles out of the Kefka text panel into their own repositionable panel.");
+
             if (!detach)
             {
                 return;
@@ -1764,12 +1837,16 @@ namespace SnazzyP4.Windows
                 Configuration.Save();
             }
 
+            Tooltip("Places the two toggles side by side instead of stacked.");
+
             var individual = Configuration.ToggleButtonsIndividualPanels;
             if (ImGui.Checkbox("Separate panel per button", ref individual))
             {
                 Configuration.ToggleButtonsIndividualPanels = individual;
                 Configuration.Save();
             }
+
+            Tooltip("Splits the Thunder and Blizzard toggles into two panels that move independently.");
 
             ImGui.Unindent();
         }
@@ -2118,6 +2195,18 @@ namespace SnazzyP4.Windows
             {
                 ImGui.SetScrollHereY(1.0f);
                 scrollToPrompt = false;
+            }
+        }
+
+        /// <summary>
+        /// Shows a tooltip for the most recently drawn control while it is hovered, including while it is disabled.
+        /// </summary>
+        /// <param name="text">The tooltip text.</param>
+        private static void Tooltip(string text)
+        {
+            if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
+            {
+                ImGui.SetTooltip(text);
             }
         }
 

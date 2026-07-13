@@ -148,8 +148,9 @@ Open with the **Settings** button or `/snazzyp4 config`. Settings are grouped in
 
 - **Never show version update messages** — gold toggle; stops the changelog popup after each update.
 - **Role** — Support or DPS.
-- **Markers** — auto-place `/mk` markers, with a choice of head marker per role and set (attack /
-  bind / ignore / shapes). Always placed on yourself.
+- **Apply Marker on Macro Press** — pressing the spread macro also runs the `/mk` self-mark for
+  that set, with a choice of head marker per role and set (attack / bind / ignore / shapes).
+  Always placed on yourself, only when you press the button — the same as an in-game macro.
 - **Automation** — all off by default:
   - **Auto Open/Close on Enter/Exit of Duty** — opens the overlay when you enter a captured
     instance and closes it when you leave. Click **Use current instance** while inside Dancing Mad
