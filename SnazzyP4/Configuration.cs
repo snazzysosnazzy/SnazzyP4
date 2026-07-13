@@ -553,6 +553,8 @@ namespace SnazzyP4
         /// <summary>
         /// Gets the effective display text for a text id, falling back to its registered default.
         /// </summary>
+        /// <param name="id">The text label id from <see cref="TextLabels"/>.</param>
+        /// <returns>The custom text when one is set, otherwise the default.</returns>
         public string GetText(string id)
         {
             return CustomText.TryGetValue(id, out var value) && !string.IsNullOrEmpty(value) ? value : TextLabels.Default(id);
@@ -561,6 +563,8 @@ namespace SnazzyP4
         /// <summary>
         /// Gets the raw custom override for a text id, or an empty string when there is none.
         /// </summary>
+        /// <param name="id">The text label id from <see cref="TextLabels"/>.</param>
+        /// <returns>The stored custom text, or an empty string when unset.</returns>
         public string GetRawText(string id)
         {
             return CustomText.TryGetValue(id, out var value) ? value : string.Empty;
@@ -569,6 +573,8 @@ namespace SnazzyP4
         /// <summary>
         /// Stores a custom text override, or removes it when the value is empty so the default is used again.
         /// </summary>
+        /// <param name="id">The text label id from <see cref="TextLabels"/>.</param>
+        /// <param name="value">The custom text; an empty value reverts to the default.</param>
         public void SetText(string id, string value)
         {
             if (string.IsNullOrEmpty(value))
@@ -592,6 +598,8 @@ namespace SnazzyP4
         /// <summary>
         /// Gets the announcement configuration for a chat channel, creating an empty one on first use.
         /// </summary>
+        /// <param name="channel">The chat command prefix the configuration belongs to, such as "/p".</param>
+        /// <returns>That channel's announcement configuration with its slots populated.</returns>
         public ChannelAnnouncements GetAnnouncements(string channel)
         {
             if (!Announcements.TryGetValue(channel, out var channelAnnouncements))
@@ -610,6 +618,8 @@ namespace SnazzyP4
         /// <summary>
         /// Ensures all four leaves (first/second set, real/fake) of a category have their slots.
         /// </summary>
+        /// <param name="category">The category whose leaves are populated.</param>
+        /// <param name="categoryId">The category id, either "exdeath" or "chaos".</param>
         private static void EnsureCategorySlots(AnnouncementCategory category, string categoryId)
         {
             AnnouncementData.EnsureSlots(category.GetLeaf(true, true), AnnouncementData.SlotIdsFor(categoryId, true));
@@ -621,6 +631,8 @@ namespace SnazzyP4
         /// <summary>
         /// Builds the dictionary key for a per-section value in the current layout mode.
         /// </summary>
+        /// <param name="sectionId">The section the key is built for.</param>
+        /// <returns>The section id prefixed with the current layout mode.</returns>
         private string ModeKey(string sectionId)
         {
             return (Detached ? "d:" : "w:") + sectionId;
@@ -629,6 +641,9 @@ namespace SnazzyP4
         /// <summary>
         /// Gets the windowed offset for a section, falling back to the supplied default.
         /// </summary>
+        /// <param name="sectionId">The section whose offset is looked up.</param>
+        /// <param name="fallback">The offset used when none has been stored.</param>
+        /// <returns>The stored offset, or the fallback.</returns>
         public Vector2 GetOffset(string sectionId, Vector2 fallback)
         {
             return Offsets.TryGetValue(sectionId, out var offset) ? offset : fallback;
@@ -637,6 +652,8 @@ namespace SnazzyP4
         /// <summary>
         /// Stores the windowed offset for a section.
         /// </summary>
+        /// <param name="sectionId">The section whose offset is stored.</param>
+        /// <param name="offset">The new windowed offset.</param>
         public void SetOffset(string sectionId, Vector2 offset)
         {
             Offsets[sectionId] = offset;
@@ -645,6 +662,9 @@ namespace SnazzyP4
         /// <summary>
         /// Gets the detached window position for a section, falling back to the supplied default.
         /// </summary>
+        /// <param name="sectionId">The section whose position is looked up.</param>
+        /// <param name="fallback">The position used when none has been stored.</param>
+        /// <returns>The stored screen position, or the fallback.</returns>
         public Vector2 GetDetachedPosition(string sectionId, Vector2 fallback)
         {
             return DetachedPositions.TryGetValue(sectionId, out var position) ? position : fallback;
@@ -653,6 +673,8 @@ namespace SnazzyP4
         /// <summary>
         /// Stores the detached window position for a section.
         /// </summary>
+        /// <param name="sectionId">The section whose position is stored.</param>
+        /// <param name="position">The new detached screen position.</param>
         public void SetDetachedPosition(string sectionId, Vector2 position)
         {
             DetachedPositions[sectionId] = position;
@@ -661,6 +683,8 @@ namespace SnazzyP4
         /// <summary>
         /// Gets the scale multiplier for a section in the current mode.
         /// </summary>
+        /// <param name="sectionId">The section whose scale is looked up.</param>
+        /// <returns>The stored scale for the current mode, or 1.0 when unset.</returns>
         public float GetSectionScale(string sectionId)
         {
             return SectionScales.TryGetValue(ModeKey(sectionId), out var scale) ? scale : 1.0f;
@@ -669,6 +693,8 @@ namespace SnazzyP4
         /// <summary>
         /// Stores the scale multiplier for a section in the current mode.
         /// </summary>
+        /// <param name="sectionId">The section whose scale is stored.</param>
+        /// <param name="scale">The new per-section scale multiplier.</param>
         public void SetSectionScale(string sectionId, float scale)
         {
             SectionScales[ModeKey(sectionId)] = scale;
@@ -677,6 +703,8 @@ namespace SnazzyP4
         /// <summary>
         /// Resolves the effective background opacity for a section, using the universal value or the per-section override.
         /// </summary>
+        /// <param name="sectionId">The section being drawn.</param>
+        /// <returns>The universal background opacity, or the section's own when universal settings are off.</returns>
         public float EffectiveBackgroundAlpha(string sectionId)
         {
             return UseUniversalSettings ? BackgroundAlpha : GetSectionBackgroundAlpha(sectionId);
@@ -685,6 +713,8 @@ namespace SnazzyP4
         /// <summary>
         /// Resolves the effective hide-title-bar flag for a section, using the universal value or the per-section override.
         /// </summary>
+        /// <param name="sectionId">The section being drawn.</param>
+        /// <returns>Whether that section's title bar is hidden under the active settings.</returns>
         public bool EffectiveNoTitleBar(string sectionId)
         {
             return UseUniversalSettings ? NoTitleBar : GetSectionNoTitleBar(sectionId);
@@ -693,6 +723,8 @@ namespace SnazzyP4
         /// <summary>
         /// Resolves the effective hide-labels flag for a section, using the universal value or the per-section override.
         /// </summary>
+        /// <param name="sectionId">The section being drawn.</param>
+        /// <returns>Whether that section's labels are hidden under the active settings.</returns>
         public bool EffectiveHideLabels(string sectionId)
         {
             return UseUniversalSettings ? HideLabels : GetSectionHideLabels(sectionId);
@@ -701,6 +733,8 @@ namespace SnazzyP4
         /// <summary>
         /// Resolves the effective button opacity for a section, using the universal value or the per-section override.
         /// </summary>
+        /// <param name="sectionId">The section being drawn.</param>
+        /// <returns>The universal button opacity, or the section's own when universal settings are off.</returns>
         public float EffectiveButtonAlpha(string sectionId)
         {
             return UseUniversalSettings ? ButtonAlpha : GetSectionButtonAlpha(sectionId);
@@ -709,6 +743,8 @@ namespace SnazzyP4
         /// <summary>
         /// Gets the per-section background opacity for the current mode, defaulting to fully opaque.
         /// </summary>
+        /// <param name="sectionId">The section whose value is looked up.</param>
+        /// <returns>The stored background opacity for the current mode, or fully opaque when unset.</returns>
         public float GetSectionBackgroundAlpha(string sectionId)
         {
             return SectionBackgroundAlpha.TryGetValue(ModeKey(sectionId), out var alpha) ? alpha : 1.0f;
@@ -717,6 +753,8 @@ namespace SnazzyP4
         /// <summary>
         /// Stores the per-section background opacity for the current mode.
         /// </summary>
+        /// <param name="sectionId">The section whose value is stored.</param>
+        /// <param name="alpha">The new background opacity.</param>
         public void SetSectionBackgroundAlpha(string sectionId, float alpha)
         {
             SectionBackgroundAlpha[ModeKey(sectionId)] = alpha;
@@ -725,6 +763,8 @@ namespace SnazzyP4
         /// <summary>
         /// Gets the per-section hide-title-bar flag for the current mode, defaulting to hidden.
         /// </summary>
+        /// <param name="sectionId">The section whose value is looked up.</param>
+        /// <returns>Whether the title bar is hidden for the current mode; hidden by default.</returns>
         public bool GetSectionNoTitleBar(string sectionId)
         {
             return SectionNoTitleBar.TryGetValue(ModeKey(sectionId), out var hidden) ? hidden : true;
@@ -733,6 +773,8 @@ namespace SnazzyP4
         /// <summary>
         /// Stores the per-section hide-title-bar flag for the current mode.
         /// </summary>
+        /// <param name="sectionId">The section whose value is stored.</param>
+        /// <param name="hidden">Whether the title bar is hidden.</param>
         public void SetSectionNoTitleBar(string sectionId, bool hidden)
         {
             SectionNoTitleBar[ModeKey(sectionId)] = hidden;
@@ -741,6 +783,8 @@ namespace SnazzyP4
         /// <summary>
         /// Gets the per-section hide-labels flag for the current mode, defaulting to shown.
         /// </summary>
+        /// <param name="sectionId">The section whose value is looked up.</param>
+        /// <returns>Whether the labels are hidden for the current mode.</returns>
         public bool GetSectionHideLabels(string sectionId)
         {
             return SectionHideLabels.TryGetValue(ModeKey(sectionId), out var hidden) && hidden;
@@ -749,6 +793,8 @@ namespace SnazzyP4
         /// <summary>
         /// Stores the per-section hide-labels flag for the current mode.
         /// </summary>
+        /// <param name="sectionId">The section whose value is stored.</param>
+        /// <param name="hidden">Whether the labels are hidden.</param>
         public void SetSectionHideLabels(string sectionId, bool hidden)
         {
             SectionHideLabels[ModeKey(sectionId)] = hidden;
@@ -757,6 +803,8 @@ namespace SnazzyP4
         /// <summary>
         /// Gets the per-section button opacity for the current mode, defaulting to fully opaque.
         /// </summary>
+        /// <param name="sectionId">The section whose value is looked up.</param>
+        /// <returns>The stored button opacity for the current mode, or fully opaque when unset.</returns>
         public float GetSectionButtonAlpha(string sectionId)
         {
             return SectionButtonAlpha.TryGetValue(ModeKey(sectionId), out var alpha) ? alpha : 1.0f;
@@ -765,6 +813,8 @@ namespace SnazzyP4
         /// <summary>
         /// Stores the per-section button opacity for the current mode.
         /// </summary>
+        /// <param name="sectionId">The section whose value is stored.</param>
+        /// <param name="alpha">The new button opacity.</param>
         public void SetSectionButtonAlpha(string sectionId, float alpha)
         {
             SectionButtonAlpha[ModeKey(sectionId)] = alpha;
@@ -784,6 +834,7 @@ namespace SnazzyP4
         /// Copies every writable setting from another configuration, except the schema version and the transient edit-interaction flags.
         /// This is used both by the restore-defaults flow and by importing a shared settings profile.
         /// </summary>
+        /// <param name="source">The configuration whose values are copied over this one.</param>
         public void CopyFrom(Configuration source)
         {
             foreach (var property in typeof(Configuration).GetProperties(BindingFlags.Public | BindingFlags.Instance))

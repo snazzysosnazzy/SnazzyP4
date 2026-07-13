@@ -331,6 +331,8 @@ namespace SnazzyP4
         /// Returns a preloaded icon texture by file name, or null while it is still loading (or failed to load),
         /// in which case the caller falls back to the on-demand shared texture.
         /// </summary>
+        /// <param name="file">The icon file name, such as "Thunder.png".</param>
+        /// <returns>The resident texture wrap, or null while it is still loading or failed to load.</returns>
         public static IDalamudTextureWrap? PreloadedIcon(string file)
         {
             lock (PreloadedIcons)
@@ -342,6 +344,7 @@ namespace SnazzyP4
         /// <summary>
         /// Opens the plugin window when entering, and closes it when leaving, the captured auto-open/close duty.
         /// </summary>
+        /// <param name="territory">The territory id that was just entered.</param>
         private void OnTerritoryChanged(uint territory)
         {
             if (Configuration.AutoOpenCloseOnDuty && Configuration.AutoDutyTerritoryId != 0)
@@ -362,6 +365,7 @@ namespace SnazzyP4
         /// <summary>
         /// Runs the optional Reset and Hide actions when the party wipes.
         /// </summary>
+        /// <param name="args">The duty-state event data for the wipe.</param>
         private void OnDutyWiped(Dalamud.Game.DutyState.IDutyStateEventArgs args)
         {
             if (Configuration.ResetOnWipe)
@@ -378,6 +382,7 @@ namespace SnazzyP4
         /// <summary>
         /// Queues a move delta to be applied to the detached windows on the next frame.
         /// </summary>
+        /// <param name="delta">The pixel distance every detached window moves.</param>
         public void QueueGroupMove(Vector2 delta)
         {
             pendingGroupMove += delta;
@@ -459,6 +464,7 @@ namespace SnazzyP4
         /// Executes a game command exactly as if the player typed it, dispatched onto the framework thread.
         /// This sends input to the game on the player's behalf, so it is only used by the opt-in marker and party features.
         /// </summary>
+        /// <param name="command">The chat command to run, including its leading slash.</param>
         public static void ExecuteGameCommand(string command)
         {
             if (string.IsNullOrWhiteSpace(command))
@@ -472,6 +478,7 @@ namespace SnazzyP4
         /// <summary>
         /// Sends a command string through the game's shell module.
         /// </summary>
+        /// <param name="command">The chat command to run, including its leading slash.</param>
         private static unsafe void SendCommandUnsafe(string command)
         {
             var uiModule = UIModule.Instance();
@@ -506,6 +513,8 @@ namespace SnazzyP4
         /// Handles the slash command.
         /// With no argument it toggles the main window, "config" opens the settings, and every button argument performs the same action as clicking that button so controller players can drive the plugin from macros.
         /// </summary>
+        /// <param name="command">The slash command that was invoked.</param>
+        /// <param name="arguments">The text after the command name, naming the action to run.</param>
         private void OnCommand(string command, string arguments)
         {
             var normalized = arguments.Trim().ToLowerInvariant();
@@ -618,6 +627,8 @@ namespace SnazzyP4
         /// <summary>
         /// Returns the changelog entries newer than the given version, or every entry when the version is empty.
         /// </summary>
+        /// <param name="from">The version the changes are listed from, or an empty string for all of them.</param>
+        /// <returns>The changelog entries newer than that version, newest first.</returns>
         public Changelog.Entry[] ChangesSince(string from)
         {
             if (string.IsNullOrEmpty(from) || !System.Version.TryParse(from, out var fromVersion))
@@ -669,6 +680,7 @@ namespace SnazzyP4
         /// <summary>
         /// Toggles Edit Layout, keeping it mutually exclusive with Move All and running the shared enter and exit behaviour.
         /// </summary>
+        /// <param name="on">Whether Edit Layout turns on.</param>
         public void SetEditMode(bool on)
         {
             if (Configuration.EditMode == on)
@@ -689,6 +701,7 @@ namespace SnazzyP4
         /// <summary>
         /// Toggles Move All, keeping it mutually exclusive with Edit Layout and running the shared enter and exit behaviour.
         /// </summary>
+        /// <param name="on">Whether Move All turns on.</param>
         public void SetMoveAll(bool on)
         {
             if (Configuration.MoveAllActive == on)
@@ -740,6 +753,8 @@ namespace SnazzyP4
         /// <summary>
         /// Builds the full path to an icon image inside the plugin's icon directory.
         /// </summary>
+        /// <param name="file">The icon file name, such as "Thunder.png".</param>
+        /// <returns>The absolute path of that icon.</returns>
         public static string Icon(string file)
         {
             return Path.Combine(IconDir, file);
@@ -749,6 +764,8 @@ namespace SnazzyP4
         /// Determines whether a section participates in the current configuration.
         /// The detached Last Fake toggle sections only exist when their settings enable them, and every button section is hidden while the controller macro-button option is on.
         /// </summary>
+        /// <param name="id">The section id to test.</param>
+        /// <returns>True when the section participates in the current configuration.</returns>
         public bool SectionEnabled(string id)
         {
             if (Configuration.HideMacroButtons && IsButtonSection(id))
@@ -773,6 +790,8 @@ namespace SnazzyP4
         /// <summary>
         /// Determines whether a section is a button section rather than a text panel.
         /// </summary>
+        /// <param name="id">The section id to test.</param>
+        /// <returns>True when the section contains buttons rather than pure text.</returns>
         private bool IsButtonSection(string id)
         {
             foreach (var section in Sections)

@@ -19,6 +19,7 @@ namespace SnazzyP4.Windows
         /// <summary>
         /// Creates the update notice window.
         /// </summary>
+        /// <param name="plugin">The owning plugin.</param>
         public UpdateWindow(Plugin plugin) : base("Snazzy P4 - Updated###SnazzyP4Update")
         {
             this.plugin = plugin;

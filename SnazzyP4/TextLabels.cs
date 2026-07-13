@@ -169,6 +169,8 @@ namespace SnazzyP4
         /// <summary>
         /// Returns the default text for an id, or an empty string when the id is unknown.
         /// </summary>
+        /// <param name="id">The text label id.</param>
+        /// <returns>The default text for that label, or an empty string for an unknown id.</returns>
         public static string Default(string id)
         {
             return DefaultsById.TryGetValue(id, out var value) ? value : string.Empty;
@@ -177,6 +179,7 @@ namespace SnazzyP4
         /// <summary>
         /// Builds the id-to-default lookup from the entry table.
         /// </summary>
+        /// <returns>The default text keyed by label id.</returns>
         private static Dictionary<string, string> BuildDefaults()
         {
             var defaults = new Dictionary<string, string>();

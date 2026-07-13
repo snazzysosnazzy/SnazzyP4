@@ -57,6 +57,7 @@ namespace SnazzyP4.Windows
         /// <summary>
         /// Creates the settings window bound to the plugin.
         /// </summary>
+        /// <param name="plugin">The owning plugin.</param>
         public ConfigWindow(Plugin plugin)
             : base("Snazzy P4 Settings###SnazzyP4Config",
                    ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoCollapse)
@@ -351,6 +352,10 @@ namespace SnazzyP4.Windows
         /// <summary>
         /// Draws one labelled scale slider with its percentage presets, persisting the clamped value.
         /// </summary>
+        /// <param name="label">The heading shown above the slider.</param>
+        /// <param name="id">The ImGui id keeping the slider and its presets unique.</param>
+        /// <param name="getScale">Reads the current scale value.</param>
+        /// <param name="setScale">Writes the new scale value.</param>
         private void DrawScaleSlider(string label, string id, Func<float> getScale, Action<float> setScale)
         {
             ImGui.TextUnformatted(label);
@@ -465,6 +470,9 @@ namespace SnazzyP4.Windows
         /// <summary>
         /// Draws one marker dropdown bound to a getter and setter.
         /// </summary>
+        /// <param name="label">The label shown next to the dropdown.</param>
+        /// <param name="getToken">Reads the currently selected marker token.</param>
+        /// <param name="setToken">Writes the newly selected marker token.</param>
         private void DrawMarkerDropdown(string label, Func<string> getToken, Action<string> setToken)
         {
             var current = getToken();
@@ -679,6 +687,8 @@ namespace SnazzyP4.Windows
         /// Enables or disables announcement slots across both categories and every set/real-fake leaf for the selected channel.
         /// When <paramref name="titlesOnly"/> is true only the title slots are affected; otherwise every non-title slot is.
         /// </summary>
+        /// <param name="enabled">Whether the affected slots turn on.</param>
+        /// <param name="titlesOnly">Whether only the Exdeath set titles are affected instead of every non-title slot.</param>
         private void SetAllAnnouncementSlots(bool enabled, bool titlesOnly)
         {
             var announcements = Configuration.GetAnnouncements(Configuration.AnnouncementChannel);
@@ -700,6 +710,10 @@ namespace SnazzyP4.Windows
         /// <summary>
         /// Applies an enable/disable to the matching slots of every leaf in one category, ensuring the leaf's slots exist first.
         /// </summary>
+        /// <param name="category">The category whose leaves are updated.</param>
+        /// <param name="categoryId">The category id, either "exdeath" or "chaos".</param>
+        /// <param name="enabled">Whether the affected slots turn on.</param>
+        /// <param name="titlesOnly">Whether only the title slots are affected instead of every other slot.</param>
         private static void ApplyAnnouncementToggle(AnnouncementCategory category, string categoryId, bool enabled, bool titlesOnly)
         {
             for (var setIndex = 0; setIndex < 2; setIndex++)
@@ -756,6 +770,9 @@ namespace SnazzyP4.Windows
         /// <summary>
         /// Draws one announce category (Exdeath or Chaos): its mode toggle and the first/second set sections.
         /// </summary>
+        /// <param name="label">The collapsing header text for the category.</param>
+        /// <param name="category">The category being edited.</param>
+        /// <param name="categoryId">The category id, either "exdeath" or "chaos".</param>
         private void DrawAnnounceCategory(string label, AnnouncementCategory category, string categoryId)
         {
             if (!ImGui.CollapsingHeader($"{label}##cat_{categoryId}"))
@@ -797,6 +814,11 @@ namespace SnazzyP4.Windows
         /// <summary>
         /// Draws a set section (First/Second) with its real and fake leaves.
         /// </summary>
+        /// <param name="label">The collapsing header text for the set.</param>
+        /// <param name="category">The category the set belongs to.</param>
+        /// <param name="isFirst">Whether the first set is drawn rather than the second.</param>
+        /// <param name="categoryId">The category id, either "exdeath" or "chaos".</param>
+        /// <param name="slotIds">The canonical slot ids for the set.</param>
         private void DrawSetSection(string label, AnnouncementCategory category, bool isFirst, string categoryId, string[] slotIds)
         {
             if (!ImGui.CollapsingHeader($"{label}##set_{categoryId}_{isFirst}"))
@@ -813,6 +835,13 @@ namespace SnazzyP4.Windows
         /// <summary>
         /// Draws one leaf (a set and real/fake) in either ordered or simple mode.
         /// </summary>
+        /// <param name="label">The collapsing header text for the branch.</param>
+        /// <param name="leaf">The leaf being edited.</param>
+        /// <param name="ordered">Whether the category uses ordered-list mode rather than simple text.</param>
+        /// <param name="categoryId">The category id, either "exdeath" or "chaos".</param>
+        /// <param name="slotIds">The canonical slot ids for the set.</param>
+        /// <param name="isFirst">Whether the leaf belongs to the first set rather than the second.</param>
+        /// <param name="isReal">Whether the leaf belongs to the real branch rather than the fake one.</param>
         private void DrawLeaf(string label, AnnouncementLeaf leaf, bool ordered, string categoryId, string[] slotIds, bool isFirst, bool isReal)
         {
             var key = $"{categoryId}_{isFirst}_{isReal}";
@@ -837,6 +866,8 @@ namespace SnazzyP4.Windows
         /// <summary>
         /// Draws the simple-mode growing text box for a leaf.
         /// </summary>
+        /// <param name="leaf">The leaf whose simple text is edited.</param>
+        /// <param name="key">The ImGui id suffix keeping the text box unique.</param>
         private void DrawSimpleLeaf(AnnouncementLeaf leaf, string key)
         {
             ImGui.TextDisabled("One chat message per line; empty lines are ignored.");
@@ -857,6 +888,12 @@ namespace SnazzyP4.Windows
         /// <summary>
         /// Draws the ordered-mode reorderable announcement slots for a leaf, each with its custom message list.
         /// </summary>
+        /// <param name="leaf">The leaf whose slots are edited.</param>
+        /// <param name="categoryId">The category id, either "exdeath" or "chaos".</param>
+        /// <param name="slotIds">The canonical slot ids for the set.</param>
+        /// <param name="isFirst">Whether the leaf belongs to the first set rather than the second.</param>
+        /// <param name="isReal">Whether the leaf belongs to the real branch rather than the fake one.</param>
+        /// <param name="key">The ImGui id suffix keeping the controls unique.</param>
         private void DrawOrderedLeaf(AnnouncementLeaf leaf, string categoryId, string[] slotIds, bool isFirst, bool isReal, string key)
         {
             AnnouncementData.EnsureSlots(leaf, slotIds);
@@ -971,6 +1008,7 @@ namespace SnazzyP4.Windows
         /// <summary>
         /// Draws the reorderable list of custom message boxes for a slot, with add and remove controls.
         /// </summary>
+        /// <param name="slot">The slot whose message list is edited.</param>
         private void DrawMessageList(AnnouncementSlot slot)
         {
             if (slot.Messages.Count == 0)
@@ -1115,6 +1153,7 @@ namespace SnazzyP4.Windows
         /// <summary>
         /// Draws a compact per-announcement channel dropdown, with a "(selected channel)" entry that clears the override.
         /// </summary>
+        /// <param name="slot">The slot whose channel override is edited.</param>
         private void DrawSlotChannelCombo(AnnouncementSlot slot)
         {
             var current = slot.Channel;
@@ -1162,6 +1201,9 @@ namespace SnazzyP4.Windows
         /// <summary>
         /// Draws a chat channel dropdown bound to a getter and setter.
         /// </summary>
+        /// <param name="label">The label shown next to the dropdown.</param>
+        /// <param name="getChannel">Reads the currently selected channel prefix.</param>
+        /// <param name="setChannel">Writes the newly selected channel prefix.</param>
         private void DrawChannelCombo(string label, Func<string> getChannel, Action<string> setChannel)
         {
             var current = getChannel();
@@ -1359,12 +1401,11 @@ namespace SnazzyP4.Windows
             if (universal)
             {
                 ImGui.Indent();
-                DrawAppearanceControls(
-                    () => Configuration.BackgroundAlpha, value => Configuration.BackgroundAlpha = value,
-                    () => Configuration.NoTitleBar, value => Configuration.NoTitleBar = value,
-                    () => Configuration.HideLabels, value => Configuration.HideLabels = value,
-                    () => Configuration.ButtonAlpha, value => Configuration.ButtonAlpha = value,
-                    "univ", "Button / Text opacity");
+                DrawAppearanceControls(() => Configuration.BackgroundAlpha, value => Configuration.BackgroundAlpha = value,
+                                       () => Configuration.NoTitleBar, value => Configuration.NoTitleBar = value,
+                                       () => Configuration.HideLabels, value => Configuration.HideLabels = value,
+                                       () => Configuration.ButtonAlpha, value => Configuration.ButtonAlpha = value,
+                                       "univ", "Button / Text opacity");
                 ImGui.Unindent();
             }
             else
@@ -1430,12 +1471,11 @@ namespace SnazzyP4.Windows
 
                 if (!Configuration.UseUniversalSettings)
                 {
-                    DrawAppearanceControls(
-                        () => Configuration.GetSectionBackgroundAlpha(id), value => Configuration.SetSectionBackgroundAlpha(id, value),
-                        () => Configuration.GetSectionNoTitleBar(id), value => Configuration.SetSectionNoTitleBar(id, value),
-                        () => Configuration.GetSectionHideLabels(id), value => Configuration.SetSectionHideLabels(id, value),
-                        () => Configuration.GetSectionButtonAlpha(id), value => Configuration.SetSectionButtonAlpha(id, value),
-                        id, section.HasButtons ? "Button opacity" : "Text opacity");
+                    DrawAppearanceControls(() => Configuration.GetSectionBackgroundAlpha(id), value => Configuration.SetSectionBackgroundAlpha(id, value),
+                                           () => Configuration.GetSectionNoTitleBar(id), value => Configuration.SetSectionNoTitleBar(id, value),
+                                           () => Configuration.GetSectionHideLabels(id), value => Configuration.SetSectionHideLabels(id, value),
+                                           () => Configuration.GetSectionButtonAlpha(id), value => Configuration.SetSectionButtonAlpha(id, value),
+                                           id, section.HasButtons ? "Button opacity" : "Text opacity");
                 }
 
                 ImGui.Unindent();
@@ -1445,6 +1485,8 @@ namespace SnazzyP4.Windows
         /// <summary>
         /// Draws the detached window position sliders, which force the window position when changed.
         /// </summary>
+        /// <param name="sectionId">The section whose position sliders are drawn.</param>
+        /// <param name="defaultOffset">The position used when none has been stored.</param>
         private void DrawDetachedPosition(string sectionId, Vector2 defaultOffset)
         {
             var position = Configuration.GetDetachedPosition(sectionId, defaultOffset);
@@ -1469,6 +1511,8 @@ namespace SnazzyP4.Windows
         /// <summary>
         /// Draws the windowed offset sliders for a section.
         /// </summary>
+        /// <param name="sectionId">The section whose offset sliders are drawn.</param>
+        /// <param name="defaultOffset">The offset used when none has been stored.</param>
         private void DrawWindowedPosition(string sectionId, Vector2 defaultOffset)
         {
             var offset = Configuration.GetOffset(sectionId, defaultOffset);
@@ -1739,7 +1783,7 @@ namespace SnazzyP4.Windows
         {
             // The hide-macro-buttons toggle is the setting controller players actually want, so it is spaced out and highlighted here after a tester missed it entirely.
             ImGui.TextColored(new Vector4(1f, 0.84f, 0f, 1f),
-                "Controller players: enable this to hide the on-screen macro buttons.");
+                              "Controller players: enable this to hide the on-screen macro buttons.");
             ImGui.Spacing();
 
             var hideMacroButtons = Configuration.HideMacroButtons;
@@ -1793,6 +1837,7 @@ namespace SnazzyP4.Windows
         /// <summary>
         /// Draws one command row with a copy button that places the command on the clipboard.
         /// </summary>
+        /// <param name="command">The slash command shown with its copy button.</param>
         private static void DrawMacroRow(string command)
         {
             if (ImGui.Button($"Copy##{command}"))
@@ -1898,6 +1943,7 @@ namespace SnazzyP4.Windows
         /// Applies a colour preset to every configurable colour.
         /// The default preset restores the shipped colours, while the colourblind presets pick hues that stay distinguishable for that deficiency.
         /// </summary>
+        /// <param name="preset">The preset name: "default", "deuteranopia", "protanopia" or "tritanopia".</param>
         private void ApplyColorPreset(string preset)
         {
             if (preset == "default")
@@ -1974,6 +2020,9 @@ namespace SnazzyP4.Windows
         /// <summary>
         /// Draws a single colour picker and persists the value once editing finishes.
         /// </summary>
+        /// <param name="label">The label shown next to the picker.</param>
+        /// <param name="getColor">Reads the current colour.</param>
+        /// <param name="setColor">Writes the new colour.</param>
         private void DrawColorPicker(string label, Func<Vector4> getColor, Action<Vector4> setColor)
         {
             var color = getColor();
@@ -1991,6 +2040,11 @@ namespace SnazzyP4.Windows
         /// <summary>
         /// Draws a clamped float slider bound to a getter and setter.
         /// </summary>
+        /// <param name="label">The label shown next to the slider.</param>
+        /// <param name="getValue">Reads the current value.</param>
+        /// <param name="setValue">Writes the new value.</param>
+        /// <param name="minimum">The slider's lower bound.</param>
+        /// <param name="maximum">The slider's upper bound.</param>
         private void DrawFloatSlider(string label, Func<float> getValue, Action<float> setValue, float minimum, float maximum)
         {
             var value = getValue();
@@ -2071,6 +2125,8 @@ namespace SnazzyP4.Windows
         /// <summary>
         /// Applies a clamped value through a scale setter and persists it.
         /// </summary>
+        /// <param name="setScale">Writes the clamped scale value.</param>
+        /// <param name="value">The requested scale before clamping.</param>
         private void SetScale(Action<float> setScale, float value)
         {
             setScale(Math.Clamp(value, 0.5f, 3.0f));
@@ -2081,12 +2137,21 @@ namespace SnazzyP4.Windows
         /// Draws the background opacity, title bar, label and button opacity controls.
         /// This is reused for the universal block and for each per-section block.
         /// </summary>
-        private void DrawAppearanceControls(
-            Func<float> getBackgroundAlpha, Action<float> setBackgroundAlpha,
-            Func<bool> getNoTitleBar, Action<bool> setNoTitleBar,
-            Func<bool> getHideLabels, Action<bool> setHideLabels,
-            Func<float> getButtonAlpha, Action<float> setButtonAlpha,
-            string idSuffix, string opacityLabel)
+        /// <param name="getBackgroundAlpha">Reads the background opacity.</param>
+        /// <param name="setBackgroundAlpha">Writes the background opacity.</param>
+        /// <param name="getNoTitleBar">Reads the hide-title-bar flag.</param>
+        /// <param name="setNoTitleBar">Writes the hide-title-bar flag.</param>
+        /// <param name="getHideLabels">Reads the hide-labels flag.</param>
+        /// <param name="setHideLabels">Writes the hide-labels flag.</param>
+        /// <param name="getButtonAlpha">Reads the button opacity.</param>
+        /// <param name="setButtonAlpha">Writes the button opacity.</param>
+        /// <param name="idSuffix">The ImGui id suffix keeping the controls unique.</param>
+        /// <param name="opacityLabel">The label used for the button or text opacity slider.</param>
+        private void DrawAppearanceControls(Func<float> getBackgroundAlpha, Action<float> setBackgroundAlpha,
+                                            Func<bool> getNoTitleBar, Action<bool> setNoTitleBar,
+                                            Func<bool> getHideLabels, Action<bool> setHideLabels,
+                                            Func<float> getButtonAlpha, Action<float> setButtonAlpha,
+                                            string idSuffix, string opacityLabel)
         {
             var backgroundAlpha = getBackgroundAlpha();
             ImGui.SetNextItemWidth(200f);

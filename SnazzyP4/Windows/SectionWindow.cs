@@ -40,6 +40,8 @@ namespace SnazzyP4.Windows
         /// <summary>
         /// Creates a detached window for a section.
         /// </summary>
+        /// <param name="plugin">The owning plugin.</param>
+        /// <param name="definition">The section this window renders.</param>
         public SectionWindow(Plugin plugin, SectionDef definition)
             : base($"{definition.Name}###SnazzyP4_{definition.Id}")
         {
@@ -55,6 +57,8 @@ namespace SnazzyP4.Windows
         /// <summary>
         /// Whether this is the combined set window with its divider pinned to a fixed position.
         /// </summary>
+        /// <param name="configuration">The plugin configuration the combine options are read from.</param>
+        /// <returns>True when this is the combined window and its divider is pinned.</returns>
         private bool AnchorDividerActive(Configuration configuration)
         {
             return definition.Id == "CombinedSets"

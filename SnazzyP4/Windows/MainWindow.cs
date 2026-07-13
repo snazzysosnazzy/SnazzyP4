@@ -36,6 +36,7 @@ namespace SnazzyP4.Windows
         /// <summary>
         /// Creates the hub window.
         /// </summary>
+        /// <param name="plugin">The owning plugin.</param>
         public MainWindow(Plugin plugin) : base("Snazzy P4###SnazzyP4Main")
         {
             this.plugin = plugin;
@@ -92,6 +93,9 @@ namespace SnazzyP4.Windows
         /// <summary>
         /// Builds the ImGui window flags for the overlay options shared by the hub and detached windows.
         /// </summary>
+        /// <param name="noTitleBar">Whether the window's title bar is hidden.</param>
+        /// <param name="clickThrough">Whether the window ignores mouse input.</param>
+        /// <returns>The window flags matching those overlay options.</returns>
         public static ImGuiWindowFlags OverlayFlags(bool noTitleBar, bool clickThrough)
         {
             var flags = ImGuiWindowFlags.None;
@@ -112,6 +116,7 @@ namespace SnazzyP4.Windows
         /// Pushes the style used to draw a section at a given opacity.
         /// ImGui's default button and frame backgrounds are translucent, which makes elements look faded even at full opacity, so they are forced to solid and the opacity is applied uniformly through the alpha style variable.
         /// </summary>
+        /// <param name="alpha">The opacity applied uniformly to the section's widgets.</param>
         public static void PushSectionStyle(float alpha)
         {
             PushOpaqueColor(ImGuiCol.Button);
@@ -135,6 +140,7 @@ namespace SnazzyP4.Windows
         /// <summary>
         /// Pushes a style colour with its alpha forced to fully opaque.
         /// </summary>
+        /// <param name="styleColor">The style colour whose alpha is forced to opaque.</param>
         private static unsafe void PushOpaqueColor(ImGuiCol styleColor)
         {
             var color = *ImGui.GetStyleColorVec4(styleColor);
@@ -396,6 +402,8 @@ namespace SnazzyP4.Windows
         /// <summary>
         /// Draws the red display-only warning over a section rectangle while click-through is enabled.
         /// </summary>
+        /// <param name="min">The top-left corner of the covered rectangle in screen space.</param>
+        /// <param name="max">The bottom-right corner of the covered rectangle in screen space.</param>
         public static void DrawDisplayOnlyOverlay(Vector2 min, Vector2 max)
         {
             const string warning = "DISPLAY ONLY MODE (CHECK SETTINGS)";

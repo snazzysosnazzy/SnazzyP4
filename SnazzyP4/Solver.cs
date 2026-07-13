@@ -82,6 +82,24 @@ namespace SnazzyP4
         /// A full copy of the solver's input state, captured before each button press so the last press can be undone.
         /// The two collections are copied so later mutation does not change a stored snapshot.
         /// </summary>
+        /// <param name="FirstExdeathReal">Whether the first Exdeath was real.</param>
+        /// <param name="SecondExdeathReal">Whether the second Exdeath was real.</param>
+        /// <param name="FirstExdeathPressed">Whether the first Exdeath button had been pressed.</param>
+        /// <param name="SecondExdeathPressed">Whether the second Exdeath button had been pressed.</param>
+        /// <param name="Phase">The stage of the input sequence.</param>
+        /// <param name="Selections">A copy of the short/long selections made so far.</param>
+        /// <param name="FirstSetChaos">The First Set chaos resolution, when Inferno had been pressed.</param>
+        /// <param name="SecondSetChaos">The Second Set chaos resolution, when Tsunami had been pressed.</param>
+        /// <param name="InfernoReal">Whether the pressed Inferno was the real variant.</param>
+        /// <param name="TsunamiReal">Whether the pressed Tsunami was the real variant.</param>
+        /// <param name="ThunderPressed">Whether a Thunder button had been pressed.</param>
+        /// <param name="ThunderReal">Whether the pressed Thunder was the real variant.</param>
+        /// <param name="ThunderLastFake">The Thunder line's Last Fake toggle.</param>
+        /// <param name="BlizzardPressed">Whether a Blizzard button had been pressed.</param>
+        /// <param name="BlizzardReal">Whether the pressed Blizzard was the real variant.</param>
+        /// <param name="BlizzardLastFake">The Blizzard line's Last Fake toggle.</param>
+        /// <param name="ShortMarkerSent">Whether the short-set marker had already been placed.</param>
+        /// <param name="LongMarkerSent">Whether the long-set marker had already been placed.</param>
         private sealed record Snapshot(
             bool FirstExdeathReal,
             bool SecondExdeathReal,
@@ -228,6 +246,7 @@ namespace SnazzyP4
         /// <summary>
         /// Creates a solver bound to the plugin configuration.
         /// </summary>
+        /// <param name="configuration">The plugin configuration the solver reads its options from.</param>
         public Solver(Configuration configuration)
         {
             this.configuration = configuration;
@@ -289,6 +308,8 @@ namespace SnazzyP4
         /// Determines whether a button section is fully resolved and hidden by the hide-resolved-buttons option.
         /// The section reappears once Reset clears the inputs. Text panels and the Last Fake toggles are unaffected.
         /// </summary>
+        /// <param name="sectionId">The section id to test.</param>
+        /// <returns>True when the option is active and that section's inputs are fully entered.</returns>
         public bool SectionResolvedHidden(string sectionId)
         {
             if (!HideResolvedActive)
@@ -309,6 +330,8 @@ namespace SnazzyP4
         /// Determines whether a section currently has anything to display, which is used to hide empty text panels.
         /// Non-text sections and the layout-edit preview always report content.
         /// </summary>
+        /// <param name="sectionId">The section id to test.</param>
+        /// <returns>True when the section has something to show.</returns>
         public bool SectionHasContent(string sectionId)
         {
             if (LayoutEditActive)
@@ -330,6 +353,10 @@ namespace SnazzyP4
         /// <summary>
         /// Determines whether a set panel has any body, gaze, chaos or completion content to show.
         /// </summary>
+        /// <param name="isShort">Whether the short (first) set is tested rather than the long one.</param>
+        /// <param name="gazeKnown">Whether that set's gaze has been resolved.</param>
+        /// <param name="chaosIndex">The set's chaos slot: 0 for Inferno, 1 for Tsunami.</param>
+        /// <returns>True when the set has at least one resolved line.</returns>
         private bool SetHasContent(bool isShort, bool gazeKnown, int chaosIndex)
         {
             if (phase == Phase.Done || gazeKnown || ChaosForSet(chaosIndex).HasValue)
@@ -351,6 +378,7 @@ namespace SnazzyP4
         /// <summary>
         /// Draws the Exdeath real/fake buttons and the short/long mechanic grid.
         /// </summary>
+        /// <param name="scale">The pixel scale applied to the buttons.</param>
         public void DrawExdeath(float scale)
         {
             var style = ImGui.GetStyle();
@@ -365,8 +393,8 @@ namespace SnazzyP4
 
             if (!labelsHidden)
             {
-                // SetCursorPosX is used instead of SameLine's offset because the latter re-adds the group offset,
-                // which pushed the second column right by the section's position in windowed mode.
+                // SameLine's offset parameter re-adds the group offset, so SetCursorPosX places the second column,
+                // keeping it aligned when the section draws inside a positioned group in windowed mode.
                 var headerStartX = ImGui.GetCursorPosX();
                 ImGui.TextUnformatted(configuration.GetText(TextLabels.RealColumnHeader));
                 ImGui.SameLine();
@@ -405,6 +433,9 @@ namespace SnazzyP4
         /// <summary>
         /// Draws one row of the short/long grid for a single mechanic.
         /// </summary>
+        /// <param name="iconFile">The icon file shown on both buttons of the row.</param>
+        /// <param name="kind">The mechanic the row picks.</param>
+        /// <param name="scale">The pixel scale applied to the buttons.</param>
         private void DrawShortLongRow(string iconFile, MechanicKind kind, float scale)
         {
             if (IconButton($"##Short{kind}", iconFile, ShortLongEnabled(kind), scale))
@@ -425,6 +456,8 @@ namespace SnazzyP4
         /// A pull assigns one body debuff (Lightning or Drop, never both) and one Acceleration, so a body pick
         /// locks every body button and an Acceleration pick locks both Acceleration buttons until reset.
         /// </summary>
+        /// <param name="kind">The mechanic whose buttons are tested.</param>
+        /// <returns>True when that mechanic can currently be picked.</returns>
         private bool ShortLongEnabled(MechanicKind kind)
         {
             if (phase is not (Phase.WaitFirstShortLong or Phase.WaitSecondShortLong))
@@ -443,6 +476,7 @@ namespace SnazzyP4
         /// <summary>
         /// Determines whether a body debuff (Lightning or Drop) has been picked in either set.
         /// </summary>
+        /// <returns>True when Lightning or Drop is already in the selections.</returns>
         private bool BodyPicked()
         {
             foreach (var selection in selections)
@@ -459,6 +493,7 @@ namespace SnazzyP4
         /// <summary>
         /// Determines whether an Acceleration has been picked in either set.
         /// </summary>
+        /// <returns>True when an Acceleration is already in the selections.</returns>
         private bool AccelerationPicked()
         {
             foreach (var selection in selections)
@@ -502,6 +537,7 @@ namespace SnazzyP4
         /// <summary>
         /// Draws the First Set resolution, which is the short picks with the first gaze and first chaos.
         /// </summary>
+        /// <param name="scale">The pixel scale the hosting window applied.</param>
         public void DrawFirstSet(float scale)
         {
             RenderLines(BuildSetPanel(configuration.GetText(TextLabels.FirstSetLabel), true, firstExdeathPressed, firstExdeathReal, 0), SetAlignment.Left, 0f);
@@ -510,6 +546,7 @@ namespace SnazzyP4
         /// <summary>
         /// Draws the Second Set resolution, which is the long picks with the second gaze and second chaos.
         /// </summary>
+        /// <param name="scale">The pixel scale the hosting window applied.</param>
         public void DrawSecondSet(float scale)
         {
             RenderLines(BuildSetPanel(configuration.GetText(TextLabels.SecondSetLabel), false, secondExdeathPressed, secondExdeathReal, 1), SetAlignment.Left, 0f);
@@ -519,6 +556,7 @@ namespace SnazzyP4
         /// Draws the First Set and Second Set together in one panel, divided by a line.
         /// The sets stack vertically or sit side by side, and can optionally expand outward from the divider instead of the left edge.
         /// </summary>
+        /// <param name="scale">The pixel scale the hosting window applied.</param>
         public void DrawCombinedSets(float scale)
         {
             var firstLines = BuildSetPanel(configuration.GetText(TextLabels.FirstSetLabel), true, firstExdeathPressed, firstExdeathReal, 0);
@@ -538,10 +576,10 @@ namespace SnazzyP4
                 ImGui.Spacing();
                 var dividerScreen = ImGui.GetCursorScreenPos();
                 CombinedDividerOffsetY = dividerScreen.Y - ImGui.GetWindowPos().Y;
-                ImGui.GetWindowDrawList().AddLine(
-                    new Vector2(dividerScreen.X, dividerScreen.Y),
-                    new Vector2(dividerScreen.X + stackedWidth, dividerScreen.Y),
-                    dividerColor, dividerThickness);
+                ImGui.GetWindowDrawList().AddLine(new Vector2(dividerScreen.X, dividerScreen.Y),
+                                                  new Vector2(dividerScreen.X + stackedWidth, dividerScreen.Y),
+                                                  dividerColor,
+                                                  dividerThickness);
                 ImGui.Dummy(new Vector2(stackedWidth, dividerThickness));
                 ImGui.Spacing();
 
@@ -570,16 +608,21 @@ namespace SnazzyP4
             }
 
             var bottom = Math.Max(firstMax.Y, ImGui.GetItemRectMax().Y);
-            ImGui.GetWindowDrawList().AddLine(
-                new Vector2(dividerX, top),
-                new Vector2(dividerX, bottom),
-                dividerColor,
-                dividerThickness);
+            ImGui.GetWindowDrawList().AddLine(new Vector2(dividerX, top),
+                                              new Vector2(dividerX, bottom),
+                                              dividerColor,
+                                              dividerThickness);
         }
 
         /// <summary>
         /// Builds a set panel's lines, prefixing the set label unless labels are hidden.
         /// </summary>
+        /// <param name="label">The set label shown above the lines.</param>
+        /// <param name="isShort">Whether the short (first) set is built rather than the long one.</param>
+        /// <param name="gazeKnown">Whether that set's gaze has been resolved.</param>
+        /// <param name="gazeReal">Whether that set's gaze was real.</param>
+        /// <param name="chaosIndex">The set's chaos slot: 0 for Inferno, 1 for Tsunami.</param>
+        /// <returns>The panel's lines as coloured runs, label first.</returns>
         private List<List<SetRun>> BuildSetPanel(string label, bool isShort, bool gazeKnown, bool gazeReal, int chaosIndex)
         {
             var lines = new List<List<SetRun>>();
@@ -596,6 +639,11 @@ namespace SnazzyP4
         /// Builds the resolution lines for one set as coloured runs.
         /// The body comes from the short/long picks in this set, while the gaze comes from the matching Exdeath press order, so the first press drives the First Set gaze and the second press drives the Second Set gaze.
         /// </summary>
+        /// <param name="isShort">Whether the short (first) set is built rather than the long one.</param>
+        /// <param name="gazeKnown">Whether that set's gaze has been resolved.</param>
+        /// <param name="gazeReal">Whether that set's gaze was real.</param>
+        /// <param name="chaosIndex">The set's chaos slot: 0 for Inferno, 1 for Tsunami.</param>
+        /// <returns>The set's resolution lines as coloured runs.</returns>
         private List<List<SetRun>> BuildSetLines(bool isShort, bool gazeKnown, bool gazeReal, int chaosIndex)
         {
             var lines = new List<List<SetRun>>();
@@ -689,6 +737,8 @@ namespace SnazzyP4
         /// <summary>
         /// Returns the chaos resolution for a set: index 0 is the first set (Inferno), index 1 is the second set (Tsunami).
         /// </summary>
+        /// <param name="chaosIndex">The set's chaos slot: 0 for Inferno, 1 for Tsunami.</param>
+        /// <returns>That slot's resolution and colour, or null while unpressed.</returns>
         private (string Text, Vector4 Color)? ChaosForSet(int chaosIndex)
         {
             return chaosIndex == 0 ? firstSetChaos : secondSetChaos;
@@ -698,6 +748,9 @@ namespace SnazzyP4
         /// Builds one spread or stack body line with the role-based target letter, appending the Acceleration word when it shares the line.
         /// Support uses A for stack and D for spread, while DPS uses C for stack and B for spread.
         /// </summary>
+        /// <param name="spread">Whether the body resolves to a spread rather than a stack.</param>
+        /// <param name="accelerationText">The movement word appended to the line, or null when the set has no Acceleration.</param>
+        /// <returns>The composed line as coloured runs.</returns>
         private List<SetRun> BuildResolutionLine(bool spread, string? accelerationText)
         {
             var support = configuration.IsSupport;
@@ -732,6 +785,9 @@ namespace SnazzyP4
         /// <summary>
         /// Renders a panel's lines, aligning each line within the given column width.
         /// </summary>
+        /// <param name="lines">The lines to draw, each a list of coloured runs.</param>
+        /// <param name="alignment">How each line is placed within the column.</param>
+        /// <param name="columnWidth">The column width the alignment is measured against.</param>
         private static void RenderLines(List<List<SetRun>> lines, SetAlignment alignment, float columnWidth)
         {
             var baseX = ImGui.GetCursorPosX();
@@ -772,6 +828,8 @@ namespace SnazzyP4
         /// <summary>
         /// Measures the pixel width of a line by summing its runs.
         /// </summary>
+        /// <param name="line">The line whose runs are measured.</param>
+        /// <returns>The rendered width of the line in pixels.</returns>
         private static float LineWidth(List<SetRun> line)
         {
             var width = 0f;
@@ -786,6 +844,8 @@ namespace SnazzyP4
         /// <summary>
         /// Measures the widest line in a panel.
         /// </summary>
+        /// <param name="lines">The lines to measure.</param>
+        /// <returns>The widest line's width in pixels.</returns>
         private static float MaxLineWidth(List<List<SetRun>> lines)
         {
             var max = 0f;
@@ -800,6 +860,8 @@ namespace SnazzyP4
         /// <summary>
         /// Creates a run drawn in the default text colour.
         /// </summary>
+        /// <param name="text">The text the run displays.</param>
+        /// <returns>A run drawn in the default text colour.</returns>
         private static SetRun PlainRun(string text)
         {
             return new(text, default, false, false);
@@ -808,6 +870,9 @@ namespace SnazzyP4
         /// <summary>
         /// Creates a run drawn in a specific colour.
         /// </summary>
+        /// <param name="text">The text the run displays.</param>
+        /// <param name="color">The colour the run is drawn in.</param>
+        /// <returns>A run drawn in the given colour.</returns>
         private static SetRun ColorRun(string text, Vector4 color)
         {
             return new(text, color, true, false);
@@ -816,6 +881,8 @@ namespace SnazzyP4
         /// <summary>
         /// Creates a run drawn in the muted placeholder colour.
         /// </summary>
+        /// <param name="text">The text the run displays.</param>
+        /// <returns>A run drawn in the disabled text colour.</returns>
         private static SetRun DisabledRun(string text)
         {
             return new(text, default, false, true);
@@ -824,6 +891,8 @@ namespace SnazzyP4
         /// <summary>
         /// Determines whether a selection resolves to a spread.
         /// </summary>
+        /// <param name="selection">The selection to classify.</param>
+        /// <returns>True when the selection resolves to a spread.</returns>
         private static bool IsSpread(Selection selection)
         {
             return MechanicText(selection.Kind, selection.IsReal) == "Spread";
@@ -832,6 +901,8 @@ namespace SnazzyP4
         /// <summary>
         /// Determines whether a set contains a spread selection.
         /// </summary>
+        /// <param name="isShort">Whether the short (first) set is tested rather than the long one.</param>
+        /// <returns>True when that set resolves to a spread.</returns>
         private bool SetHasSpread(bool isShort)
         {
             foreach (var selection in selections)
@@ -872,6 +943,7 @@ namespace SnazzyP4
         /// <summary>
         /// Places a configured head marker on the player, skipping it when no marker is configured.
         /// </summary>
+        /// <param name="marker">The head marker token, or an empty value to place none.</param>
         private void PlaceMarker(string marker)
         {
             if (string.IsNullOrWhiteSpace(marker))
@@ -885,6 +957,7 @@ namespace SnazzyP4
         /// <summary>
         /// Draws the Reset button, which is disabled while the layout is being edited.
         /// </summary>
+        /// <param name="scale">The pixel scale applied to the button.</param>
         public void DrawReset(float scale)
         {
             using (ImRaii.Disabled(LayoutEditActive))
@@ -899,6 +972,7 @@ namespace SnazzyP4
         /// <summary>
         /// Draws the Undo button, which steps back the last button press and is disabled while editing the layout or when there is nothing to undo.
         /// </summary>
+        /// <param name="scale">The pixel scale applied to the button.</param>
         public void DrawUndo(float scale)
         {
             using (ImRaii.Disabled(LayoutEditActive || !CanUndo))
@@ -913,6 +987,7 @@ namespace SnazzyP4
         /// <summary>
         /// Draws the Hide/Show button, which is disabled while the layout is being edited.
         /// </summary>
+        /// <param name="scale">The pixel scale applied to the button.</param>
         public void DrawHideToggle(float scale)
         {
             using (ImRaii.Disabled(LayoutEditActive))
@@ -928,6 +1003,7 @@ namespace SnazzyP4
         /// Sets the hidden state and persists it. When it becomes hidden and "Reset on Hide" is enabled, it also runs Reset.
         /// All Hide/Show buttons and the /snazzyp4 hide command route through here so the behaviour is consistent.
         /// </summary>
+        /// <param name="hidden">Whether the display becomes hidden.</param>
         public void SetHidden(bool hidden)
         {
             if (configuration.Hidden == hidden)
@@ -954,6 +1030,7 @@ namespace SnazzyP4
         /// <summary>
         /// Draws the Chaos section with the Inferno and Tsunami buttons.
         /// </summary>
+        /// <param name="scale">The pixel scale applied to the buttons.</param>
         public void DrawFireWaterButtons(float scale)
         {
             if (!configuration.EffectiveHideLabels(CurrentSection))
@@ -1008,6 +1085,7 @@ namespace SnazzyP4
         /// <summary>
         /// Draws the Kefka section with the Thunder and Blizzard buttons.
         /// </summary>
+        /// <param name="scale">The pixel scale applied to the buttons.</param>
         public void DrawThunderButtons(float scale)
         {
             if (!configuration.EffectiveHideLabels(CurrentSection))
@@ -1059,6 +1137,7 @@ namespace SnazzyP4
         /// <summary>
         /// Reserves the exact footprint of a hidden button pair so the remaining buttons keep their positions.
         /// </summary>
+        /// <param name="scale">The pixel scale the hidden pair would have been drawn at.</param>
         private static void DrawHiddenPairPlaceholder(float scale)
         {
             var style = ImGui.GetStyle();
@@ -1071,6 +1150,7 @@ namespace SnazzyP4
         /// Records a Thunder press (real or fake), capturing an undo point first.
         /// Further presses are ignored until reset, matching the disabled buttons.
         /// </summary>
+        /// <param name="real">Whether the real variant was pressed.</param>
         private void OnThunder(bool real)
         {
             if (thunderPressed)
@@ -1087,6 +1167,7 @@ namespace SnazzyP4
         /// Records a Blizzard press (real or fake), capturing an undo point first.
         /// Further presses are ignored until reset, matching the disabled buttons.
         /// </summary>
+        /// <param name="real">Whether the real variant was pressed.</param>
         private void OnBlizzard(bool real)
         {
             if (blizzardPressed)
@@ -1103,6 +1184,7 @@ namespace SnazzyP4
         /// Draws the Kefka text panel with the Thunder and Blizzard resolutions.
         /// When the toggles are not detached, the inline Last Fake toggles are drawn beside each line.
         /// </summary>
+        /// <param name="scale">The pixel scale the hosting window applied.</param>
         public void DrawThunderText(float scale)
         {
             var showDocked = configuration.ShowLastFake && configuration.LastFakeAnnounceEnabled
@@ -1192,6 +1274,14 @@ namespace SnazzyP4
         /// Draws one Kefka resolution line and, optionally, its inline Last Fake toggle.
         /// The displayed real/fake value is the button value combined with the Last Fake toggle when the toggle feature is enabled.
         /// </summary>
+        /// <param name="idSuffix">The ImGui id suffix for the line's toggle.</param>
+        /// <param name="lastFake">The line's Last Fake toggle state.</param>
+        /// <param name="buttonReal">Whether the pressed button was the real variant.</param>
+        /// <param name="name">The mechanic name shown at the start of the line.</param>
+        /// <param name="color">The colour the line is drawn in.</param>
+        /// <param name="startX">The cursor position the toggle column is measured from.</param>
+        /// <param name="toggleColumn">The distance from the start position to the toggle column.</param>
+        /// <param name="drawToggleInline">Whether the Last Fake toggle is drawn beside the line.</param>
         private void DrawKefkaLine(string idSuffix,
                                    ref bool lastFake,
                                    bool buttonReal,
@@ -1214,6 +1304,13 @@ namespace SnazzyP4
         /// <summary>
         /// Draws a sample Kefka line while the layout is being edited, with the inline Last Fake toggle when it is enabled.
         /// </summary>
+        /// <param name="idSuffix">The ImGui id suffix for the line's toggle.</param>
+        /// <param name="lastFake">The line's Last Fake toggle state.</param>
+        /// <param name="sample">The placeholder text shown while editing the layout.</param>
+        /// <param name="color">The colour the line is drawn in.</param>
+        /// <param name="startX">The cursor position the toggle column is measured from.</param>
+        /// <param name="toggleColumn">The distance from the start position to the toggle column.</param>
+        /// <param name="drawToggleInline">Whether the Last Fake toggle is drawn beside the line.</param>
         private void DrawKefkaSampleLine(string idSuffix,
                                          ref bool lastFake,
                                          string sample,
@@ -1234,6 +1331,7 @@ namespace SnazzyP4
         /// <summary>
         /// Draws the Last Fake ANNOUNCE button, which sends the current Kefka values to the configured channel.
         /// </summary>
+        /// <param name="scale">The pixel scale applied to the button.</param>
         public void DrawAnnounceLastFakeButton(float scale)
         {
             using (ImRaii.Disabled(LayoutEditActive))
@@ -1265,6 +1363,9 @@ namespace SnazzyP4
         /// <summary>
         /// Resolves a Kefka macro to its current text, using a question mark when that mechanic has not been pressed.
         /// </summary>
+        /// <param name="pressed">Whether that mechanic's button has been pressed.</param>
+        /// <param name="effectiveReal">The line's real/fake value after the Last Fake toggle is applied.</param>
+        /// <returns>The configured real or fake text, or a question mark while unpressed.</returns>
         private string KefkaMacroValue(bool pressed, bool effectiveReal)
         {
             if (!pressed)
@@ -1280,6 +1381,8 @@ namespace SnazzyP4
         /// It renders as a plain checkbox, or as a green REAL / red FAKE button whose label, size and opacity can be customised.
         /// The toggle is disabled while the layout is being edited so a click drags the panel instead of flipping it.
         /// </summary>
+        /// <param name="lastFake">The toggle state the control flips.</param>
+        /// <param name="idSuffix">The ImGui id suffix keeping the control unique.</param>
         private void DrawToggle(ref bool lastFake, string idSuffix)
         {
             using var editDisabled = ImRaii.Disabled(LayoutEditActive);
@@ -1334,6 +1437,8 @@ namespace SnazzyP4
         /// <summary>
         /// Resolves the label text for a Last Fake toggle in its current state.
         /// </summary>
+        /// <param name="lastFake">The toggle state the label describes.</param>
+        /// <returns>The custom label for that state, or the default REAL/FAKE word.</returns>
         private string ToggleLabel(bool lastFake)
         {
             if (configuration.UseCustomToggleText)
@@ -1347,18 +1452,21 @@ namespace SnazzyP4
         /// <summary>
         /// Returns a copy of a colour with its red, green and blue channels shifted for hover and active states.
         /// </summary>
+        /// <param name="color">The base colour to shift.</param>
+        /// <param name="delta">The amount added to the red, green and blue channels.</param>
+        /// <returns>The shifted colour with its channels clamped.</returns>
         private static Vector4 ShiftColor(Vector4 color, float delta)
         {
-            return new(
-                Math.Clamp(color.X + delta, 0f, 1f),
-                Math.Clamp(color.Y + delta, 0f, 1f),
-                Math.Clamp(color.Z + delta, 0f, 1f),
-                color.W);
+            return new(Math.Clamp(color.X + delta, 0f, 1f),
+                       Math.Clamp(color.Y + delta, 0f, 1f),
+                       Math.Clamp(color.Z + delta, 0f, 1f),
+                       color.W);
         }
 
         /// <summary>
         /// Draws both Last Fake toggles for the combined detached panel.
         /// </summary>
+        /// <param name="scale">The pixel scale the hosting window applied.</param>
         public void DrawLastFakeToggles(float scale)
         {
             DrawNamedToggle("thunder", ref thunderLastFake, configuration.GetText(TextLabels.ThunderName));
@@ -1373,6 +1481,7 @@ namespace SnazzyP4
         /// <summary>
         /// Draws the Thunder Last Fake toggle for its own detached panel.
         /// </summary>
+        /// <param name="scale">The pixel scale the hosting window applied.</param>
         public void DrawLastFakeThunderToggle(float scale)
         {
             DrawNamedToggle("thunder", ref thunderLastFake, configuration.GetText(TextLabels.ThunderName));
@@ -1381,6 +1490,7 @@ namespace SnazzyP4
         /// <summary>
         /// Draws the Blizzard Last Fake toggle for its own detached panel.
         /// </summary>
+        /// <param name="scale">The pixel scale the hosting window applied.</param>
         public void DrawLastFakeBlizzardToggle(float scale)
         {
             DrawNamedToggle("blizzard", ref blizzardLastFake, configuration.GetText(TextLabels.BlizzardName));
@@ -1389,6 +1499,9 @@ namespace SnazzyP4
         /// <summary>
         /// Draws a labelled Last Fake toggle for the detached panels.
         /// </summary>
+        /// <param name="idSuffix">The ImGui id suffix keeping the control unique.</param>
+        /// <param name="lastFake">The toggle state the control flips.</param>
+        /// <param name="name">The mechanic name shown next to the toggle.</param>
         private void DrawNamedToggle(string idSuffix, ref bool lastFake, string name)
         {
             if (!configuration.EffectiveHideLabels(CurrentSection))
@@ -1404,6 +1517,11 @@ namespace SnazzyP4
         /// Draws an icon button, disabling it while the layout is being edited so a click drags the section.
         /// A unique ImGui id is pushed because the same texture is reused across columns, and opacity is applied to the whole section by the hosting window.
         /// </summary>
+        /// <param name="id">The ImGui id keeping the button unique.</param>
+        /// <param name="iconFile">The icon file shown on the button.</param>
+        /// <param name="enabled">Whether the button is currently pressable.</param>
+        /// <param name="scale">The pixel scale applied to the button.</param>
+        /// <returns>True when the button was clicked this frame.</returns>
         private bool IconButton(string id, string iconFile, bool enabled, float scale)
         {
             var size = new Vector2(IconButtonSize, IconButtonSize) * scale;
@@ -1425,6 +1543,7 @@ namespace SnazzyP4
         /// <summary>
         /// Advances the sequence when an Exdeath button is pressed and fires the Exdeath announcements for that set and real/fake.
         /// </summary>
+        /// <param name="real">Whether the real variant was pressed.</param>
         private void OnExdeath(bool real)
         {
             if (phase == Phase.WaitFirstExdeath)
@@ -1455,25 +1574,24 @@ namespace SnazzyP4
         /// </summary>
         private void PushUndo()
         {
-            undoStack.Push(new Snapshot(
-                firstExdeathReal,
-                secondExdeathReal,
-                firstExdeathPressed,
-                secondExdeathPressed,
-                phase,
-                new List<Selection>(selections),
-                firstSetChaos,
-                secondSetChaos,
-                infernoReal,
-                tsunamiReal,
-                thunderPressed,
-                thunderReal,
-                thunderLastFake,
-                blizzardPressed,
-                blizzardReal,
-                blizzardLastFake,
-                shortMarkerSent,
-                longMarkerSent));
+            undoStack.Push(new Snapshot(firstExdeathReal,
+                                        secondExdeathReal,
+                                        firstExdeathPressed,
+                                        secondExdeathPressed,
+                                        phase,
+                                        new List<Selection>(selections),
+                                        firstSetChaos,
+                                        secondSetChaos,
+                                        infernoReal,
+                                        tsunamiReal,
+                                        thunderPressed,
+                                        thunderReal,
+                                        thunderLastFake,
+                                        blizzardPressed,
+                                        blizzardReal,
+                                        blizzardLastFake,
+                                        shortMarkerSent,
+                                        longMarkerSent));
         }
 
         /// <summary>
@@ -1516,6 +1634,8 @@ namespace SnazzyP4
         /// <summary>
         /// Records a short/long mechanic pick and advances the sequence.
         /// </summary>
+        /// <param name="kind">The mechanic that was picked.</param>
+        /// <param name="isShort">Whether it was picked in the short column.</param>
         private void OnShortLong(MechanicKind kind, bool isShort)
         {
             bool real;
@@ -1541,6 +1661,10 @@ namespace SnazzyP4
         /// Records a chaos twister press and fires the Chaos announcements for that mechanic and real/fake.
         /// Inferno always resolves in the first set and Tsunami in the second; each ignores further presses until reset.
         /// </summary>
+        /// <param name="text">The resolution text shown in the set panel.</param>
+        /// <param name="color">The colour the resolution is drawn in.</param>
+        /// <param name="slotId">The pressed mechanic, either "inferno" or "tsunami".</param>
+        /// <param name="isReal">Whether the real variant was pressed.</param>
         private void OnChaos(string text, Vector4 color, string slotId, bool isReal)
         {
             var isInferno = slotId == "inferno";
@@ -1578,6 +1702,11 @@ namespace SnazzyP4
         /// Fires the announcements for one category, set and real/fake, sending each to the selected channel.
         /// Ordered mode sends every enabled slot in order (Exdeath) or only the pressed slot (Chaos, via <paramref name="onlySlot"/>); simple mode sends each non-empty line.
         /// </summary>
+        /// <param name="category">The announcement configuration that fires.</param>
+        /// <param name="categoryId">The category id, either "exdeath" or "chaos".</param>
+        /// <param name="isFirst">Whether the first set's leaf fires rather than the second's.</param>
+        /// <param name="isReal">Whether the real branch fires rather than the fake one.</param>
+        /// <param name="onlySlot">The only mechanic slot allowed to fire, or null for all of them.</param>
         private void FireAnnouncements(AnnouncementCategory category, string categoryId, bool isFirst, bool isReal, string? onlySlot)
         {
             if (!configuration.AnnouncementsEnabled || configuration.AnnouncementChronological)
@@ -1642,6 +1771,9 @@ namespace SnazzyP4
         /// <summary>
         /// Resolves the channel a slot is sent to: its own channel when per-channel announcements are on (Personal Mode) and set, otherwise the selected channel.
         /// </summary>
+        /// <param name="slot">The slot whose channel is resolved.</param>
+        /// <param name="globalChannel">The channel selected in the Chat tab.</param>
+        /// <returns>The slot's own channel when per-channel routing applies, otherwise the selected one.</returns>
         private string SlotChannel(AnnouncementSlot slot, string globalChannel)
         {
             if (configuration.IsPersonalMode && configuration.PerChannelAnnouncements && !string.IsNullOrEmpty(slot.Channel))
@@ -1657,6 +1789,9 @@ namespace SnazzyP4
         /// Party Mode only allows party-safe slots (gaze, Inferno, Tsunami). Personal Mode allows everything, but blocks
         /// non-party-safe slots from party (/p) chat unless the party override is enabled.
         /// </summary>
+        /// <param name="slotId">The slot that wants to fire.</param>
+        /// <param name="channel">The channel it would be sent to.</param>
+        /// <returns>True when the current mode permits that slot on that channel.</returns>
         private bool SlotAllowed(string slotId, string channel)
         {
             var partySafe = AnnouncementData.IsPartySafe(slotId);
@@ -1676,6 +1811,8 @@ namespace SnazzyP4
         /// <summary>
         /// Sends one announcement message to a chat channel, ignoring empty messages.
         /// </summary>
+        /// <param name="channel">The chat command prefix the message is sent with.</param>
+        /// <param name="message">The message text; blank messages are skipped.</param>
         private static void SendAnnouncement(string channel, string message)
         {
             if (string.IsNullOrWhiteSpace(message))
@@ -1753,6 +1890,15 @@ namespace SnazzyP4
         /// The gaze slot is separated out via <paramref name="includeGaze"/>/<paramref name="includeNonGaze"/> so it can be placed after the other debuffs.
         /// Simple-mode leaves have no per-mechanic split, so their text is added only on the non-gaze pass.
         /// </summary>
+        /// <param name="output">The list the collected messages are appended to.</param>
+        /// <param name="category">The announcement configuration the leaf belongs to.</param>
+        /// <param name="categoryId">The category id, either "exdeath" or "chaos".</param>
+        /// <param name="isFirst">Whether the first set's leaf is read rather than the second's.</param>
+        /// <param name="isReal">Whether the real branch is read rather than the fake one.</param>
+        /// <param name="includeGaze">Whether the gaze slot is collected on this pass.</param>
+        /// <param name="includeNonGaze">Whether the non-gaze slots are collected on this pass.</param>
+        /// <param name="includeSetNumber">Whether generated defaults carry the "[1st]"/"[2nd]" prefix.</param>
+        /// <param name="channel">The channel the list will be sent to, used for the mode filter.</param>
         private void CollectLeafMessages(List<string> output, AnnouncementCategory category, string categoryId, bool isFirst, bool isReal, bool includeGaze, bool includeNonGaze, bool includeSetNumber, string channel)
         {
             var leaf = category.GetLeaf(isFirst, isReal);
@@ -1817,6 +1963,9 @@ namespace SnazzyP4
         /// <summary>
         /// Resolves a mechanic pick to its callout word.
         /// </summary>
+        /// <param name="kind">The picked mechanic.</param>
+        /// <param name="real">Whether the owning Exdeath was real.</param>
+        /// <returns>The callout word for that combination.</returns>
         private static string MechanicText(MechanicKind kind, bool real)
         {
             return kind switch
@@ -1867,6 +2016,7 @@ namespace SnazzyP4
         /// <summary>
         /// Presses an Exdeath button from a slash command, mirroring the icon button.
         /// </summary>
+        /// <param name="real">Whether the real variant is pressed.</param>
         public void CommandExdeath(bool real)
         {
             OnExdeath(real);
@@ -1875,6 +2025,7 @@ namespace SnazzyP4
         /// <summary>
         /// Presses a Lightning short or long button from a slash command, ignoring the press when the slot is not currently pickable.
         /// </summary>
+        /// <param name="isShort">Whether the short column is pressed.</param>
         public void CommandLightning(bool isShort)
         {
             CommandShortLong(MechanicKind.Lightning, isShort);
@@ -1883,6 +2034,7 @@ namespace SnazzyP4
         /// <summary>
         /// Presses a Drop short or long button from a slash command, ignoring the press when the slot is not currently pickable.
         /// </summary>
+        /// <param name="isShort">Whether the short column is pressed.</param>
         public void CommandDrop(bool isShort)
         {
             CommandShortLong(MechanicKind.Drop, isShort);
@@ -1891,6 +2043,7 @@ namespace SnazzyP4
         /// <summary>
         /// Presses an Acceleration short or long button from a slash command, ignoring the press when the slot is not currently pickable.
         /// </summary>
+        /// <param name="isShort">Whether the short column is pressed.</param>
         public void CommandAcceleration(bool isShort)
         {
             CommandShortLong(MechanicKind.Acceleration, isShort);
@@ -1899,6 +2052,8 @@ namespace SnazzyP4
         /// <summary>
         /// Applies a short/long pick from a slash command only when the matching button would be enabled.
         /// </summary>
+        /// <param name="kind">The mechanic the command picks.</param>
+        /// <param name="isShort">Whether the short column is pressed.</param>
         private void CommandShortLong(MechanicKind kind, bool isShort)
         {
             if (ShortLongEnabled(kind))
@@ -1910,24 +2065,25 @@ namespace SnazzyP4
         /// <summary>
         /// Presses an Inferno button from a slash command, mirroring the real and fake icon buttons.
         /// </summary>
+        /// <param name="real">Whether the real variant is pressed.</param>
         public void CommandInferno(bool real)
         {
-            OnChaos(
-                configuration.GetText(real ? TextLabels.InfernoReal : TextLabels.InfernoFake), FireColor, "inferno", real);
+            OnChaos(configuration.GetText(real ? TextLabels.InfernoReal : TextLabels.InfernoFake), FireColor, "inferno", real);
         }
 
         /// <summary>
         /// Presses a Tsunami button from a slash command, mirroring the real and fake icon buttons.
         /// </summary>
+        /// <param name="real">Whether the real variant is pressed.</param>
         public void CommandTsunami(bool real)
         {
-            OnChaos(
-                configuration.GetText(real ? TextLabels.TsunamiReal : TextLabels.TsunamiFake), WaterColor, "tsunami", real);
+            OnChaos(configuration.GetText(real ? TextLabels.TsunamiReal : TextLabels.TsunamiFake), WaterColor, "tsunami", real);
         }
 
         /// <summary>
         /// Presses a Thunder button from a slash command, mirroring the real and fake icon buttons.
         /// </summary>
+        /// <param name="real">Whether the real variant is pressed.</param>
         public void CommandThunder(bool real)
         {
             OnThunder(real);
@@ -1936,6 +2092,7 @@ namespace SnazzyP4
         /// <summary>
         /// Presses a Blizzard button from a slash command, mirroring the real and fake icon buttons.
         /// </summary>
+        /// <param name="real">Whether the real variant is pressed.</param>
         public void CommandBlizzard(bool real)
         {
             OnBlizzard(real);
@@ -1944,6 +2101,7 @@ namespace SnazzyP4
         /// <summary>
         /// Sets the Thunder Last Fake toggle from a slash command, where fake marks the last as fake.
         /// </summary>
+        /// <param name="fake">Whether the last Thunder is marked as the fake.</param>
         public void CommandLastThunder(bool fake)
         {
             thunderLastFake = fake;
@@ -1952,6 +2110,7 @@ namespace SnazzyP4
         /// <summary>
         /// Sets the Blizzard Last Fake toggle from a slash command, where fake marks the last as fake.
         /// </summary>
+        /// <param name="fake">Whether the last Blizzard is marked as the fake.</param>
         public void CommandLastBlizzard(bool fake)
         {
             blizzardLastFake = fake;

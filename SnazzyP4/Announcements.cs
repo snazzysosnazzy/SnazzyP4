@@ -71,6 +71,9 @@ namespace SnazzyP4
         /// <summary>
         /// Returns the leaf for a set and real/fake combination.
         /// </summary>
+        /// <param name="isFirst">Whether the first set's leaf is wanted rather than the second's.</param>
+        /// <param name="isReal">Whether the real branch is wanted rather than the fake one.</param>
+        /// <returns>The leaf holding that combination's announcement configuration.</returns>
         public AnnouncementLeaf GetLeaf(bool isFirst, bool isReal)
         {
             if (isFirst)
@@ -111,6 +114,9 @@ namespace SnazzyP4
         /// <summary>
         /// Returns the ordered slot ids for a category and set. Chaos is static, so the first set is Inferno and the second is Tsunami.
         /// </summary>
+        /// <param name="categoryId">The category, either "exdeath" or "chaos".</param>
+        /// <param name="isFirst">Whether the ids are for the first set rather than the second.</param>
+        /// <returns>The canonical slot ids for that category and set.</returns>
         public static string[] SlotIdsFor(string categoryId, bool isFirst)
         {
             if (categoryId == "chaos")
@@ -125,6 +131,8 @@ namespace SnazzyP4
         /// Whether a slot is safe to broadcast to party chat: the gaze and the two chaos callouts.
         /// Party Mode sends only these; Personal Mode blocks everything else from party chat unless overridden.
         /// </summary>
+        /// <param name="slotId">The slot id to classify.</param>
+        /// <returns>True when the slot may be broadcast to party chat.</returns>
         public static bool IsPartySafe(string slotId)
         {
             return slotId is "gaze" or "inferno" or "tsunami";
@@ -133,6 +141,8 @@ namespace SnazzyP4
         /// <summary>
         /// Returns the display label for a slot id.
         /// </summary>
+        /// <param name="id">The slot id to label.</param>
+        /// <returns>The display label shown next to the slot's checkbox.</returns>
         public static string SlotLabel(string id)
         {
             return id switch
@@ -151,6 +161,7 @@ namespace SnazzyP4
         /// <summary>
         /// Creates a new, empty user-added custom slot with a unique id.
         /// </summary>
+        /// <returns>A custom slot with a unique id and one empty message box.</returns>
         public static AnnouncementSlot NewCustomSlot()
         {
             return new()
@@ -166,6 +177,12 @@ namespace SnazzyP4
         /// Returns the generated default message for a slot in a given set and real/fake branch.
         /// When <paramref name="includeSetNumber"/> is false, the "[1st]"/"[2nd]" prefix is dropped from Exdeath debuff messages.
         /// </summary>
+        /// <param name="categoryId">The category, either "exdeath" or "chaos".</param>
+        /// <param name="slotId">The slot the message is generated for.</param>
+        /// <param name="isFirst">Whether the message belongs to the first set rather than the second.</param>
+        /// <param name="isReal">Whether the message belongs to the real branch rather than the fake one.</param>
+        /// <param name="includeSetNumber">Whether Exdeath debuff messages carry the "[1st]"/"[2nd]" prefix.</param>
+        /// <returns>The generated chat message, or an empty string for an unknown slot.</returns>
         public static string DefaultMessage(string categoryId, string slotId, bool isFirst, bool isReal, bool includeSetNumber = true)
         {
             var set = isFirst ? "1st" : "2nd";
@@ -202,6 +219,8 @@ namespace SnazzyP4
         /// <summary>
         /// Ensures a leaf contains exactly the slots for its category, adding any that are missing and removing any that no longer apply, while preserving the existing order and state.
         /// </summary>
+        /// <param name="leaf">The leaf whose slot list is filled in.</param>
+        /// <param name="slotIds">The canonical slot ids the leaf must contain.</param>
         public static void EnsureSlots(AnnouncementLeaf leaf, string[] slotIds)
         {
             for (var canonicalIndex = 0; canonicalIndex < slotIds.Length; canonicalIndex++)

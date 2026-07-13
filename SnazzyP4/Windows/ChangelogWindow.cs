@@ -38,6 +38,7 @@ namespace SnazzyP4.Windows
         /// Draws a set of changelog entries, each with its version heading and detailed change lines.
         /// This is shared by the changelog window and the update notice.
         /// </summary>
+        /// <param name="entries">The changelog entries to draw, newest first.</param>
         public static void DrawEntries(Changelog.Entry[] entries)
         {
             foreach (var entry in entries)
