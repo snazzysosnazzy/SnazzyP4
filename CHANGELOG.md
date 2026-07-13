@@ -3,6 +3,14 @@
 All notable changes to Snazzy P4 are listed here. Versions match the `vX.Y.Z.W`
 release tags.
 
+## v1.0.8.0 — 2026-07-12
+
+- **Global label and title-bar switches** under General Settings, so they're easy to find:
+  **Hide all name labels** (off by default) and **Hide all title bars** (on by default).
+- While a global switch is on it hides everything of that kind, and the matching per-section
+  switches in the Layout tab are **disabled** since they no longer matter. Turn the global
+  switch off to pick per section again.
+
 ## v1.0.7.1 — 2026-07-12
 
 - While the **Floating Hide button is off**, the settings toolbar now **always shows**

@@ -161,7 +161,9 @@ Open with the **Settings** button or `/snazzyp4 config`. Settings are grouped in
     duty state).
 - **General Settings** — show toolbar (it collapses when you press Hide, expands on Show, and
   its `<<`/`>>` arrows work any time), **Hide Settings toolbar when UI is hidden**,
-  **Persistent Settings Collapsed State** (Hide/Show leave the collapsed state alone), detached
+  **Persistent Settings Collapsed State** (Hide/Show leave the collapsed state alone),
+  **Hide all name labels** (off by default) and **Hide all title bars** (on by default) — while
+  a global switch is on, the per-section switches in the Layout tab are disabled — detached
   windows, edit layout, Move All; floating
   **Hide** / **Reset** / **Undo** buttons; **Hide Resolved Buttons Until Reset** (each button
   group disappears once fully entered and returns on Reset); **Acceleration on the same line**

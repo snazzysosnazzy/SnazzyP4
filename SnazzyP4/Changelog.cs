@@ -19,6 +19,11 @@ namespace SnazzyP4
         /// </summary>
         public static readonly Entry[] Entries =
         {
+            new("1.0.8.0", "2026-07-12", new[]
+            {
+                "Two global switches now live under General Settings so they are easy to find: \"Hide all name labels\" (off by default) and \"Hide all title bars\" (on by default).",
+                "While a global switch is on it hides everything of that kind, and the matching per-section switches in the Layout tab are disabled since they no longer matter. Turn the global switch off to pick per section again.",
+            }),
             new("1.0.7.1", "2026-07-12", new[]
             {
                 "While the Floating Hide button is off, the settings toolbar now always shows (collapsible as normal) and is never hidden - it is the only way to bring the display back in that setup, so \"Hide Settings toolbar when UI is hidden\" and \"Show toolbar\" off are overridden to prevent a confusing lock-out.",

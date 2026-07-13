@@ -81,7 +81,7 @@ namespace SnazzyP4
         public string MarkerSecondSetDps { get; set; } = "bind2";
 
         /// <summary>
-        /// Whether header and label text is hidden universally, while keeping the First Set and Second Set labels.
+        /// Whether every header and name label is hidden globally, overriding the per-section switches.
         /// </summary>
         public bool HideLabels { get; set; }
 
@@ -403,7 +403,7 @@ namespace SnazzyP4
         public float BackgroundAlpha { get; set; } = 1.0f;
 
         /// <summary>
-        /// Whether title bars are hidden universally.
+        /// Whether every title bar is hidden globally, overriding the per-section switches. On by default.
         /// </summary>
         public bool NoTitleBar { get; set; } = true;
 
@@ -711,23 +711,35 @@ namespace SnazzyP4
         }
 
         /// <summary>
-        /// Resolves the effective hide-title-bar flag for a section, using the universal value or the per-section override.
+        /// Resolves the effective hide-title-bar flag for a section.
+        /// The global switch hides every title bar; otherwise the per-section override applies.
         /// </summary>
         /// <param name="sectionId">The section being drawn.</param>
         /// <returns>Whether that section's title bar is hidden under the active settings.</returns>
         public bool EffectiveNoTitleBar(string sectionId)
         {
-            return UseUniversalSettings ? NoTitleBar : GetSectionNoTitleBar(sectionId);
+            if (NoTitleBar)
+            {
+                return true;
+            }
+
+            return !UseUniversalSettings && GetSectionNoTitleBar(sectionId);
         }
 
         /// <summary>
-        /// Resolves the effective hide-labels flag for a section, using the universal value or the per-section override.
+        /// Resolves the effective hide-labels flag for a section.
+        /// The global switch hides every label; otherwise the per-section override applies.
         /// </summary>
         /// <param name="sectionId">The section being drawn.</param>
         /// <returns>Whether that section's labels are hidden under the active settings.</returns>
         public bool EffectiveHideLabels(string sectionId)
         {
-            return UseUniversalSettings ? HideLabels : GetSectionHideLabels(sectionId);
+            if (HideLabels)
+            {
+                return true;
+            }
+
+            return !UseUniversalSettings && GetSectionHideLabels(sectionId);
         }
 
         /// <summary>

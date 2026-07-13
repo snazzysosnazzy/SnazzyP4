@@ -1266,6 +1266,22 @@ namespace SnazzyP4.Windows
 
             ImGui.TextDisabled("Keeps the toolbar's collapsed state unchanged when Hide/Show is pressed.");
 
+            var hideAllLabels = Configuration.HideLabels;
+            if (ImGui.Checkbox("Hide all name labels", ref hideAllLabels))
+            {
+                Configuration.HideLabels = hideAllLabels;
+                Configuration.Save();
+            }
+
+            var hideAllTitleBars = Configuration.NoTitleBar;
+            if (ImGui.Checkbox("Hide all title bars", ref hideAllTitleBars))
+            {
+                Configuration.NoTitleBar = hideAllTitleBars;
+                Configuration.Save();
+            }
+
+            ImGui.TextDisabled("While a global switch is on, the matching per-section switches in the Layout tab are overridden and disabled.");
+
             var detached = Configuration.Detached;
             if (ImGui.Checkbox("Detached windows (each section is its own window)", ref detached))
             {
@@ -1405,7 +1421,7 @@ namespace SnazzyP4.Windows
                                        () => Configuration.NoTitleBar, value => Configuration.NoTitleBar = value,
                                        () => Configuration.HideLabels, value => Configuration.HideLabels = value,
                                        () => Configuration.ButtonAlpha, value => Configuration.ButtonAlpha = value,
-                                       "univ", "Button / Text opacity");
+                                       "univ", "Button / Text opacity", true);
                 ImGui.Unindent();
             }
             else
@@ -1475,7 +1491,7 @@ namespace SnazzyP4.Windows
                                            () => Configuration.GetSectionNoTitleBar(id), value => Configuration.SetSectionNoTitleBar(id, value),
                                            () => Configuration.GetSectionHideLabels(id), value => Configuration.SetSectionHideLabels(id, value),
                                            () => Configuration.GetSectionButtonAlpha(id), value => Configuration.SetSectionButtonAlpha(id, value),
-                                           id, section.HasButtons ? "Button opacity" : "Text opacity");
+                                           id, section.HasButtons ? "Button opacity" : "Text opacity", false);
                 }
 
                 ImGui.Unindent();
@@ -2147,11 +2163,12 @@ namespace SnazzyP4.Windows
         /// <param name="setButtonAlpha">Writes the button opacity.</param>
         /// <param name="idSuffix">The ImGui id suffix keeping the controls unique.</param>
         /// <param name="opacityLabel">The label used for the button or text opacity slider.</param>
+        /// <param name="universal">Whether this is the universal block; the per-section blocks disable a switch while its global override is on.</param>
         private void DrawAppearanceControls(Func<float> getBackgroundAlpha, Action<float> setBackgroundAlpha,
                                             Func<bool> getNoTitleBar, Action<bool> setNoTitleBar,
                                             Func<bool> getHideLabels, Action<bool> setHideLabels,
                                             Func<float> getButtonAlpha, Action<float> setButtonAlpha,
-                                            string idSuffix, string opacityLabel)
+                                            string idSuffix, string opacityLabel, bool universal)
         {
             var backgroundAlpha = getBackgroundAlpha();
             ImGui.SetNextItemWidth(200f);
@@ -2161,18 +2178,25 @@ namespace SnazzyP4.Windows
                 Configuration.Save();
             }
 
-            var noTitleBar = getNoTitleBar();
-            if (ImGui.Checkbox($"Hide title bar##nt_{idSuffix}", ref noTitleBar))
+            // The per-section switches are moot while the matching global switch on the General tab hides everything.
+            using (ImRaii.Disabled(!universal && Configuration.NoTitleBar))
             {
-                setNoTitleBar(noTitleBar);
-                Configuration.Save();
+                var noTitleBar = getNoTitleBar();
+                if (ImGui.Checkbox($"Hide title bar##nt_{idSuffix}", ref noTitleBar))
+                {
+                    setNoTitleBar(noTitleBar);
+                    Configuration.Save();
+                }
             }
 
-            var hideLabels = getHideLabels();
-            if (ImGui.Checkbox($"Hide label names##hl_{idSuffix}", ref hideLabels))
+            using (ImRaii.Disabled(!universal && Configuration.HideLabels))
             {
-                setHideLabels(hideLabels);
-                Configuration.Save();
+                var hideLabels = getHideLabels();
+                if (ImGui.Checkbox($"Hide label names##hl_{idSuffix}", ref hideLabels))
+                {
+                    setHideLabels(hideLabels);
+                    Configuration.Save();
+                }
             }
 
             var buttonAlpha = getButtonAlpha();
