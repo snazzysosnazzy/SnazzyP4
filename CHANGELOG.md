@@ -3,6 +3,19 @@
 All notable changes to Snazzy P4 are listed here. Versions match the `vX.Y.Z.W`
 release tags.
 
+## v1.0.9.0 — 2026-07-12
+
+- **Collapsible Scaling and Opacity groups** on the General tab. Scaling holds Global UI
+  Scale, **Toolbar Scale** (renamed) and Macro UI Scale; the new **Opacity** group holds
+  **Background**, **Toolbar** (new), **Button** and **Text** opacity.
+- **Opacity now works like the scales**: the General values are global multipliers and each
+  section's own opacity in the Layout tab multiplies on top. The old **Use Universal
+  Settings** switch — which overrode and hid the per-section controls — is gone, and the
+  per-section controls always show.
+- The single universal Button / Text opacity is **split into separate Button and Text
+  multipliers**, and the **toolbar gets its own opacity slider**.
+- Renamed: **Hide Toolbar when UI is hidden** and **Persistent Toolbar Collapsed State**.
+
 ## v1.0.8.0 — 2026-07-12
 
 - **Global label and title-bar switches** under General Settings, so they're easy to find:

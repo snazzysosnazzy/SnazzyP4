@@ -392,15 +392,14 @@ namespace SnazzyP4
         public bool ToolbarCollapsed { get; set; }
 
         /// <summary>
-        /// Whether the universal appearance values apply to everything.
-        /// When this is off, the per-section overrides are used instead.
-        /// </summary>
-        public bool UseUniversalSettings { get; set; }
-
-        /// <summary>
-        /// The universal window background opacity from zero to one.
+        /// The global background opacity multiplier from zero to one, multiplied with each section's own value.
         /// </summary>
         public float BackgroundAlpha { get; set; } = 1.0f;
+
+        /// <summary>
+        /// The quick-settings toolbar opacity from zero to one.
+        /// </summary>
+        public float ToolbarAlpha { get; set; } = 1.0f;
 
         /// <summary>
         /// Whether every title bar is hidden globally, overriding the per-section switches. On by default.
@@ -408,9 +407,14 @@ namespace SnazzyP4
         public bool NoTitleBar { get; set; } = true;
 
         /// <summary>
-        /// The universal icon-button opacity from zero to one.
+        /// The global button opacity multiplier from zero to one, multiplied with a button section's own value.
         /// </summary>
         public float ButtonAlpha { get; set; } = 1.0f;
+
+        /// <summary>
+        /// The global text opacity multiplier from zero to one, multiplied with a text section's own value.
+        /// </summary>
+        public float TextAlpha { get; set; } = 1.0f;
 
         /// <summary>
         /// Whether the windows pass the mouse through to the game, which also disables the buttons.
@@ -701,18 +705,18 @@ namespace SnazzyP4
         }
 
         /// <summary>
-        /// Resolves the effective background opacity for a section, using the universal value or the per-section override.
+        /// Resolves the effective background opacity for a section, multiplying the global value with the section's own.
         /// </summary>
         /// <param name="sectionId">The section being drawn.</param>
-        /// <returns>The universal background opacity, or the section's own when universal settings are off.</returns>
+        /// <returns>The combined background opacity, clamped between zero and one.</returns>
         public float EffectiveBackgroundAlpha(string sectionId)
         {
-            return UseUniversalSettings ? BackgroundAlpha : GetSectionBackgroundAlpha(sectionId);
+            return Math.Clamp(BackgroundAlpha * GetSectionBackgroundAlpha(sectionId), 0f, 1f);
         }
 
         /// <summary>
         /// Resolves the effective hide-title-bar flag for a section.
-        /// The global switch hides every title bar; otherwise the per-section override applies.
+        /// The global switch hides every title bar; otherwise the per-section switch applies.
         /// </summary>
         /// <param name="sectionId">The section being drawn.</param>
         /// <returns>Whether that section's title bar is hidden under the active settings.</returns>
@@ -723,12 +727,12 @@ namespace SnazzyP4
                 return true;
             }
 
-            return !UseUniversalSettings && GetSectionNoTitleBar(sectionId);
+            return GetSectionNoTitleBar(sectionId);
         }
 
         /// <summary>
         /// Resolves the effective hide-labels flag for a section.
-        /// The global switch hides every label; otherwise the per-section override applies.
+        /// The global switch hides every label; otherwise the per-section switch applies.
         /// </summary>
         /// <param name="sectionId">The section being drawn.</param>
         /// <returns>Whether that section's labels are hidden under the active settings.</returns>
@@ -739,17 +743,19 @@ namespace SnazzyP4
                 return true;
             }
 
-            return !UseUniversalSettings && GetSectionHideLabels(sectionId);
+            return GetSectionHideLabels(sectionId);
         }
 
         /// <summary>
-        /// Resolves the effective button opacity for a section, using the universal value or the per-section override.
+        /// Resolves the effective widget opacity for a section, multiplying the global button or text value with the section's own.
         /// </summary>
         /// <param name="sectionId">The section being drawn.</param>
-        /// <returns>The universal button opacity, or the section's own when universal settings are off.</returns>
-        public float EffectiveButtonAlpha(string sectionId)
+        /// <param name="hasButtons">Whether the section contains buttons, which selects the global button or text multiplier.</param>
+        /// <returns>The combined opacity, clamped between zero and one.</returns>
+        public float EffectiveButtonAlpha(string sectionId, bool hasButtons)
         {
-            return UseUniversalSettings ? ButtonAlpha : GetSectionButtonAlpha(sectionId);
+            var globalAlpha = hasButtons ? ButtonAlpha : TextAlpha;
+            return Math.Clamp(globalAlpha * GetSectionButtonAlpha(sectionId), 0f, 1f);
         }
 
         /// <summary>

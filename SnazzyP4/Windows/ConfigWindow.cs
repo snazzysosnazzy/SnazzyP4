@@ -167,6 +167,7 @@ namespace SnazzyP4.Windows
             DrawSuppressUpdateNotices();
             ImGui.Separator();
             DrawUiScale();
+            DrawOpacitySettings();
             ImGui.Separator();
             DrawRole();
             ImGui.Separator();
@@ -337,16 +338,38 @@ namespace SnazzyP4.Windows
         }
 
         /// <summary>
-        /// Draws the UI scale slider and the quick preset buttons.
+        /// Draws the collapsible group of global scale multipliers with their quick preset buttons.
         /// </summary>
         private void DrawUiScale()
         {
+            if (!ImGui.CollapsingHeader("Scaling"))
+            {
+                return;
+            }
+
             DrawScaleSlider("Global UI Scale", "##globalscale", () => Configuration.UiScale, value => Configuration.UiScale = value);
             ImGui.TextDisabled("Multiplies everything the plugin draws.");
-            DrawScaleSlider("Settings Toolbar Scale", "##toolbarscale", () => Configuration.ToolbarScale, value => Configuration.ToolbarScale = value);
+            DrawScaleSlider("Toolbar Scale", "##toolbarscale", () => Configuration.ToolbarScale, value => Configuration.ToolbarScale = value);
             ImGui.TextDisabled("Multiplies the quick-settings toolbar, on top of the global scale.");
             DrawScaleSlider("Macro UI Scale", "##macroscale", () => Configuration.MacroUiScale, value => Configuration.MacroUiScale = value);
             ImGui.TextDisabled("Multiplies the macro buttons and text panels, on top of the global scale.");
+        }
+
+        /// <summary>
+        /// Draws the collapsible group of global opacity multipliers: background, toolbar, buttons and text.
+        /// </summary>
+        private void DrawOpacitySettings()
+        {
+            if (!ImGui.CollapsingHeader("Opacity"))
+            {
+                return;
+            }
+
+            DrawFloatSlider("Background Opacity##globalbg", () => Configuration.BackgroundAlpha, value => Configuration.BackgroundAlpha = value, 0f, 1f);
+            DrawFloatSlider("Toolbar Opacity##globaltoolbar", () => Configuration.ToolbarAlpha, value => Configuration.ToolbarAlpha = value, 0f, 1f);
+            DrawFloatSlider("Button Opacity##globalbutton", () => Configuration.ButtonAlpha, value => Configuration.ButtonAlpha = value, 0f, 1f);
+            DrawFloatSlider("Text Opacity##globaltext", () => Configuration.TextAlpha, value => Configuration.TextAlpha = value, 0f, 1f);
+            ImGui.TextDisabled("Global multipliers. Each section's own opacity in the Layout tab multiplies on top.");
         }
 
         /// <summary>
@@ -1249,7 +1272,7 @@ namespace SnazzyP4.Windows
             }
 
             var hideToolbarWhenHidden = Configuration.HideToolbarWhenHidden;
-            if (ImGui.Checkbox("Hide Settings toolbar when UI is hidden", ref hideToolbarWhenHidden))
+            if (ImGui.Checkbox("Hide Toolbar when UI is hidden", ref hideToolbarWhenHidden))
             {
                 Configuration.HideToolbarWhenHidden = hideToolbarWhenHidden;
                 Configuration.Save();
@@ -1258,7 +1281,7 @@ namespace SnazzyP4.Windows
             ImGui.TextDisabled("Ignored while the Floating Hide button is off, since the toolbar is then the only way to bring the display back.");
 
             var persistCollapsed = Configuration.PersistToolbarCollapsed;
-            if (ImGui.Checkbox("Persistent Settings Collapsed State", ref persistCollapsed))
+            if (ImGui.Checkbox("Persistent Toolbar Collapsed State", ref persistCollapsed))
             {
                 Configuration.PersistToolbarCollapsed = persistCollapsed;
                 Configuration.Save();
@@ -1401,33 +1424,12 @@ namespace SnazzyP4.Windows
         }
 
         /// <summary>
-        /// Draws the universal appearance controls or a hint that they are set per section.
+        /// Draws the Appearance heading with the click-through option; the per-section controls follow below.
         /// </summary>
         private void DrawAppearance()
         {
             ImGui.TextUnformatted("Appearance");
-
-            var universal = Configuration.UseUniversalSettings;
-            if (ImGui.Checkbox("Use Universal Settings", ref universal))
-            {
-                Configuration.UseUniversalSettings = universal;
-                Configuration.Save();
-            }
-
-            if (universal)
-            {
-                ImGui.Indent();
-                DrawAppearanceControls(() => Configuration.BackgroundAlpha, value => Configuration.BackgroundAlpha = value,
-                                       () => Configuration.NoTitleBar, value => Configuration.NoTitleBar = value,
-                                       () => Configuration.HideLabels, value => Configuration.HideLabels = value,
-                                       () => Configuration.ButtonAlpha, value => Configuration.ButtonAlpha = value,
-                                       "univ", "Button / Text opacity", true);
-                ImGui.Unindent();
-            }
-            else
-            {
-                ImGui.TextDisabled("Background / title bar / labels / button opacity are set\nper section below.");
-            }
+            ImGui.TextDisabled("Each section's opacity below multiplies the global opacity from the General tab.");
 
             var clickThrough = Configuration.ClickThrough;
             if (ImGui.Checkbox("Click-through (display only)", ref clickThrough))
@@ -1485,14 +1487,11 @@ namespace SnazzyP4.Windows
                     Configuration.Save();
                 }
 
-                if (!Configuration.UseUniversalSettings)
-                {
-                    DrawAppearanceControls(() => Configuration.GetSectionBackgroundAlpha(id), value => Configuration.SetSectionBackgroundAlpha(id, value),
-                                           () => Configuration.GetSectionNoTitleBar(id), value => Configuration.SetSectionNoTitleBar(id, value),
-                                           () => Configuration.GetSectionHideLabels(id), value => Configuration.SetSectionHideLabels(id, value),
-                                           () => Configuration.GetSectionButtonAlpha(id), value => Configuration.SetSectionButtonAlpha(id, value),
-                                           id, section.HasButtons ? "Button opacity" : "Text opacity", false);
-                }
+                DrawAppearanceControls(() => Configuration.GetSectionBackgroundAlpha(id), value => Configuration.SetSectionBackgroundAlpha(id, value),
+                                       () => Configuration.GetSectionNoTitleBar(id), value => Configuration.SetSectionNoTitleBar(id, value),
+                                       () => Configuration.GetSectionHideLabels(id), value => Configuration.SetSectionHideLabels(id, value),
+                                       () => Configuration.GetSectionButtonAlpha(id), value => Configuration.SetSectionButtonAlpha(id, value),
+                                       id, section.HasButtons ? "Button opacity" : "Text opacity");
 
                 ImGui.Unindent();
             }
@@ -2163,12 +2162,11 @@ namespace SnazzyP4.Windows
         /// <param name="setButtonAlpha">Writes the button opacity.</param>
         /// <param name="idSuffix">The ImGui id suffix keeping the controls unique.</param>
         /// <param name="opacityLabel">The label used for the button or text opacity slider.</param>
-        /// <param name="universal">Whether this is the universal block; the per-section blocks disable a switch while its global override is on.</param>
         private void DrawAppearanceControls(Func<float> getBackgroundAlpha, Action<float> setBackgroundAlpha,
                                             Func<bool> getNoTitleBar, Action<bool> setNoTitleBar,
                                             Func<bool> getHideLabels, Action<bool> setHideLabels,
                                             Func<float> getButtonAlpha, Action<float> setButtonAlpha,
-                                            string idSuffix, string opacityLabel, bool universal)
+                                            string idSuffix, string opacityLabel)
         {
             var backgroundAlpha = getBackgroundAlpha();
             ImGui.SetNextItemWidth(200f);
@@ -2179,7 +2177,7 @@ namespace SnazzyP4.Windows
             }
 
             // The per-section switches are moot while the matching global switch on the General tab hides everything.
-            using (ImRaii.Disabled(!universal && Configuration.NoTitleBar))
+            using (ImRaii.Disabled(Configuration.NoTitleBar))
             {
                 var noTitleBar = getNoTitleBar();
                 if (ImGui.Checkbox($"Hide title bar##nt_{idSuffix}", ref noTitleBar))
@@ -2189,7 +2187,7 @@ namespace SnazzyP4.Windows
                 }
             }
 
-            using (ImRaii.Disabled(!universal && Configuration.HideLabels))
+            using (ImRaii.Disabled(Configuration.HideLabels))
             {
                 var hideLabels = getHideLabels();
                 if (ImGui.Checkbox($"Hide label names##hl_{idSuffix}", ref hideLabels))

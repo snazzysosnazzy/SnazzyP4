@@ -19,6 +19,13 @@ namespace SnazzyP4
         /// </summary>
         public static readonly Entry[] Entries =
         {
+            new("1.0.9.0", "2026-07-12", new[]
+            {
+                "The General tab now groups its sliders into two collapsible sections: Scaling (Global UI Scale, Toolbar Scale, Macro UI Scale) and a new Opacity group (Background, Toolbar, Button and Text opacity).",
+                "Opacity now works like the scales: the General values are global multipliers and each section's own opacity in the Layout tab multiplies on top, instead of the old Use Universal Settings switch that overrode and hid the per-section controls. That switch is gone, the universal block is removed from the Layout tab, and the per-section controls always show.",
+                "The single universal Button / Text opacity is split into separate Button Opacity and Text Opacity multipliers, and the toolbar gets its own opacity slider.",
+                "Renamed for clarity: \"Hide Toolbar when UI is hidden\", \"Persistent Toolbar Collapsed State\" and \"Toolbar Scale\".",
+            }),
             new("1.0.8.0", "2026-07-12", new[]
             {
                 "Two global switches now live under General Settings so they are easy to find: \"Hide all name labels\" (off by default) and \"Hide all title bars\" (on by default).",

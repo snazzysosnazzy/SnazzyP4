@@ -147,8 +147,11 @@ Open with the **Settings** button or `/snazzyp4 config`. Settings are grouped in
 ### General
 
 - **Never show version update messages** — gold toggle; stops the changelog popup after each update.
-- **Scales** — **Global UI Scale** (multiplies everything), **Settings Toolbar Scale** (just the
-  quick toolbar) and **Macro UI Scale** (buttons and text panels), each with percentage presets.
+- **Scaling** (collapsible) — **Global UI Scale** (multiplies everything), **Toolbar Scale**
+  (just the quick toolbar) and **Macro UI Scale** (buttons and text panels), each with
+  percentage presets.
+- **Opacity** (collapsible) — global **Background**, **Toolbar**, **Button** and **Text**
+  opacity multipliers; each section's own opacity in the Layout tab multiplies on top.
 - **Role** — Support or DPS.
 - **Markers** — auto-place `/mk` markers, with a choice of head marker per role and set (attack /
   bind / ignore / shapes). Always placed on yourself.
@@ -160,8 +163,8 @@ Open with the **Settings** button or `/snazzyp4 config`. Settings are grouped in
   - **Reset on Wipe** / **Hide on Wipe** — run Reset / Hide when the party wipes (uses the game's
     duty state).
 - **General Settings** — show toolbar (it collapses when you press Hide, expands on Show, and
-  its `<<`/`>>` arrows work any time), **Hide Settings toolbar when UI is hidden**,
-  **Persistent Settings Collapsed State** (Hide/Show leave the collapsed state alone),
+  its `<<`/`>>` arrows work any time), **Hide Toolbar when UI is hidden**,
+  **Persistent Toolbar Collapsed State** (Hide/Show leave the collapsed state alone),
   **Hide all name labels** (off by default) and **Hide all title bars** (on by default) — while
   a global switch is on, the per-section switches in the Layout tab are disabled — detached
   windows, edit layout, Move All; floating
@@ -195,9 +198,10 @@ Open with the **Settings** button or `/snazzyp4 config`. Settings are grouped in
 
 ### Layout
 
-- **Appearance** — Use Universal Settings for one look, or set per-section background opacity /
-  hide title bar / hide labels / button opacity, plus **click-through (display-only)** mode. Values
-  are kept separately for windowed and detached mode.
+- **Appearance** — **click-through (display-only)** mode, then per-section background opacity /
+  hide title bar / hide labels / button or text opacity. The opacities multiply the global
+  Opacity values from the General tab, and values are kept separately for windowed and detached
+  mode.
 - **Sections** — per-section position, scale and appearance for the current mode.
 
 ### Colors

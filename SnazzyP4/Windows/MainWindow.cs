@@ -155,7 +155,9 @@ namespace SnazzyP4.Windows
         {
             plugin.MaybeShowUpdateNotice();
             ImGui.SetWindowFontScale(Configuration.UiScale * Configuration.ToolbarScale);
+            ImGui.PushStyleVar(ImGuiStyleVar.Alpha, Configuration.ToolbarAlpha);
             DrawToolbar();
+            ImGui.PopStyleVar();
 
             if (Configuration.Detached)
             {
@@ -357,7 +359,7 @@ namespace SnazzyP4.Windows
                     ImGui.SetWindowFontScale(Configuration.UiScale * Configuration.MacroUiScale * sectionScale);
                     plugin.Solver.CurrentSection = section.Id;
                     plugin.Solver.CurrentFontScale = Configuration.UiScale * Configuration.MacroUiScale * sectionScale;
-                    PushSectionStyle(Configuration.EffectiveButtonAlpha(section.Id));
+                    PushSectionStyle(Configuration.EffectiveButtonAlpha(section.Id, section.HasButtons));
                     section.Draw(scale * sectionScale);
                     PopSectionStyle();
                 }

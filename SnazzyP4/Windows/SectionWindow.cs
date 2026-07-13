@@ -157,7 +157,7 @@ namespace SnazzyP4.Windows
             ImGui.SetWindowFontScale(configuration.UiScale * configuration.MacroUiScale * sectionScale);
             plugin.Solver.CurrentSection = definition.Id;
             plugin.Solver.CurrentFontScale = configuration.UiScale * configuration.MacroUiScale * sectionScale;
-            MainWindow.PushSectionStyle(configuration.EffectiveButtonAlpha(definition.Id));
+            MainWindow.PushSectionStyle(configuration.EffectiveButtonAlpha(definition.Id, definition.HasButtons));
             definition.Draw(configuration.UiScale * configuration.MacroUiScale * ImGuiHelpers.GlobalScale * sectionScale);
             MainWindow.PopSectionStyle();
 
