@@ -417,12 +417,6 @@ namespace SnazzyP4
         public float TextAlpha { get; set; } = 1.0f;
 
         /// <summary>
-        /// Whether the windows pass the mouse through to the game, which also disables the buttons.
-        /// This value always applies universally.
-        /// </summary>
-        public bool ClickThrough { get; set; }
-
-        /// <summary>
         /// The custom text overrides for panel labels, headers, callouts and buttons, keyed by the ids in <see cref="TextLabels"/>.
         /// An id that is absent or empty uses the default text.
         /// </summary>

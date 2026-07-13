@@ -19,6 +19,12 @@ namespace SnazzyP4
         /// </summary>
         public static readonly Entry[] Entries =
         {
+            new("1.0.10.0", "2026-07-13", new[]
+            {
+                "The collapsible Scaling and Opacity groups moved from the General tab to the Layout tab, under a heading now named Global Layout Settings, so all layout tuning lives in one place.",
+                "Removed the click-through (display only) option; it was no longer needed.",
+                "The Sections list now reads \"Fine tune layout settings below on an individual section basis\" instead of the X/Y hint.",
+            }),
             new("1.0.9.0", "2026-07-12", new[]
             {
                 "The General tab now groups its sliders into two collapsible sections: Scaling (Global UI Scale, Toolbar Scale, Macro UI Scale) and a new Opacity group (Background, Toolbar, Button and Text opacity).",

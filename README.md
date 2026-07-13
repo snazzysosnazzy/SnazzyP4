@@ -147,11 +147,6 @@ Open with the **Settings** button or `/snazzyp4 config`. Settings are grouped in
 ### General
 
 - **Never show version update messages** — gold toggle; stops the changelog popup after each update.
-- **Scaling** (collapsible) — **Global UI Scale** (multiplies everything), **Toolbar Scale**
-  (just the quick toolbar) and **Macro UI Scale** (buttons and text panels), each with
-  percentage presets.
-- **Opacity** (collapsible) — global **Background**, **Toolbar**, **Button** and **Text**
-  opacity multipliers; each section's own opacity in the Layout tab multiplies on top.
 - **Role** — Support or DPS.
 - **Markers** — auto-place `/mk` markers, with a choice of head marker per role and set (attack /
   bind / ignore / shapes). Always placed on yourself.
@@ -198,11 +193,14 @@ Open with the **Settings** button or `/snazzyp4 config`. Settings are grouped in
 
 ### Layout
 
-- **Appearance** — **click-through (display-only)** mode, then per-section background opacity /
-  hide title bar / hide labels / button or text opacity. The opacities multiply the global
-  Opacity values from the General tab, and values are kept separately for windowed and detached
-  mode.
-- **Sections** — per-section position, scale and appearance for the current mode.
+- **Global Layout Settings** — two collapsible groups:
+  - **Scaling** — **Global UI Scale** (multiplies everything), **Toolbar Scale** (just the quick
+    toolbar) and **Macro UI Scale** (buttons and text panels), each with percentage presets.
+  - **Opacity** — global **Background**, **Toolbar**, **Button** and **Text** opacity
+    multipliers; each section's own opacity below multiplies on top.
+- **Sections** — fine-tune per section: position, scale, background opacity, hide title bar /
+  labels, and button or text opacity for the current mode (windowed and detached keep separate
+  values).
 
 ### Colors
 

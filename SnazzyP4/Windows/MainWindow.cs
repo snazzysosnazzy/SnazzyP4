@@ -69,7 +69,7 @@ namespace SnazzyP4.Windows
             // The toolbar never fully hides while the floating Hide button is off, since it is then the only way to unhide.
             var toolbarGone = Configuration.Hidden && Configuration.HideToolbarWhenHidden && Configuration.FloatingHideButton;
             ImGui.SetNextWindowBgAlpha(toolbarGone ? 0f : Configuration.BackgroundAlpha);
-            var overlay = OverlayFlags(Configuration.NoTitleBar || toolbarGone, Configuration.ClickThrough || toolbarGone);
+            var overlay = OverlayFlags(Configuration.NoTitleBar || toolbarGone, toolbarGone);
             if (Configuration.Detached || Configuration.Hidden)
             {
                 Flags = ImGuiWindowFlags.AlwaysAutoResize | overlay;
@@ -386,11 +386,6 @@ namespace SnazzyP4.Windows
                         ImGui.GetColorU32(new Vector4(0.40f, 0.70f, 1.00f, 0.90f)));
                 }
 
-                if (Configuration.ClickThrough)
-                {
-                    DrawDisplayOnlyOverlay(sectionMin, sectionMax);
-                }
-
                 // Tracking the furthest extent keeps the window's scroll region reaching every section.
                 var localExtent = sectionMax - ImGui.GetWindowPos()
                                   + new Vector2(ImGui.GetScrollX(), ImGui.GetScrollY());
@@ -399,22 +394,6 @@ namespace SnazzyP4.Windows
 
             ImGui.SetCursorPos(maxLocal + new Vector2(0, 8 * scale));
             ImGui.Dummy(Vector2.One);
-        }
-
-        /// <summary>
-        /// Draws the red display-only warning over a section rectangle while click-through is enabled.
-        /// </summary>
-        /// <param name="min">The top-left corner of the covered rectangle in screen space.</param>
-        /// <param name="max">The bottom-right corner of the covered rectangle in screen space.</param>
-        public static void DrawDisplayOnlyOverlay(Vector2 min, Vector2 max)
-        {
-            const string warning = "DISPLAY ONLY MODE (CHECK SETTINGS)";
-            var drawList = ImGui.GetWindowDrawList();
-            drawList.AddRectFilled(min, max, ImGui.GetColorU32(new Vector4(0f, 0f, 0f, 0.35f)));
-
-            var textSize = ImGui.CalcTextSize(warning);
-            var textPos = min + (max - min - textSize) * 0.5f;
-            drawList.AddText(textPos, ImGui.GetColorU32(new Vector4(1f, 0.15f, 0.15f, 1f)), warning);
         }
     }
 }

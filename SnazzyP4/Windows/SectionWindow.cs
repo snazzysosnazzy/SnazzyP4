@@ -86,7 +86,7 @@ namespace SnazzyP4.Windows
             var configuration = plugin.Configuration;
             ImGui.SetNextWindowBgAlpha(configuration.EffectiveBackgroundAlpha(definition.Id));
             Flags = ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoCollapse
-                    | MainWindow.OverlayFlags(configuration.EffectiveNoTitleBar(definition.Id), configuration.ClickThrough);
+                    | MainWindow.OverlayFlags(configuration.EffectiveNoTitleBar(definition.Id), false);
 
             // The window is never moved by ImGui's native title-bar drag; individual Edit Layout drags and Move All group drags reposition it manually so that a press anywhere on it counts, since its buttons are disabled.
             Flags |= ImGuiWindowFlags.NoMove;
@@ -160,11 +160,6 @@ namespace SnazzyP4.Windows
             MainWindow.PushSectionStyle(configuration.EffectiveButtonAlpha(definition.Id, definition.HasButtons));
             definition.Draw(configuration.UiScale * configuration.MacroUiScale * ImGuiHelpers.GlobalScale * sectionScale);
             MainWindow.PopSectionStyle();
-
-            if (configuration.ClickThrough)
-            {
-                MainWindow.DrawDisplayOnlyOverlay(ImGui.GetWindowPos(), ImGui.GetWindowPos() + ImGui.GetWindowSize());
-            }
 
             // The buttons are disabled during Move All, so a press anywhere on the window counts as the start of a group drag.
             if (configuration.MoveAllActive

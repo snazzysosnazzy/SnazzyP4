@@ -3,6 +3,15 @@
 All notable changes to Snazzy P4 are listed here. Versions match the `vX.Y.Z.W`
 release tags.
 
+## v1.0.10.0 — 2026-07-13
+
+- The collapsible **Scaling** and **Opacity** groups moved from the General tab to the
+  **Layout** tab, under a heading now named **Global Layout Settings**, so all layout tuning
+  lives in one place.
+- **Removed the click-through (display only) option**; it was no longer needed.
+- The Sections list now reads "Fine tune layout settings below on an individual section basis"
+  instead of the X/Y hint.
+
 ## v1.0.9.0 — 2026-07-12
 
 - **Collapsible Scaling and Opacity groups** on the General tab. Scaling holds Global UI

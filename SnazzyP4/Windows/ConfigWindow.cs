@@ -166,9 +166,6 @@ namespace SnazzyP4.Windows
         {
             DrawSuppressUpdateNotices();
             ImGui.Separator();
-            DrawUiScale();
-            DrawOpacitySettings();
-            ImGui.Separator();
             DrawRole();
             ImGui.Separator();
             DrawAutomationSettings();
@@ -369,7 +366,7 @@ namespace SnazzyP4.Windows
             DrawFloatSlider("Toolbar Opacity##globaltoolbar", () => Configuration.ToolbarAlpha, value => Configuration.ToolbarAlpha = value, 0f, 1f);
             DrawFloatSlider("Button Opacity##globalbutton", () => Configuration.ButtonAlpha, value => Configuration.ButtonAlpha = value, 0f, 1f);
             DrawFloatSlider("Text Opacity##globaltext", () => Configuration.TextAlpha, value => Configuration.TextAlpha = value, 0f, 1f);
-            ImGui.TextDisabled("Global multipliers. Each section's own opacity in the Layout tab multiplies on top.");
+            ImGui.TextDisabled("Global multipliers. Each section's own opacity below multiplies on top.");
         }
 
         /// <summary>
@@ -1424,24 +1421,13 @@ namespace SnazzyP4.Windows
         }
 
         /// <summary>
-        /// Draws the Appearance heading with the click-through option; the per-section controls follow below.
+        /// Draws the global layout settings: the collapsible scaling and opacity groups.
         /// </summary>
         private void DrawAppearance()
         {
-            ImGui.TextUnformatted("Appearance");
-            ImGui.TextDisabled("Each section's opacity below multiplies the global opacity from the General tab.");
-
-            var clickThrough = Configuration.ClickThrough;
-            if (ImGui.Checkbox("Click-through (display only)", ref clickThrough))
-            {
-                Configuration.ClickThrough = clickThrough;
-                Configuration.Save();
-            }
-
-            if (Configuration.ClickThrough)
-            {
-                ImGui.TextDisabled("Buttons are disabled while click-through is on.\nReopen this window with  /snazzyp4 config  to turn it off.");
-            }
+            ImGui.TextUnformatted("Global Layout Settings");
+            DrawUiScale();
+            DrawOpacitySettings();
         }
 
         /// <summary>
@@ -1451,9 +1437,7 @@ namespace SnazzyP4.Windows
         private void DrawSections()
         {
             ImGui.TextUnformatted(Configuration.Detached ? "Sections (Detached mode)" : "Sections (Windowed mode)");
-            ImGui.TextDisabled(Configuration.Detached
-                ? "X/Y set each detached window's screen position."
-                : "X/Y set each section's offset within the main window.");
+            ImGui.TextDisabled("Fine tune layout settings below on an individual section basis.");
 
             foreach (var section in plugin.Sections)
             {
