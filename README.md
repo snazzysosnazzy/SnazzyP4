@@ -9,7 +9,7 @@ This does not achieve anything that can't already be achieved by in-game macros 
 
 You can criticize this plugin from the standpoint of it being a better UI, customization/organization of text, or that it has features to help reduce bloat of UI on screen, but to say that it's anything compared to cactbot is an unfair comparison and I urge you to try out the plugin or read the source code yourself to understand that this isn't doing any of those things.
 
-This ultimately is no different from using a tool like wtfdig.info's browser-based p4-helper or using in-game macros. It's hard for me to justify that those are okay to use, but this plugin isn't, when they effectively achieve the same outcome through effectively the same means. 
+This ultimately is no different from using a tool like wtfdig.info's browser-based p4-helper, using in-game macros, or relying on another's call-outs to resolve the mechanic. It's hard for me to justify that those are okay to use, but this plugin isn't, when they effectively achieve the same outcome through effectively the same means. 
 
 ## Planned Updates
 
