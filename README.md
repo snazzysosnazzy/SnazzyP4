@@ -29,8 +29,8 @@ What Snazzy P4 does ***NOT*** do:
 1. Does not parse combat data.
 2. Does not read your debuffs.
 3. Does not resolve any mechanic for you.
-4. Does not place markers on you automatically by reading combat data like AM (it only places a marker on you when pressing a macro similar to a /mk <me> command in an in-game macro)
-5. Does not announce anything to chat automatically by reading combat data like cactbot (it only sends chats when you press a macro similar to a /p command in an in-game macro).
+4. Does not place markers on you automatically by reading combat data like AM (it only places a marker on you when pressing a macro similar to a /mk <me> command in an in-game macro, based purely on the text command you define for the said macro)
+5. Does not announce anything to chat automatically by reading combat data like cactbot (it only sends chats when you press a macro similar to a /p command in an in-game macro, based purely on the chat command you define for the said macro).
 6. Does not make any sort of determination or automated action without direct user input that is directly controlled via macro press and that can't be 1-to-1 replicated by an in-game macro.
 
 The only game state it ever reads is optional and non-combat: the **Automation** settings can
