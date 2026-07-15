@@ -5,11 +5,12 @@ This does not achieve anything that can't already be achieved by in-game macros 
 
 1. The self-marking is issued through a self mark / macro command (the same you would use for in game macro) and is only issued when you press a button and only done so for your spread (exactly the same as an ingame macro) this does not read combat data to make that determination or perform any action automatically.
 2. The announcement feature is just a more organized approach to /p commands that you could setup in in-game macros (exactly the same as an ingame macro) this does not read combat data to make a determination on when to perform the announcement nor does it automatically know what kind of announcement should be sent, and the announcement is not done automatically without user input.
-3. The text organization and color coded text can be achieved by just pressing in-game macros at specific times and setting up solo linkshells + changing their text color (this is the only portion that is more advanced than in-game in terms of its customizability and UI flexibility, however, you can achieve almost the entirety of its functionality through in-game means). 
+3. The text organization and color coded text can be achieved by just pressing in-game macros at specific times and setting up solo linkshells + changing their text color (this is the only portion that is more advanced than in-game in terms of its customizability and UI flexibility, however, you can achieve almost the entirety of its functionality through in-game means).
+4. This does not read or parse any combat data, and does not automatically perform any actions that aren't strictly defined by a macro and performed by manual button press. This does not automate resolution of the mechanic in anyway and the actions it performs are 1-to-1 in core functionality to that of in-game macros.
 
 You can criticize this plugin from the standpoint of it being a better UI, customization/organization of text, or that it has features to help reduce bloat of UI on screen, but to say that it's anything compared to cactbot is an unfair comparison and I urge you to try out the plugin or read the source code yourself to understand that this isn't doing any of those things.
 
-This ultimately is no different from using a tool like wtfdig.info's browser-based p4-helper, using in-game macros, or relying on another's call-outs to resolve the mechanic. It's hard for me to justify that those are okay to use, but this plugin isn't, when they effectively achieve the same outcome through effectively the same means. 
+This ultimately is no different from using a tool like wtfdig.info's browser-based p4-helper, using in-game macros, or relying on another's manually inputed call-outs to resolve the mechanic. It's hard for me to justify that those are okay to use, but this plugin isn't, when they effectively achieve the same outcome through effectively the same means. 
 
 ## Planned Updates
 
