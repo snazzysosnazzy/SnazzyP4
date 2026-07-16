@@ -3,6 +3,21 @@
 All notable changes to Snazzy P4 are listed here. Versions match the `vX.Y.Z.W`
 release tags.
 
+## v1.0.13.0 — 2026-07-13
+
+- **Debuff resolution announcements in both modes** — Lightning, Drop and Acceleration are now
+  available in Party Mode too, with defaults that spell out the resolution and target letters:
+  `[1st] Lightning - Spread on D/B`, `[1st] Drop - Stack on A/C`,
+  `[1st] Acceleration - STILLNESS/MOTION`. In Party Mode (or any Personal message sent to `/p`)
+  **both roles' letters** show; Personal messages to other channels show only **your own role's
+  letter**. Letters follow the Text-tab customisations.
+- **New "Announce Kefka" category** — `Thunder - REAL/FAKE` and `Blizzard - REAL/FAKE` fire when
+  you press the matching Kefka button, with the same per-channel, ordered/simple and
+  custom-message options as everything else. Kefka happens outside the debuff resolution window,
+  so these always fire per press and are **not part of the Chronological summary**.
+- The Chronological summary order per set: Lightning → Drop → Acceleration → Gaze → that set's
+  chaos (Inferno after the first set, Tsunami after the second).
+
 ## v1.0.12.0 — 2026-07-13
 
 - **Position dropdown** under Global Layout Settings:

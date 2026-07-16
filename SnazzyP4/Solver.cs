@@ -1161,6 +1161,7 @@ namespace SnazzyP4
             PushUndo();
             thunderPressed = true;
             thunderReal = real;
+            FireAnnouncements(ActiveKefka, "kefka", true, real, "thunder");
         }
 
         /// <summary>
@@ -1178,6 +1179,7 @@ namespace SnazzyP4
             PushUndo();
             blizzardPressed = true;
             blizzardReal = real;
+            FireAnnouncements(ActiveKefka, "kefka", false, real, "blizzard");
         }
 
         /// <summary>
@@ -1699,6 +1701,11 @@ namespace SnazzyP4
         private AnnouncementCategory ActiveChaos => configuration.GetAnnouncements(configuration.AnnouncementChannel).Chaos;
 
         /// <summary>
+        /// The Kefka (Thunder/Blizzard) announcement configuration for the currently selected channel.
+        /// </summary>
+        private AnnouncementCategory ActiveKefka => configuration.GetAnnouncements(configuration.AnnouncementChannel).Kefka;
+
+        /// <summary>
         /// Fires the announcements for one category, set and real/fake, sending each to the selected channel.
         /// Ordered mode sends every enabled slot in order (Exdeath) or only the pressed slot (Chaos, via <paramref name="onlySlot"/>); simple mode sends each non-empty line.
         /// </summary>
@@ -1709,7 +1716,8 @@ namespace SnazzyP4
         /// <param name="onlySlot">The only mechanic slot allowed to fire, or null for all of them.</param>
         private void FireAnnouncements(AnnouncementCategory category, string categoryId, bool isFirst, bool isReal, string? onlySlot)
         {
-            if (!configuration.AnnouncementsEnabled || configuration.AnnouncementChronological)
+            // Kefka happens outside the debuff resolution window, so it always fires per press even in chronological mode.
+            if (!configuration.AnnouncementsEnabled || (configuration.AnnouncementChronological && categoryId != "kefka"))
             {
                 return;
             }
@@ -1749,15 +1757,17 @@ namespace SnazzyP4
                     }
                     else
                     {
-                        SendAnnouncement(channel, AnnouncementData.DefaultMessage(categoryId, slot.Id, isFirst, isReal, configuration.AnnouncementShowSetNumber));
+                        var bothRoles = !configuration.IsPersonalMode || channel == "/p";
+                        SendAnnouncement(channel, AnnouncementData.DefaultMessage(categoryId, slot.Id, isFirst, isReal, configuration.AnnouncementShowSetNumber,
+                                                                                  configuration.SpreadLetters(bothRoles), configuration.StackLetters(bothRoles)));
                     }
                 }
 
                 return;
             }
 
-            // Simple mode has no per-mechanic split; treat the whole leaf by category (Chaos is party-safe, Exdeath is not).
-            if (!SlotAllowed(categoryId == "chaos" ? "inferno" : "spread", globalChannel))
+            // Simple mode has no per-mechanic split, so the whole leaf is classified by a representative mechanic slot.
+            if (!SlotAllowed(RepresentativeSlot(categoryId), globalChannel))
             {
                 return;
             }
@@ -1782,6 +1792,21 @@ namespace SnazzyP4
             }
 
             return globalChannel;
+        }
+
+        /// <summary>
+        /// Returns the mechanic slot that stands in for a whole simple-mode leaf when the mode filter runs.
+        /// </summary>
+        /// <param name="categoryId">The category id: "exdeath", "chaos" or "kefka".</param>
+        /// <returns>A built-in mechanic slot id from that category.</returns>
+        private static string RepresentativeSlot(string categoryId)
+        {
+            return categoryId switch
+            {
+                "chaos" => "inferno",
+                "kefka" => "thunder",
+                _ => "spread",
+            };
         }
 
         /// <summary>
@@ -1904,8 +1929,8 @@ namespace SnazzyP4
             var leaf = category.GetLeaf(isFirst, isReal);
             if (!category.Ordered)
             {
-                // Simple mode has no per-mechanic split; allow it by category (Chaos party-safe, Exdeath not) on the non-gaze pass.
-                if (!includeNonGaze || !SlotAllowed(categoryId == "chaos" ? "inferno" : "spread", channel))
+                // Simple mode has no per-mechanic split, so the leaf is classified by a representative slot on the non-gaze pass.
+                if (!includeNonGaze || !SlotAllowed(RepresentativeSlot(categoryId), channel))
                 {
                     return;
                 }
@@ -1951,7 +1976,9 @@ namespace SnazzyP4
                 }
                 else
                 {
-                    var message = AnnouncementData.DefaultMessage(categoryId, slot.Id, isFirst, isReal, includeSetNumber);
+                    var bothRoles = !configuration.IsPersonalMode || channel == "/p";
+                    var message = AnnouncementData.DefaultMessage(categoryId, slot.Id, isFirst, isReal, includeSetNumber,
+                                                                  configuration.SpreadLetters(bothRoles), configuration.StackLetters(bothRoles));
                     if (!string.IsNullOrWhiteSpace(message))
                     {
                         output.Add(message);

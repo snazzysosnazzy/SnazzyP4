@@ -95,6 +95,9 @@ namespace SnazzyP4
 
         /// <summary>The Chaos announcements.</summary>
         public AnnouncementCategory Chaos { get; set; } = new();
+
+        /// <summary>The Kefka (Thunder/Blizzard) announcements.</summary>
+        public AnnouncementCategory Kefka { get; set; } = new();
     }
 
     /// <summary>
@@ -111,6 +114,12 @@ namespace SnazzyP4
         /// <summary>The ordered Chaos announcement slot ids for the second set, which always resolves Tsunami.</summary>
         public static readonly string[] ChaosSecondSlots = { "title", "tsunami" };
 
+        /// <summary>The ordered Kefka announcement slot ids for the Thunder branch.</summary>
+        public static readonly string[] KefkaFirstSlots = { "title", "thunder" };
+
+        /// <summary>The ordered Kefka announcement slot ids for the Blizzard branch.</summary>
+        public static readonly string[] KefkaSecondSlots = { "title", "blizzard" };
+
         /// <summary>
         /// Returns the ordered slot ids for a category and set. Chaos is static, so the first set is Inferno and the second is Tsunami.
         /// </summary>
@@ -124,18 +133,23 @@ namespace SnazzyP4
                 return isFirst ? ChaosFirstSlots : ChaosSecondSlots;
             }
 
+            if (categoryId == "kefka")
+            {
+                return isFirst ? KefkaFirstSlots : KefkaSecondSlots;
+            }
+
             return ExdeathSlots;
         }
 
         /// <summary>
-        /// Whether a slot is safe to broadcast to party chat: the gaze and the two chaos callouts.
-        /// Party Mode sends only these; Personal Mode blocks everything else from party chat unless overridden.
+        /// Whether a slot is safe to broadcast to party chat: every built-in mechanic callout.
+        /// Party Mode sends only these; Personal Mode blocks the titles and custom messages from party chat unless overridden.
         /// </summary>
         /// <param name="slotId">The slot id to classify.</param>
         /// <returns>True when the slot may be broadcast to party chat.</returns>
         public static bool IsPartySafe(string slotId)
         {
-            return slotId is "gaze" or "inferno" or "tsunami";
+            return slotId is "gaze" or "spread" or "drop" or "accel" or "inferno" or "tsunami" or "thunder" or "blizzard";
         }
 
         /// <summary>
@@ -154,6 +168,8 @@ namespace SnazzyP4
                 "accel" => "Acceleration",
                 "inferno" => "Inferno",
                 "tsunami" => "Tsunami",
+                "thunder" => "Thunder",
+                "blizzard" => "Blizzard",
                 _ => "Custom message",
             };
         }
@@ -182,28 +198,48 @@ namespace SnazzyP4
         /// <param name="isFirst">Whether the message belongs to the first set rather than the second.</param>
         /// <param name="isReal">Whether the message belongs to the real branch rather than the fake one.</param>
         /// <param name="includeSetNumber">Whether Exdeath debuff messages carry the "[1st]"/"[2nd]" prefix.</param>
+        /// <param name="spreadLetters">The target letters appended to a spread resolution.</param>
+        /// <param name="stackLetters">The target letters appended to a stack resolution.</param>
         /// <returns>The generated chat message, or an empty string for an unknown slot.</returns>
-        public static string DefaultMessage(string categoryId, string slotId, bool isFirst, bool isReal, bool includeSetNumber = true)
+        public static string DefaultMessage(string categoryId, string slotId, bool isFirst, bool isReal, bool includeSetNumber = true, string spreadLetters = "", string stackLetters = "")
         {
             var set = isFirst ? "1st" : "2nd";
             if (slotId == "title")
             {
-                // Exdeath set titles include the real/fake state; chaos sets are static (Inferno first, Tsunami second) so the title names the mechanic.
-                return categoryId == "exdeath"
-                    ? $"---------- {set} Set : {(isReal ? "REAL" : "FAKE")} ----------"
-                    : (isFirst ? "---------- Inferno ----------" : "---------- Tsunami ----------");
+                // Exdeath set titles include the real/fake state; the chaos and Kefka branches are static so the title names the mechanic.
+                if (categoryId == "exdeath")
+                {
+                    return $"---------- {set} Set : {(isReal ? "REAL" : "FAKE")} ----------";
+                }
+
+                if (categoryId == "chaos")
+                {
+                    return isFirst ? "---------- Inferno ----------" : "---------- Tsunami ----------";
+                }
+
+                return isFirst ? "---------- Thunder ----------" : "---------- Blizzard ----------";
             }
 
-            // Format: "[set] Debuff - Resolvement", for example "[1st] Lightning - Spread". The set prefix is optional.
+            // Format: "[set] Debuff - Resolvement", for example "[1st] Lightning - Spread on D/B". The set prefix is optional.
             if (categoryId == "exdeath")
             {
                 var prefix = includeSetNumber ? $"[{set}] " : string.Empty;
                 return slotId switch
                 {
                     "gaze" => isReal ? $"{prefix}Gaze - Look Away" : $"{prefix}Gaze - Look",
-                    "spread" => isReal ? $"{prefix}Lightning - Spread" : $"{prefix}Lightning - Stack",
-                    "drop" => isReal ? $"{prefix}Water Drop - Stack" : $"{prefix}Water Drop - Spread",
-                    "accel" => isReal ? $"{prefix}Acceleration - Stand Still" : $"{prefix}Acceleration - Move",
+                    "spread" => isReal ? $"{prefix}Lightning - Spread on {spreadLetters}" : $"{prefix}Lightning - Stack on {stackLetters}",
+                    "drop" => isReal ? $"{prefix}Drop - Stack on {stackLetters}" : $"{prefix}Drop - Spread on {spreadLetters}",
+                    "accel" => isReal ? $"{prefix}Acceleration - STILLNESS" : $"{prefix}Acceleration - MOTION",
+                    _ => string.Empty,
+                };
+            }
+
+            if (categoryId == "kefka")
+            {
+                return slotId switch
+                {
+                    "thunder" => isReal ? "Thunder - REAL" : "Thunder - FAKE",
+                    "blizzard" => isReal ? "Blizzard - REAL" : "Blizzard - FAKE",
                     _ => string.Empty,
                 };
             }

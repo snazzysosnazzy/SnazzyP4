@@ -653,7 +653,7 @@ namespace SnazzyP4.Windows
                 Configuration.Save();
             }
 
-            Tooltip("Holds the per-press announcements back. Once both Exdeaths, both debuff picks and both chaos are pressed, the whole list is sent to the selected channel in resolution order: 1st-set debuffs, 1st gaze, Inferno, 2nd-set debuffs, 2nd gaze, Tsunami.");
+            Tooltip("Holds the per-press announcements back. Once both Exdeaths, both debuff picks and both chaos are pressed, the whole list is sent to the selected channel in resolution order: 1st-set debuffs, 1st gaze, Inferno, 2nd-set debuffs, 2nd gaze, Tsunami. Kefka announcements happen outside that window, so they always fire on their press.");
 
             var showSetNumber = Configuration.AnnouncementShowSetNumber;
             if (ImGui.Checkbox("Include [1st] / [2nd] prefix in default messages", ref showSetNumber))
@@ -679,6 +679,7 @@ namespace SnazzyP4.Windows
             var announcements = Configuration.GetAnnouncements(Configuration.AnnouncementChannel);
             DrawAnnounceCategory("Announce Exdeath", announcements.Exdeath, "exdeath");
             DrawAnnounceCategory("Announce Chaos", announcements.Chaos, "chaos");
+            DrawAnnounceCategory("Announce Kefka", announcements.Kefka, "kefka");
         }
 
         /// <summary>
@@ -811,10 +812,11 @@ namespace SnazzyP4.Windows
             var announcements = Configuration.GetAnnouncements(Configuration.AnnouncementChannel);
             ApplyAnnouncementToggle(announcements.Exdeath, "exdeath", enabled, titlesOnly);
 
-            // The set-title buttons only affect the Exdeath 1st/2nd set titles, not the Chaos (Inferno/Tsunami) titles.
+            // The set-title buttons only affect the Exdeath 1st/2nd set titles, not the Chaos or Kefka titles.
             if (!titlesOnly)
             {
                 ApplyAnnouncementToggle(announcements.Chaos, "chaos", enabled, titlesOnly);
+                ApplyAnnouncementToggle(announcements.Kefka, "kefka", enabled, titlesOnly);
             }
 
             Configuration.Save();
@@ -924,6 +926,11 @@ namespace SnazzyP4.Windows
                 DrawSetSection("Inferno", category, true, categoryId, AnnouncementData.ChaosFirstSlots);
                 DrawSetSection("Tsunami", category, false, categoryId, AnnouncementData.ChaosSecondSlots);
             }
+            else if (categoryId == "kefka")
+            {
+                DrawSetSection("Thunder", category, true, categoryId, AnnouncementData.KefkaFirstSlots);
+                DrawSetSection("Blizzard", category, false, categoryId, AnnouncementData.KefkaSecondSlots);
+            }
             else
             {
                 DrawSetSection("First set", category, true, categoryId, AnnouncementData.ExdeathSlots);
@@ -1020,6 +1027,9 @@ namespace SnazzyP4.Windows
         private void DrawOrderedLeaf(AnnouncementLeaf leaf, string categoryId, string[] slotIds, bool isFirst, bool isReal, string key)
         {
             AnnouncementData.EnsureSlots(leaf, slotIds);
+            var bothRoles = !Configuration.IsPersonalMode || Configuration.AnnouncementChannel == "/p";
+            var spreadLetters = Configuration.SpreadLetters(bothRoles);
+            var stackLetters = Configuration.StackLetters(bothRoles);
             var moveFrom = -1;
             var moveTo = -1;
             var removeIndex = -1;
@@ -1090,7 +1100,7 @@ namespace SnazzyP4.Windows
                             slot.UseCustomMessage = custom;
                             if (custom && slot.Messages.Count == 0)
                             {
-                                slot.Messages.Add(AnnouncementData.DefaultMessage(categoryId, slot.Id, isFirst, isReal, Configuration.AnnouncementShowSetNumber));
+                                slot.Messages.Add(AnnouncementData.DefaultMessage(categoryId, slot.Id, isFirst, isReal, Configuration.AnnouncementShowSetNumber, spreadLetters, stackLetters));
                             }
 
                             Configuration.Save();
@@ -1104,7 +1114,7 @@ namespace SnazzyP4.Windows
                         }
                         else
                         {
-                            ImGui.TextDisabled($"Default: {AnnouncementData.DefaultMessage(categoryId, slot.Id, isFirst, isReal, Configuration.AnnouncementShowSetNumber)}");
+                            ImGui.TextDisabled($"Default: {AnnouncementData.DefaultMessage(categoryId, slot.Id, isFirst, isReal, Configuration.AnnouncementShowSetNumber, spreadLetters, stackLetters)}");
                         }
                     }
 

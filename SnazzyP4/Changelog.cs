@@ -19,6 +19,12 @@ namespace SnazzyP4
         /// </summary>
         public static readonly Entry[] Entries =
         {
+            new("1.0.13.0", "2026-07-13", new[]
+            {
+                "The debuff resolution announcements (Lightning, Drop, Acceleration) are now available in BOTH Party and Personal modes, and their defaults spell out the resolution with target letters: \"[1st] Lightning - Spread on D/B\", \"[1st] Drop - Stack on A/C\", \"[1st] Acceleration - STILLNESS/MOTION\". In Party Mode (or any Personal message sent to /p) both roles' letters show, like \"D/B\"; Personal messages to other channels show only your own role's letter. The letters follow your Text-tab customisations.",
+                "New \"Announce Kefka\" category: \"Thunder - REAL/FAKE\" and \"Blizzard - REAL/FAKE\" fire when you press the matching Kefka button, with the same per-channel, ordered/simple and custom-message options as everything else. Kefka happens outside the debuff resolution window, so these always fire per press and are not part of the Chronological summary.",
+                "The Chronological summary order per set is: Lightning, Drop, Acceleration, then the gaze, then that set's chaos (Inferno after the first set, Tsunami after the second).",
+            }),
             new("1.0.12.0", "2026-07-13", new[]
             {
                 "New Position dropdown under Global Layout Settings. \"Move All UI\" X/Y sliders shift every section together, exactly like a Move All drag - and Move All drags update the sliders live. There are also sliders for the toolbar's screen position (they follow it when you drag it by hand), plus group sliders that shift all the macro button panels or all the text panels together.",

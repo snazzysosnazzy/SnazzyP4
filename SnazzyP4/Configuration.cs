@@ -594,6 +594,36 @@ namespace SnazzyP4
         }
 
         /// <summary>
+        /// Builds the spread target letters used in announcement messages.
+        /// </summary>
+        /// <param name="bothRoles">Whether both roles' letters are joined, rather than only the player's own.</param>
+        /// <returns>The letters, such as "D/B" or "D".</returns>
+        public string SpreadLetters(bool bothRoles)
+        {
+            if (bothRoles)
+            {
+                return $"{GetText(TextLabels.SpreadLetterSupport)}/{GetText(TextLabels.SpreadLetterDps)}";
+            }
+
+            return GetText(IsSupport ? TextLabels.SpreadLetterSupport : TextLabels.SpreadLetterDps);
+        }
+
+        /// <summary>
+        /// Builds the stack target letters used in announcement messages.
+        /// </summary>
+        /// <param name="bothRoles">Whether both roles' letters are joined, rather than only the player's own.</param>
+        /// <returns>The letters, such as "A/C" or "A".</returns>
+        public string StackLetters(bool bothRoles)
+        {
+            if (bothRoles)
+            {
+                return $"{GetText(TextLabels.StackLetterSupport)}/{GetText(TextLabels.StackLetterDps)}";
+            }
+
+            return GetText(IsSupport ? TextLabels.StackLetterSupport : TextLabels.StackLetterDps);
+        }
+
+        /// <summary>
         /// Stores a custom text override, or removes it when the value is empty so the default is used again.
         /// </summary>
         /// <param name="id">The text label id from <see cref="TextLabels"/>.</param>
@@ -635,6 +665,7 @@ namespace SnazzyP4
             // channel or an un-opened set announces its defaults without the user first opening the dropdown.
             EnsureCategorySlots(channelAnnouncements.Exdeath, "exdeath");
             EnsureCategorySlots(channelAnnouncements.Chaos, "chaos");
+            EnsureCategorySlots(channelAnnouncements.Kefka, "kefka");
             return channelAnnouncements;
         }
 

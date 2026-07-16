@@ -183,19 +183,23 @@ Open with the **Settings** button or `/snazzyp4 config`. Settings are grouped in
 
 - **Enable chat announcements** — master switch, off by default; nothing is sent while it's off.
 - **Mode** (mutually exclusive):
-  - **Party Mode** (default) — sends only the party-safe callouts (gaze and Inferno/Tsunami), so
-    it's safe to broadcast to your party.
-  - **Personal Mode** (advanced, hidden until you reveal it) — adds your debuff, title and custom
-    callouts, but blocks them from `/p` party chat unless you flip a heavily-warned override. Can
-    route each announcement to its own channel.
+  - **Party Mode** (default) — sends the mechanic callouts: debuff resolutions with **both
+    roles' target letters** (e.g. `[1st] Lightning - Spread on D/B`), gaze, Inferno/Tsunami and
+    the Kefka Thunder/Blizzard callouts.
+  - **Personal Mode** (advanced, hidden until you reveal it) — adds titles and custom callouts
+    (kept out of `/p` party chat unless you flip the override), shows only **your own role's
+    letter** on messages that don't go to `/p`, and can route each announcement to its own
+    channel.
 - **Chronological summary** — hold the per-press announcements back and instead send the whole
   list, in fight order, once everything is pressed.
 - **Include [1st] / [2nd] prefix** in the default messages.
 - **Channel** — pick the active channel (Party, Say, Linkshells, Echo for testing, and more),
   **Copy settings to...** another channel, and **Quick toggles** to turn all announcements (or just
   the set titles) on/off for that channel.
-- **Announce Exdeath** (fires on an Exdeath Real/Fake press) and **Announce Chaos** (fires on a
-  chaos press) — each split by First/Second set and Real/Fake, and each set/branch uses:
+- **Announce Exdeath** (fires on an Exdeath Real/Fake press), **Announce Chaos** (fires on a
+  chaos press) and **Announce Kefka** (fires on a Thunder/Blizzard press; always per press,
+  never part of the chronological summary) — each split by set/mechanic and Real/Fake, and each
+  branch uses:
   - **Ordered list** — reorderable per-mechanic toggles with custom, reorderable message lists, an
     optional **Announce Title** line, and a **+ Add custom message** button.
   - **Simple text box** — one chat line per message.
