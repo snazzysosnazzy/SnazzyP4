@@ -77,9 +77,10 @@ as one window or as separate floating panels.
                            3. Gaze
                            4. Twister / Donut
 - **Chat Callouts** — Optional announcements sent to a chat channel of your choice (party,
-                      linkshell, free company, echo for testing, and more). A party-safe
-                      **Party Mode** (gaze + Inferno/Tsunami only) is the default; an advanced
-                      **Personal Mode** adds your debuff/title/custom callouts.
+                      linkshell, free company, echo for testing, and more). **Party Mode**
+                      (default) sends the mechanic callouts - debuff resolutions with target
+                      letters, gaze, chaos and Kefka; an advanced **Personal Mode** adds
+                      title/custom callouts and per-announcement channels.
 - **Self Marked Spreads** — Optional Self marking for spread markers based on role.
 
 ## Installation
