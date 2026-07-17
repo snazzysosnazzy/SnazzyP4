@@ -15,7 +15,6 @@ This ultimately is no different from using a tool like wtfdig.info's browser-bas
 ## Planned Updates
 
 1. Alternative mode: Combination macros. Cuts number of macros in half by doing "combination" button presses. Further cuts down buttons
-2. Alternative mode; Simple macros. Cuts numbers of macros down the simplest number needed.
 
 # Snazzy P4
 
@@ -23,7 +22,22 @@ A robust custom macro system for the Kefka UMAD/DMU Phase 4 mechanics. You tap t
 buttons for what you see in the fight, and the plugin turns them into short, readable
 callouts (spread/stack targets, gaze, chaos and Kefka) so you can cut the macro bloat.
 
-![Snazzy P4 in action](docs/preview.png)
+Snazzy P4 offers three modes, selectable under **Settings → General**:
+
+**Classic Mode** (default) — the full solver: real/fake Exdeath plus a short/long button for
+each debuff, so each set panel shows your exact personal resolution.
+
+![Classic Mode](docs/Classic_Mode.png)
+
+**Simple Mode (BETA)** — one button per debuff, no short/long split. The resolution shows in
+both set panels with your own role's letter.
+
+![Simple Mode](docs/Simple_Mode.png)
+
+**Giga Simple Mode (BETA)** — real/fake buttons only. Each set panel lists every debuff's
+resolution with both roles' letters.
+
+![Giga Simple Mode](docs/Giga_Simple_Mode.png)
 
 ## Preface
 
@@ -140,13 +154,10 @@ button panels from the normal UI and keeps only the **First Set**, **Second Set*
 **Kefka** resolution text on screen. That same section also has a **Copy** button for every
 command below.
 
+**Available in every mode:**
+
 ```
 /snazzyp4 ExDeathReal        /snazzyp4 ExDeathFake
-/snazzyp4 LightningShort     /snazzyp4 LightningLong
-/snazzyp4 DropShort          /snazzyp4 DropLong
-/snazzyp4 AccelerationShort  /snazzyp4 AccelerationLong
-/snazzyp4 Lightning          /snazzyp4 Drop
-/snazzyp4 Acceleration
 /snazzyp4 InfernoReal        /snazzyp4 InfernoFake
 /snazzyp4 TsunamiReal        /snazzyp4 TsunamiFake
 /snazzyp4 ThunderReal        /snazzyp4 ThunderFake
@@ -155,11 +166,26 @@ command below.
 /snazzyp4 Undo
 ```
 
-The commands respect the same rules as the buttons — a pick that isn't valid yet (for example
-a short/long before its Exdeath) is simply ignored, exactly like a greyed-out button. The
-Short/Long debuff commands belong to **Classic Mode** and the single `Lightning` / `Drop` /
-`Acceleration` commands to **Simple Mode**; commands for another mode are ignored, and the
-Controller tab only lists the ones your current mode uses.
+**Classic Mode only:**
+
+```
+/snazzyp4 LightningShort     /snazzyp4 LightningLong
+/snazzyp4 DropShort          /snazzyp4 DropLong
+/snazzyp4 AccelerationShort  /snazzyp4 AccelerationLong
+```
+
+**Simple Mode only:**
+
+```
+/snazzyp4 Lightning          /snazzyp4 Drop
+/snazzyp4 Acceleration
+```
+
+Giga Simple Mode has no debuff buttons, so it uses only the every-mode set. The commands
+respect the same rules as the buttons — a pick that isn't valid yet (for example a short/long
+before its Exdeath) is simply ignored, exactly like a greyed-out button. Commands belonging to
+another mode are ignored the same way, and the Controller tab only lists the ones your current
+mode uses.
 
 ## Configuration Settings
 
