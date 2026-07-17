@@ -1,3 +1,10 @@
+## Development has ended
+
+I am ending development on Snazzy P4 — **v2.0.0.0 is the final release.** The plugin remains
+available and fully functional as-is, but barring a major wipe-causing bug there will be no
+further updates. A sign-off message is in [CHANGELOG.md](CHANGELOG.md) and in the plugin's
+changelog window.
+
 ## This does NOT read/parse any sort of combat data nor automates any combat for you
 I've been seeing a lot of discussion of this plugin and a lot of people are either not understanding what this plugin actually does or are making unfair comparisons of it to automated tools like splatoon and cactbot.
 
