@@ -436,7 +436,7 @@ namespace SnazzyP4
 
         /// <summary>
         /// Draws the Exdeath real/fake buttons and, while they are docked, the mode's debuff buttons below them.
-        /// The debuff buttons move to their own panel when the undock setting is on, and Giga Simple Mode has none at all.
+        /// The debuff buttons move to their own panel when the undock setting is on.
         /// </summary>
         /// <param name="scale">The pixel scale applied to the buttons.</param>
         public void DrawExdeath(float scale)
@@ -464,7 +464,7 @@ namespace SnazzyP4
                 }, false),
             };
 
-            var debuffsDocked = !configuration.SplitExdeathButtons && configuration.SolverMode != SolverMode.GigaSimple;
+            var debuffsDocked = !configuration.SplitExdeathButtons;
             var dockedColumn = configuration.SolverMode == SolverMode.Classic ? DebuffColumn.Grid : DebuffColumn.Single;
 
             // Outside the standard layout the docked debuff buttons join the same single column or row as the pair.
@@ -874,11 +874,6 @@ namespace SnazzyP4
                 return BuildSimpleSetLines(gazeKnown, gazeReal, chaosIndex);
             }
 
-            if (configuration.SolverMode == SolverMode.GigaSimple)
-            {
-                return BuildGigaSetLines(gazeKnown, gazeReal, chaosIndex);
-            }
-
             var lines = new List<List<SetRun>>();
 
             if (LayoutEditActive)
@@ -1123,119 +1118,6 @@ namespace SnazzyP4
         private List<SetRun> BuildSimpleAccelerationLine(bool real)
         {
             var word = configuration.GetText(real ? TextLabels.StandStill : TextLabels.Move);
-            return new List<SetRun>
-            {
-                PlainRun($"{configuration.GetText(TextLabels.AccelerationName)} - "),
-                ColorRun(word, AccelerationColor),
-            };
-        }
-
-        /// <summary>
-        /// Builds one set's resolution lines for Giga Simple Mode.
-        /// With no debuff buttons, the set's Exdeath press alone resolves every debuff, so the panel lists all three with both roles' letters, then the gaze and chaos lines.
-        /// </summary>
-        /// <param name="exdeathPressed">Whether that set's Exdeath has been pressed.</param>
-        /// <param name="exdeathReal">Whether that set's Exdeath was real.</param>
-        /// <param name="chaosIndex">The set's chaos slot: 0 for Inferno, 1 for Tsunami.</param>
-        /// <returns>The set's resolution lines as coloured runs.</returns>
-        private List<List<SetRun>> BuildGigaSetLines(bool exdeathPressed, bool exdeathReal, int chaosIndex)
-        {
-            var lines = new List<List<SetRun>>();
-
-            if (LayoutEditActive)
-            {
-                lines.AddRange(BuildGigaDebuffLines(true));
-                lines.Add(new List<SetRun> { ColorRun(configuration.GetText(TextLabels.GazeReal), GazeRealColor) });
-                lines.Add(chaosIndex == 0
-                    ? new List<SetRun> { ColorRun(configuration.GetText(TextLabels.InfernoReal), FireColor) }
-                    : new List<SetRun> { ColorRun(configuration.GetText(TextLabels.TsunamiReal), WaterColor) });
-                return lines;
-            }
-
-            if (exdeathPressed)
-            {
-                lines.AddRange(BuildGigaDebuffLines(exdeathReal));
-                lines.Add(new List<SetRun>
-                {
-                    ColorRun(exdeathReal ? configuration.GetText(TextLabels.GazeReal) : configuration.GetText(TextLabels.GazeFake),
-                        exdeathReal ? GazeRealColor : GazeFakeColor),
-                });
-            }
-
-            var chaos = ChaosForSet(chaosIndex);
-            if (chaos.HasValue)
-            {
-                lines.Add(new List<SetRun> { ColorRun(chaos.Value.Text, chaos.Value.Color) });
-            }
-
-            if (lines.Count == 0)
-            {
-                lines.Add(new List<SetRun> { DisabledRun("--") });
-            }
-
-            return lines;
-        }
-
-        /// <summary>
-        /// Builds the three Giga Simple debuff lines for one real/fake branch, in resolution order: Lightning, Drop, Acceleration.
-        /// </summary>
-        /// <param name="real">Whether the set's Exdeath was real.</param>
-        /// <returns>The three debuff lines as coloured runs.</returns>
-        private List<List<SetRun>> BuildGigaDebuffLines(bool real)
-        {
-            return new List<List<SetRun>>
-            {
-                BuildGigaBodyLine(TextLabels.LightningName, real),
-                BuildGigaBodyLine(TextLabels.DropName, !real),
-                BuildGigaAccelerationLine(real),
-            };
-        }
-
-        /// <summary>
-        /// Builds one Giga Simple body line, resolving the debuff with both roles' letters, each drawn in its role's colour.
-        /// </summary>
-        /// <param name="nameLabelId">The text label id of the debuff name.</param>
-        /// <param name="spread">Whether the debuff resolves to a spread rather than a stack.</param>
-        /// <returns>The composed line as coloured runs.</returns>
-        private List<SetRun> BuildGigaBodyLine(string nameLabelId, bool spread)
-        {
-            var name = configuration.GetText(nameLabelId);
-            string supportLetter;
-            string dpsLetter;
-            Vector4 supportColor;
-            Vector4 dpsColor;
-            if (spread)
-            {
-                supportLetter = configuration.GetText(TextLabels.SpreadLetterSupport);
-                dpsLetter = configuration.GetText(TextLabels.SpreadLetterDps);
-                supportColor = configuration.ColorSpreadSupport;
-                dpsColor = configuration.ColorSpreadDps;
-            }
-            else
-            {
-                supportLetter = configuration.GetText(TextLabels.StackLetterSupport);
-                dpsLetter = configuration.GetText(TextLabels.StackLetterDps);
-                supportColor = configuration.ColorStackSupport;
-                dpsColor = configuration.ColorStackDps;
-            }
-
-            return new List<SetRun>
-            {
-                PlainRun($"{name} - {configuration.GetText(spread ? TextLabels.SpreadPrefix : TextLabels.StackPrefix)}"),
-                ColorRun(supportLetter, supportColor),
-                PlainRun("/"),
-                ColorRun(dpsLetter, dpsColor),
-            };
-        }
-
-        /// <summary>
-        /// Builds one Giga Simple Acceleration line using the party-facing stillness and motion words.
-        /// </summary>
-        /// <param name="real">Whether the set's Exdeath was real.</param>
-        /// <returns>The composed line as coloured runs.</returns>
-        private List<SetRun> BuildGigaAccelerationLine(bool real)
-        {
-            var word = configuration.GetText(real ? TextLabels.AccelerationStillness : TextLabels.AccelerationMotion);
             return new List<SetRun>
             {
                 PlainRun($"{configuration.GetText(TextLabels.AccelerationName)} - "),
@@ -2063,14 +1945,12 @@ namespace SnazzyP4
         /// <param name="real">Whether the real variant was pressed.</param>
         private void OnExdeath(bool real)
         {
-            // Giga Simple Mode has no debuff picks, so the sequence jumps straight from one Exdeath press to the next.
-            var gigaSimple = configuration.SolverMode == SolverMode.GigaSimple;
             if (phase == Phase.WaitFirstExdeath)
             {
                 PushUndo();
                 firstExdeathReal = real;
                 firstExdeathPressed = true;
-                phase = gigaSimple ? Phase.WaitSecondExdeath : Phase.WaitFirstShortLong;
+                phase = Phase.WaitFirstShortLong;
                 FireAnnouncements(ActiveExdeath, "exdeath", true, real, null);
             }
             else if (phase == Phase.WaitSecondExdeath)
@@ -2078,7 +1958,7 @@ namespace SnazzyP4
                 PushUndo();
                 secondExdeathReal = real;
                 secondExdeathPressed = true;
-                phase = gigaSimple ? Phase.Done : Phase.WaitSecondShortLong;
+                phase = Phase.WaitSecondShortLong;
                 FireAnnouncements(ActiveExdeath, "exdeath", false, real, null);
 
                 // A body picked in the first window leaves its opposite set waiting on this press's real/fake.

@@ -113,20 +113,14 @@ namespace SnazzyP4
         /// <summary>The Show button text.</summary>
         public const string ShowButton = "ShowButton";
 
-        /// <summary>The Lightning debuff name used in the Simple and Giga Simple set panel lines.</summary>
+        /// <summary>The Lightning debuff name used in the Simple Mode debuff panel lines.</summary>
         public const string LightningName = "LightningName";
 
-        /// <summary>The Drop debuff name used in the Simple and Giga Simple set panel lines.</summary>
+        /// <summary>The Drop debuff name used in the Simple Mode debuff panel lines.</summary>
         public const string DropName = "DropName";
 
-        /// <summary>The Acceleration debuff name used in the Simple and Giga Simple set panel lines.</summary>
+        /// <summary>The Acceleration debuff name used in the Simple Mode debuff panel lines.</summary>
         public const string AccelerationName = "AccelerationName";
-
-        /// <summary>The real Acceleration word in the Giga Simple set panel lines.</summary>
-        public const string AccelerationStillness = "AccelerationStillness";
-
-        /// <summary>The fake Acceleration word in the Giga Simple set panel lines.</summary>
-        public const string AccelerationMotion = "AccelerationMotion";
 
         /// <summary>The Support spread target letter.</summary>
         public const string SpreadLetterSupport = "SpreadLetterSupport";
@@ -186,11 +180,9 @@ namespace SnazzyP4
             (HideButton, "HIDE", "Hide button", "Buttons"),
             (ShowButton, "SHOW", "Show button", "Buttons"),
 
-            (LightningName, "Lightning", "Lightning debuff name", "Simple modes"),
-            (DropName, "Drop", "Drop debuff name", "Simple modes"),
-            (AccelerationName, "Acceleration", "Acceleration debuff name", "Simple modes"),
-            (AccelerationStillness, "STILLNESS", "Acceleration - real (Giga Simple)", "Simple modes"),
-            (AccelerationMotion, "MOTION", "Acceleration - fake (Giga Simple)", "Simple modes"),
+            (LightningName, "Lightning", "Lightning debuff name", "Simple Mode"),
+            (DropName, "Drop", "Drop debuff name", "Simple Mode"),
+            (AccelerationName, "Acceleration", "Acceleration debuff name", "Simple Mode"),
 
             (SpreadLetterSupport, "D", "Spread letter - Support", "Target letters"),
             (StackLetterSupport, "A", "Stack letter - Support", "Target letters"),

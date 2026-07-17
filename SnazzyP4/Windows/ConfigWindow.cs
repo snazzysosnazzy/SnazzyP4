@@ -327,8 +327,8 @@ namespace SnazzyP4.Windows
 
                 Configuration.CopyFrom(imported);
 
-                // Giga Simple Mode is disabled while its resolution logic is corrected, so an imported selection falls back to Classic.
-                if (Configuration.SolverMode == SolverMode.GigaSimple)
+                // An imported profile can carry a mode value outside the known set, which falls back to Classic.
+                if (Configuration.SolverMode != SolverMode.Classic && Configuration.SolverMode != SolverMode.Simple)
                 {
                     Configuration.SolverMode = SolverMode.Classic;
                 }
@@ -708,6 +708,15 @@ namespace SnazzyP4.Windows
             }
 
             Tooltip("Affects the generated default Exdeath messages, for example \"[1st] Lightning - Spread\" versus \"Lightning - Spread\".");
+
+            var showLetters = Configuration.AnnouncementShowLetters;
+            if (ImGui.Checkbox("Include target letters in default messages", ref showLetters))
+            {
+                Configuration.AnnouncementShowLetters = showLetters;
+                Configuration.Save();
+            }
+
+            Tooltip("Appends the target letters to the Lightning/Drop defaults, for example \"Lightning - Spread on D/B\" versus \"Lightning - Spread\".");
             ImGui.Separator();
 
             DrawChannelSelector();
@@ -1571,31 +1580,27 @@ namespace SnazzyP4.Windows
                 Tooltip("Appends the movement word to the spread or stack line, for example \"Spread on X and MOVE\".");
             }
 
-            // Giga Simple Mode has no debuff buttons, so there is nothing to undock there.
-            if (Configuration.SolverMode != SolverMode.GigaSimple)
+            var splitExdeath = Configuration.SplitExdeathButtons;
+            if (ImGui.Checkbox("Undock debuff buttons from Exdeath", ref splitExdeath))
             {
-                var splitExdeath = Configuration.SplitExdeathButtons;
-                if (ImGui.Checkbox("Undock debuff buttons from Exdeath", ref splitExdeath))
+                Configuration.SplitExdeathButtons = splitExdeath;
+                Configuration.Save();
+            }
+
+            Tooltip("Moves the Lightning/Drop/Acceleration buttons into their own repositionable panel instead of sitting under the real/fake Exdeath pair.");
+
+            if (Configuration.SplitExdeathButtons && Configuration.SolverMode == SolverMode.Classic)
+            {
+                ImGui.Indent();
+                var splitColumns = Configuration.SplitDebuffColumns;
+                if (ImGui.Checkbox("Split SHORT and LONG columns into separate panels", ref splitColumns))
                 {
-                    Configuration.SplitExdeathButtons = splitExdeath;
+                    Configuration.SplitDebuffColumns = splitColumns;
                     Configuration.Save();
                 }
 
-                Tooltip("Moves the Lightning/Drop/Acceleration buttons into their own repositionable panel instead of sitting under the real/fake Exdeath pair.");
-
-                if (Configuration.SplitExdeathButtons && Configuration.SolverMode == SolverMode.Classic)
-                {
-                    ImGui.Indent();
-                    var splitColumns = Configuration.SplitDebuffColumns;
-                    if (ImGui.Checkbox("Split SHORT and LONG columns into separate panels", ref splitColumns))
-                    {
-                        Configuration.SplitDebuffColumns = splitColumns;
-                        Configuration.Save();
-                    }
-
-                    Tooltip("Further splits the undocked debuff grid into a SHORT panel and a LONG panel that move independently.");
-                    ImGui.Unindent();
-                }
+                Tooltip("Further splits the undocked debuff grid into a SHORT panel and a LONG panel that move independently.");
+                ImGui.Unindent();
             }
 
             var splitChaos = Configuration.SplitChaosButtons;
@@ -2276,7 +2281,7 @@ namespace SnazzyP4.Windows
 
         /// <summary>
         /// Determines whether a text label applies to the active gameplay mode, hiding entries the mode never renders.
-        /// The short/long headers and the Acceleration joiner belong to Classic Mode, the debuff names to the Simple modes, and the Acceleration words split between the personal and party variants.
+        /// The short/long headers and the Acceleration joiner belong to Classic Mode, the debuff names and panel label to Simple Mode.
         /// </summary>
         /// <param name="id">The text label id to test.</param>
         /// <returns>True when that label is editable in the active mode.</returns>
@@ -2284,21 +2289,10 @@ namespace SnazzyP4.Windows
         {
             if (Configuration.SolverMode == SolverMode.Classic)
             {
-                return id is not (TextLabels.LightningName or TextLabels.DropName or TextLabels.AccelerationName
-                                  or TextLabels.AccelerationStillness or TextLabels.AccelerationMotion or TextLabels.DebuffPanelLabel);
+                return id is not (TextLabels.LightningName or TextLabels.DropName or TextLabels.AccelerationName or TextLabels.DebuffPanelLabel);
             }
 
-            if (id is TextLabels.ShortColumnHeader or TextLabels.LongColumnHeader or TextLabels.AndJoiner)
-            {
-                return false;
-            }
-
-            if (Configuration.SolverMode == SolverMode.Simple)
-            {
-                return id is not (TextLabels.AccelerationStillness or TextLabels.AccelerationMotion);
-            }
-
-            return id is not (TextLabels.StandStill or TextLabels.Move or TextLabels.DebuffsHeader or TextLabels.DebuffPanelLabel);
+            return id is not (TextLabels.ShortColumnHeader or TextLabels.LongColumnHeader or TextLabels.AndJoiner);
         }
 
         /// <summary>

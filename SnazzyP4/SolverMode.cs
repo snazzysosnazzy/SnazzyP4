@@ -13,14 +13,8 @@ namespace SnazzyP4
 
         /// <summary>
         /// One button per Exdeath debuff with no short/long split.
-        /// A press locks in the latest Exdeath's real/fake and the resolution shows in both set panels.
+        /// A press locks in the latest Exdeath's real/fake and the resolutions show in their own debuff panel.
         /// </summary>
         Simple,
-
-        /// <summary>
-        /// No Exdeath debuff buttons at all.
-        /// Each set panel lists every debuff's resolution with both roles' target letters, driven by the real/fake Exdeath presses alone.
-        /// </summary>
-        GigaSimple,
     }
 }

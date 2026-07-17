@@ -19,22 +19,24 @@ namespace SnazzyP4
         /// </summary>
         public static readonly Entry[] Entries =
         {
+            new("1.1.4.0", "2026-07-16", new[]
+            {
+                "New Chat tab toggle to include or drop the target letters in the default Lightning/Drop messages, next to the [1st]/[2nd] prefix toggle: \"Lightning - Spread on D/B\" versus just \"Lightning - Spread\". On by default.",
+            }),
             new("1.1.3.0", "2026-07-16", new[]
             {
                 "The Lightning and Drop callouts are back for party chat in Classic Mode, now following the fight's timing rules. All of one Exdeath's waters and lightnings share a timer, so your body debuff press pins which Exdeath owns which set: your pick's set is called right away and the other set is called as soon as its Exdeath real/fake is known. The chronological summary uses the same attribution.",
                 "New \"All Bombs\" callout on the second set: \"ALL BOMBS ARE STILLNESS\" or \"ALL BOMBS ARE MOTION\", sent after the 2nd Exdeath press only when both presses match. On a mixed pull every player's bombs resolve differently, so nothing is sent and bombs are left to personal echo macros.",
                 "The per-set Acceleration announcement is removed: a set's bombs can come from either Exdeath, so a per-set bomb callout was wrong on mixed pulls. Existing configurations migrate automatically.",
-                "The Lightning/Drop callouts only exist in Classic Mode, since the other modes never learn the short/long split. Gaze, chaos and Kefka callouts are unchanged; the gaze was always attributed correctly.",
+                "The Lightning/Drop callouts only exist in Classic Mode, since Simple Mode never learns the short/long split. Gaze, chaos and Kefka callouts are unchanged; the gaze was always attributed correctly.",
             }),
             new("1.1.2.1", "2026-07-16", new[]
             {
                 "The Lightning, Drop and Acceleration chat callouts do not yet account for each player's short/long debuff timing, so a party-wide callout could name the wrong resolution for some players. Until that is corrected they are Personal Mode only and are never sent to party chat, in either mode, regardless of the party override.",
-                "Giga Simple Mode's set panels share the same timing gap, so the mode is temporarily unavailable. A saved Giga Simple selection falls back to Classic Mode; it will return once the resolution logic is corrected.",
             }),
             new("1.1.2.0", "2026-07-16", new[]
             {
                 "Simple Mode debuff resolutions now live in their own Debuffs text panel instead of repeating in both set panels; the First/Second Set panels keep their gaze and chaos lines. The new panel has the full per-section treatment: position, scale, opacity, label switches, its own detached window and a renamable panel label under the Text tab.",
-                "Giga Simple Mode keeps its per-set debuff lines, since each set's Exdeath press resolves the debuffs differently.",
             }),
             new("1.1.1.0", "2026-07-16", new[]
             {
@@ -46,9 +48,8 @@ namespace SnazzyP4
             }),
             new("1.1.0.0", "2026-07-16", new[]
             {
-                "Three gameplay modes, selectable at the top of the General tab. Classic Mode is the plugin exactly as it has always worked and stays the default.",
+                "Two gameplay modes, selectable at the top of the General tab. Classic Mode is the plugin exactly as it has always worked and stays the default.",
                 "Simple Mode (BETA): one Lightning, one Drop and one Acceleration button with no short/long split. A press locks in the latest Exdeath's real/fake, and because the timing is unknown the resolution shows in both set panels, like \"Lightning - Spread on B\" with your own role's letter.",
-                "Giga Simple Mode (BETA): no Exdeath debuff buttons at all, just real/fake Exdeath, Inferno, Tsunami, Thunder and Blizzard. Each set panel lists every debuff's resolution with both roles' letters, like \"Lightning - Spread on D/B\", plus the gaze and chaos lines.",
                 "Each mode keeps the full layout, colour, text and chat-callout customisation. Settings, slash commands and text labels that don't apply to the active mode are hidden, the Controller tab lists only the active mode's commands, and switching modes resets the current pull.",
                 "New Simple Mode slash commands for controllers: \"/snazzyp4 Lightning\", \"/snazzyp4 Drop\" and \"/snazzyp4 Acceleration\". The Undo command now also appears in the Controller tab's copy list.",
             }),

@@ -320,6 +320,12 @@ namespace SnazzyP4
         public bool AnnouncementShowSetNumber { get; set; } = true;
 
         /// <summary>
+        /// Whether the generated default Lightning/Drop announcement messages include the "on D/B" target letters.
+        /// When false, a default reads "Lightning - Spread" instead of "Lightning - Spread on D/B". Enabled by default.
+        /// </summary>
+        public bool AnnouncementShowLetters { get; set; } = true;
+
+        /// <summary>
         /// The chat channel currently selected in the Chat tab, whose announcement configuration is edited and fired.
         /// </summary>
         public string AnnouncementChannel { get; set; } = "/p";
@@ -628,11 +634,17 @@ namespace SnazzyP4
 
         /// <summary>
         /// Builds the spread target letters used in announcement messages.
+        /// While the letters are disabled they come back empty, which drops the "on X" suffix from the generated defaults.
         /// </summary>
         /// <param name="bothRoles">Whether both roles' letters are joined, rather than only the player's own.</param>
-        /// <returns>The letters, such as "D/B" or "D".</returns>
+        /// <returns>The letters, such as "D/B" or "D", or an empty value while disabled.</returns>
         public string SpreadLetters(bool bothRoles)
         {
+            if (!AnnouncementShowLetters)
+            {
+                return string.Empty;
+            }
+
             if (bothRoles)
             {
                 return $"{GetText(TextLabels.SpreadLetterSupport)}/{GetText(TextLabels.SpreadLetterDps)}";
@@ -643,11 +655,17 @@ namespace SnazzyP4
 
         /// <summary>
         /// Builds the stack target letters used in announcement messages.
+        /// While the letters are disabled they come back empty, which drops the "on X" suffix from the generated defaults.
         /// </summary>
         /// <param name="bothRoles">Whether both roles' letters are joined, rather than only the player's own.</param>
-        /// <returns>The letters, such as "A/C" or "A".</returns>
+        /// <returns>The letters, such as "A/C" or "A", or an empty value while disabled.</returns>
         public string StackLetters(bool bothRoles)
         {
+            if (!AnnouncementShowLetters)
+            {
+                return string.Empty;
+            }
+
             if (bothRoles)
             {
                 return $"{GetText(TextLabels.StackLetterSupport)}/{GetText(TextLabels.StackLetterDps)}";

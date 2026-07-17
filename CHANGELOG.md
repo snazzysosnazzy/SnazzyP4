@@ -3,6 +3,12 @@
 All notable changes to Snazzy P4 are listed here. Versions match the `vX.Y.Z.W`
 release tags.
 
+## v1.1.4.0 — 2026-07-16
+
+- **New "Include target letters" toggle** on the Chat tab, next to the [1st]/[2nd] prefix
+  toggle — `Lightning - Spread on D/B` versus just `Lightning - Spread` in the default
+  messages. On by default.
+
 ## v1.1.3.0 — 2026-07-16
 
 - **Lightning/Drop party callouts are back in Classic Mode, now timing-correct.** All of one
@@ -15,7 +21,7 @@ release tags.
 - **The per-set Acceleration announcement is removed** — a set's bombs can come from either
   Exdeath, so a per-set bomb callout was wrong on mixed pulls. Existing configurations migrate
   automatically.
-- The Lightning/Drop callouts only exist in Classic Mode, since the other modes never learn the
+- The Lightning/Drop callouts only exist in Classic Mode, since Simple Mode never learns the
   short/long split. Gaze, chaos and Kefka callouts are unchanged.
 
 ## v1.1.2.1 — 2026-07-16
@@ -24,9 +30,6 @@ release tags.
   mode, regardless of the party override. They do not yet account for each player's short/long
   debuff timing, so a party-wide callout could name the wrong resolution for some players. They
   remain available in Personal Mode on non-party channels until this is corrected.
-- **Giga Simple Mode is temporarily unavailable** — its set panels share the same timing gap. A
-  saved Giga Simple selection falls back to Classic Mode; the mode returns once the resolution
-  logic is corrected.
 
 ## v1.1.2.0 — 2026-07-16
 
@@ -34,8 +37,6 @@ release tags.
   repeating in both set panels; the First/Second Set panels keep their gaze and chaos lines.
   The new panel has the full per-section treatment: position, scale, opacity, label switches,
   its own detached window and a renamable panel label under the Text tab.
-- Giga Simple Mode keeps its per-set debuff lines, since each set's Exdeath press resolves the
-  debuffs differently.
 
 ## v1.1.1.0 — 2026-07-16
 
@@ -55,15 +56,12 @@ release tags.
 
 ## v1.1.0.0 — 2026-07-16
 
-- **Three gameplay modes**, selectable at the top of the General tab. **Classic Mode** is the
+- **Two gameplay modes**, selectable at the top of the General tab. **Classic Mode** is the
   plugin exactly as it has always worked and stays the default.
 - **Simple Mode (BETA)** — one Lightning, one Drop and one Acceleration button with no
   short/long split. A press locks in the latest Exdeath's real/fake, and because the timing is
   unknown the resolution shows in **both** set panels, like `Lightning - Spread on B` with your
   own role's letter.
-- **Giga Simple Mode (BETA)** — no Exdeath debuff buttons at all: just real/fake Exdeath,
-  Inferno, Tsunami, Thunder and Blizzard. Each set panel lists every debuff's resolution with
-  **both roles' letters**, like `Lightning - Spread on D/B`, plus the gaze and chaos lines.
 - Each mode keeps the full layout, colour, text and chat-callout customisation. Settings, slash
   commands and text labels that don't apply to the active mode are hidden, the Controller tab
   lists only the active mode's commands, and switching modes resets the current pull.

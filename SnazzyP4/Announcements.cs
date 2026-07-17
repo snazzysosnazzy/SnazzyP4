@@ -245,8 +245,8 @@ namespace SnazzyP4
                 return slotId switch
                 {
                     "gaze" => isReal ? $"{prefix}Gaze - Look Away" : $"{prefix}Gaze - Look",
-                    "spread" => isReal ? $"{prefix}Lightning - Spread on {spreadLetters}" : $"{prefix}Lightning - Stack on {stackLetters}",
-                    "drop" => isReal ? $"{prefix}Drop - Stack on {stackLetters}" : $"{prefix}Drop - Spread on {spreadLetters}",
+                    "spread" => isReal ? $"{prefix}Lightning - Spread{LetterSuffix(spreadLetters)}" : $"{prefix}Lightning - Stack{LetterSuffix(stackLetters)}",
+                    "drop" => isReal ? $"{prefix}Drop - Stack{LetterSuffix(stackLetters)}" : $"{prefix}Drop - Spread{LetterSuffix(spreadLetters)}",
                     "bombs" => isReal ? "ALL BOMBS ARE STILLNESS" : "ALL BOMBS ARE MOTION",
                     _ => string.Empty,
                 };
@@ -268,6 +268,21 @@ namespace SnazzyP4
                 "tsunami" => isReal ? "Tsunami - Donut (STAY)" : "Tsunami - Twister (MOVE)",
                 _ => string.Empty,
             };
+        }
+
+        /// <summary>
+        /// Builds the " on X" target suffix for a body callout, or an empty string when no letters are supplied.
+        /// </summary>
+        /// <param name="letters">The target letters, or an empty value when the letters are disabled.</param>
+        /// <returns>The suffix appended to the resolution word.</returns>
+        private static string LetterSuffix(string letters)
+        {
+            if (string.IsNullOrEmpty(letters))
+            {
+                return string.Empty;
+            }
+
+            return $" on {letters}";
         }
 
         /// <summary>

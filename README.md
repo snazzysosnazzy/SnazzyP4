@@ -238,12 +238,14 @@ Open with the **Settings** button or `/snazzyp4 config`. Settings are grouped in
   - The Lightning/Drop callouts follow the fight's timing rules: all of one Exdeath's waters and
     lightnings share a timer, so your body debuff press pins which Exdeath owns which set and
     each set's callout fires as soon as its resolution is actually known. They only exist in
-    Classic Mode, since the other modes never learn the short/long split. Bombs are never called
+    Classic Mode, since Simple Mode never learns the short/long split. Bombs are never called
     per set — on a mixed pull every player's bombs resolve differently, so the All Bombs line
     only goes out when both presses match.
 - **Chronological summary** — hold the per-press announcements back and instead send the whole
   list, in fight order, once everything is pressed.
 - **Include [1st] / [2nd] prefix** in the default messages.
+- **Include target letters** in the default messages — `Lightning - Spread on D/B` versus just
+  `Lightning - Spread`.
 - **Channel** — pick the active channel (Party, Say, Linkshells, Echo for testing, and more),
   **Copy settings to...** another channel, and **Quick toggles** to turn all announcements (or just
   the set titles) on/off for that channel.

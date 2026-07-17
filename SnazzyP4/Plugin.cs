@@ -210,8 +210,8 @@ namespace SnazzyP4
             Configuration.EditMode = false;
             Configuration.MoveAllActive = false;
 
-            // Giga Simple Mode is disabled while its resolution logic is corrected, so a stored selection falls back to Classic.
-            if (Configuration.SolverMode == SolverMode.GigaSimple)
+            // A stored mode value outside the known set falls back to Classic.
+            if (Configuration.SolverMode != SolverMode.Classic && Configuration.SolverMode != SolverMode.Simple)
             {
                 Configuration.SolverMode = SolverMode.Classic;
                 Configuration.Save();
@@ -885,7 +885,7 @@ namespace SnazzyP4
                 "FirstSet" or "SecondSet" => !Configuration.CombineSets,
                 "CombinedSets" => Configuration.CombineSets,
                 "DebuffText" => Configuration.SolverMode == SolverMode.Simple,
-                "Debuffs" => Configuration.SplitExdeathButtons && Configuration.SolverMode != SolverMode.GigaSimple
+                "Debuffs" => Configuration.SplitExdeathButtons
                                      && !(Configuration.SolverMode == SolverMode.Classic && Configuration.SplitDebuffColumns),
                 "ShortDebuffs" or "LongDebuffs" => Configuration.SplitExdeathButtons && Configuration.SplitDebuffColumns
                                      && Configuration.SolverMode == SolverMode.Classic,
