@@ -348,6 +348,7 @@ namespace SnazzyP4
                 "SecondSet" => SetHasContent(false, secondExdeathPressed, 1),
                 "CombinedSets" => SetHasContent(true, firstExdeathPressed, 0)
                                   || SetHasContent(false, secondExdeathPressed, 1),
+                "DebuffText" => selections.Count > 0,
                 "ThunderText" => thunderPressed || blizzardPressed,
                 _ => true,
             };
@@ -367,16 +368,16 @@ namespace SnazzyP4
                 return true;
             }
 
-            // Giga Simple panels only ever show Exdeath and chaos resolutions, which the checks above cover.
-            if (configuration.SolverMode == SolverMode.GigaSimple)
+            // Outside Classic Mode the set panels only show Exdeath and chaos resolutions, which the checks above cover;
+            // the Simple Mode debuff resolutions live in their own panel.
+            if (configuration.SolverMode != SolverMode.Classic)
             {
                 return false;
             }
 
             foreach (var selection in selections)
             {
-                // Simple Mode picks are not tied to a set, so any pick fills both panels.
-                if (configuration.SolverMode == SolverMode.Simple || selection.IsShort == isShort)
+                if (selection.IsShort == isShort)
                 {
                     return true;
                 }
@@ -978,7 +979,7 @@ namespace SnazzyP4
 
         /// <summary>
         /// Builds one set's resolution lines for Simple Mode.
-        /// The picked debuffs carry no short/long timing, so every pick shows in both panels: the body debuff first, then the Acceleration, followed by the set's gaze and chaos lines.
+        /// The picked debuffs carry no short/long timing and live in their own panel, so a set panel holds only the set's gaze and chaos lines.
         /// </summary>
         /// <param name="gazeKnown">Whether that set's gaze has been resolved.</param>
         /// <param name="gazeReal">Whether that set's gaze was real.</param>
@@ -990,12 +991,65 @@ namespace SnazzyP4
 
             if (LayoutEditActive)
             {
-                lines.Add(BuildSimpleBodyLine(MechanicKind.Lightning, true));
-                lines.Add(BuildSimpleAccelerationLine(true));
                 lines.Add(new List<SetRun> { ColorRun(configuration.GetText(TextLabels.GazeReal), GazeRealColor) });
                 lines.Add(chaosIndex == 0
                     ? new List<SetRun> { ColorRun(configuration.GetText(TextLabels.InfernoReal), FireColor) }
                     : new List<SetRun> { ColorRun(configuration.GetText(TextLabels.TsunamiReal), WaterColor) });
+                return lines;
+            }
+
+            if (gazeKnown)
+            {
+                lines.Add(new List<SetRun>
+                {
+                    ColorRun(gazeReal ? configuration.GetText(TextLabels.GazeReal) : configuration.GetText(TextLabels.GazeFake),
+                        gazeReal ? GazeRealColor : GazeFakeColor),
+                });
+            }
+
+            var chaos = ChaosForSet(chaosIndex);
+            if (chaos.HasValue)
+            {
+                lines.Add(new List<SetRun> { ColorRun(chaos.Value.Text, chaos.Value.Color) });
+            }
+
+            if (lines.Count == 0)
+            {
+                lines.Add(new List<SetRun> { DisabledRun("--") });
+            }
+
+            return lines;
+        }
+
+        /// <summary>
+        /// Draws the Simple Mode debuff resolution panel.
+        /// The picked debuffs are not tied to a set, so their resolutions live here instead of repeating in both set panels.
+        /// </summary>
+        /// <param name="scale">The pixel scale the hosting window applied.</param>
+        public void DrawDebuffText(float scale)
+        {
+            var lines = new List<List<SetRun>>();
+            if (!configuration.EffectiveHideLabels(CurrentSection))
+            {
+                lines.Add(new List<SetRun> { PlainRun(configuration.GetText(TextLabels.DebuffPanelLabel)) });
+            }
+
+            lines.AddRange(BuildDebuffTextLines());
+            RenderLines(lines, SetAlignment.Left, 0f);
+        }
+
+        /// <summary>
+        /// Builds the Simple Mode debuff resolution lines: the body debuff first, then the Acceleration.
+        /// </summary>
+        /// <returns>The pressed debuffs' resolution lines as coloured runs.</returns>
+        private List<List<SetRun>> BuildDebuffTextLines()
+        {
+            var lines = new List<List<SetRun>>();
+
+            if (LayoutEditActive)
+            {
+                lines.Add(BuildSimpleBodyLine(MechanicKind.Lightning, true));
+                lines.Add(BuildSimpleAccelerationLine(true));
                 return lines;
             }
 
@@ -1021,21 +1075,6 @@ namespace SnazzyP4
             if (acceleration.HasValue)
             {
                 lines.Add(BuildSimpleAccelerationLine(acceleration.Value.IsReal));
-            }
-
-            if (gazeKnown)
-            {
-                lines.Add(new List<SetRun>
-                {
-                    ColorRun(gazeReal ? configuration.GetText(TextLabels.GazeReal) : configuration.GetText(TextLabels.GazeFake),
-                        gazeReal ? GazeRealColor : GazeFakeColor),
-                });
-            }
-
-            var chaos = ChaosForSet(chaosIndex);
-            if (chaos.HasValue)
-            {
-                lines.Add(new List<SetRun> { ColorRun(chaos.Value.Text, chaos.Value.Color) });
             }
 
             if (lines.Count == 0)

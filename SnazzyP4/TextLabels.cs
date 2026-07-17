@@ -17,6 +17,9 @@ namespace SnazzyP4
         /// <summary>The Kefka text panel label.</summary>
         public const string KefkaLabel = "KefkaLabel";
 
+        /// <summary>The Simple Mode debuff resolution panel label.</summary>
+        public const string DebuffPanelLabel = "DebuffPanelLabel";
+
         /// <summary>The Last Fake header shown beside the Kefka lines.</summary>
         public const string LastFakeHeader = "LastFakeHeader";
 
@@ -145,6 +148,7 @@ namespace SnazzyP4
             (FirstSetLabel, "< First Set >", "First Set label", "Panel labels"),
             (SecondSetLabel, "< Second Set >", "Second Set label", "Panel labels"),
             (KefkaLabel, "< Kefka >", "Kefka panel label", "Panel labels"),
+            (DebuffPanelLabel, "< Debuffs >", "Debuffs panel label", "Panel labels"),
             (LastFakeHeader, "Last Fake?", "Last Fake? header", "Panel labels"),
 
             (SpreadPrefix, "Spread on ", "Spread prefix (letter is appended)", "Resolutions"),

@@ -222,6 +222,7 @@ namespace SnazzyP4
                 new("FirstSet", "First Set (text)", new Vector2(8, 330), Solver.DrawFirstSet),
                 new("SecondSet", "Second Set (text)", new Vector2(210, 330), Solver.DrawSecondSet),
                 new("CombinedSets", "First + Second Set (combined text)", new Vector2(8, 330), Solver.DrawCombinedSets),
+                new("DebuffText", "Debuffs (text)", new Vector2(8, 430), Solver.DrawDebuffText),
                 new("FireWaterButtons", "Chaos", new Vector2(340, 52), Solver.DrawFireWaterButtons, HasButtons: true),
                 new("Inferno", "Chaos (Inferno)", new Vector2(340, 52), Solver.DrawInfernoButtons, HasButtons: true),
                 new("Tsunami", "Chaos (Tsunami)", new Vector2(340, 190), Solver.DrawTsunamiButtons, HasButtons: true),
@@ -876,6 +877,7 @@ namespace SnazzyP4
                                      && !Configuration.LastFakeAnnounceDocked,
                 "FirstSet" or "SecondSet" => !Configuration.CombineSets,
                 "CombinedSets" => Configuration.CombineSets,
+                "DebuffText" => Configuration.SolverMode == SolverMode.Simple,
                 "Debuffs" => Configuration.SplitExdeathButtons && Configuration.SolverMode != SolverMode.GigaSimple
                                      && !(Configuration.SolverMode == SolverMode.Classic && Configuration.SplitDebuffColumns),
                 "ShortDebuffs" or "LongDebuffs" => Configuration.SplitExdeathButtons && Configuration.SplitDebuffColumns

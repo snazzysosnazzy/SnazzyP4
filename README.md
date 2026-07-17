@@ -29,8 +29,8 @@ each debuff, so each set panel shows your exact personal resolution.
 
 ![Classic Mode](docs/Classic_Mode.png)
 
-**Simple Mode (BETA)** — one button per debuff, no short/long split. The resolution shows in
-both set panels with your own role's letter.
+**Simple Mode (BETA)** — one button per debuff, no short/long split. Your debuff resolutions
+show in their own Debuffs panel with your own role's letter.
 
 ![Simple Mode](docs/Simple_Mode.png)
 
@@ -198,8 +198,8 @@ Open with the **Settings** button or `/snazzyp4 config`. Settings are grouped in
   - **Classic Mode** (default) — the full short/long debuff grid, exactly as always.
   - **Simple Mode (BETA)** — one Lightning, one Drop and one Acceleration button with no
     short/long split. A press locks in the latest Exdeath's real/fake, and because the timing is
-    unknown the resolution shows in **both** set panels (e.g. `Lightning - Spread on B` with your
-    own role's letter).
+    unknown the resolutions live in their own **Debuffs** text panel (e.g. `Lightning - Spread on B`
+    with your own role's letter) while the set panels keep the gaze and chaos lines.
   - **Giga Simple Mode (BETA)** — no debuff buttons at all: just real/fake Exdeath, Inferno,
     Tsunami, Thunder and Blizzard. Each set panel lists every debuff's resolution with **both
     roles' letters** (e.g. `Lightning - Spread on D/B`).

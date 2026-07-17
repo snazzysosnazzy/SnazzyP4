@@ -3,6 +3,15 @@
 All notable changes to Snazzy P4 are listed here. Versions match the `vX.Y.Z.W`
 release tags.
 
+## v1.1.2.0 — 2026-07-16
+
+- **Simple Mode debuff resolutions moved into their own "Debuffs" text panel** instead of
+  repeating in both set panels; the First/Second Set panels keep their gaze and chaos lines.
+  The new panel has the full per-section treatment: position, scale, opacity, label switches,
+  its own detached window and a renamable panel label under the Text tab.
+- Giga Simple Mode keeps its per-set debuff lines, since each set's Exdeath press resolves the
+  debuffs differently.
+
 ## v1.1.1.0 — 2026-07-16
 
 - **Undock debuff buttons from Exdeath** (General tab, off by default) — the

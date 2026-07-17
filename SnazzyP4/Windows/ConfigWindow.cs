@@ -2263,7 +2263,7 @@ namespace SnazzyP4.Windows
             if (Configuration.SolverMode == SolverMode.Classic)
             {
                 return id is not (TextLabels.LightningName or TextLabels.DropName or TextLabels.AccelerationName
-                                  or TextLabels.AccelerationStillness or TextLabels.AccelerationMotion);
+                                  or TextLabels.AccelerationStillness or TextLabels.AccelerationMotion or TextLabels.DebuffPanelLabel);
             }
 
             if (id is TextLabels.ShortColumnHeader or TextLabels.LongColumnHeader or TextLabels.AndJoiner)
@@ -2276,7 +2276,7 @@ namespace SnazzyP4.Windows
                 return id is not (TextLabels.AccelerationStillness or TextLabels.AccelerationMotion);
             }
 
-            return id is not (TextLabels.StandStill or TextLabels.Move or TextLabels.DebuffsHeader);
+            return id is not (TextLabels.StandStill or TextLabels.Move or TextLabels.DebuffsHeader or TextLabels.DebuffPanelLabel);
         }
 
         /// <summary>

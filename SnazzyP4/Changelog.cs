@@ -19,6 +19,11 @@ namespace SnazzyP4
         /// </summary>
         public static readonly Entry[] Entries =
         {
+            new("1.1.2.0", "2026-07-16", new[]
+            {
+                "Simple Mode debuff resolutions now live in their own Debuffs text panel instead of repeating in both set panels; the First/Second Set panels keep their gaze and chaos lines. The new panel has the full per-section treatment: position, scale, opacity, label switches, its own detached window and a renamable panel label under the Text tab.",
+                "Giga Simple Mode keeps its per-set debuff lines, since each set's Exdeath press resolves the debuffs differently.",
+            }),
             new("1.1.1.0", "2026-07-16", new[]
             {
                 "The Exdeath debuff buttons can be undocked into their own movable panel (General tab, off by default). With that on, a further option splits the SHORT and LONG columns into two separate panels in Classic Mode.",
