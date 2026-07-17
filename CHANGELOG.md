@@ -3,6 +3,33 @@
 All notable changes to Snazzy P4 are listed here. Versions match the `vX.Y.Z.W`
 release tags.
 
+## v2.0.0.0 — 2026-07-17
+
+Hey all, snazz here. I'm bumping the version to 2.0 as a signal that I will no longer be adding
+new features to this plugin anymore and will be stopping support effective immediately. What is
+here will now be considered the final release. I had planned updates like Combination mode and a
+few other things, but I have come to the decision that I no longer want to support this project.
+
+After weeks of being looked down on by some folks, hearing some nasty things said, and some
+folks going out of their way to frame my plugin as something like AM or cactbot or a "cheating"
+tool when the entire purpose I have made this plugin was to help people avoid resorting to those
+sorts of tools has kinda just made me lose all motivation to keep going with it and frankly my
+heart just isn't in it anymore.
+
+This was my first stint into making plugins and I wanted to make this to help folks as much as I
+could while allowing them to complete the content in what I thought was a good faith attempt at
+staying true to in-game behaviors - and from what I hear it has helped a few of you out there,
+which does bring me joy that it's made your lives a bit easier. That all being said, I think
+this will also be my last time I ever make a plugin again.
+
+Barring any major bugs that need fixing to prevent wipes, this is what you can consider my sign
+off letter. To all those out there using this plugin, I wish you the best of luck on your
+journey to defeat the clown and I know you all will get those clears soon!
+
+Much love,
+
+s n a z z
+
 ## v1.1.4.0 — 2026-07-16
 
 - **New "Include target letters" toggle** on the Chat tab, next to the [1st]/[2nd] prefix
@@ -58,7 +85,7 @@ release tags.
 
 - **Two gameplay modes**, selectable at the top of the General tab. **Classic Mode** is the
   plugin exactly as it has always worked and stays the default.
-- **Simple Mode (BETA)** — one Lightning, one Drop and one Acceleration button with no
+- **Simple Mode** — one Lightning, one Drop and one Acceleration button with no
   short/long split. A press locks in the latest Exdeath's real/fake, and because the timing is
   unknown the resolution shows in **both** set panels, like `Lightning - Spread on B` with your
   own role's letter.

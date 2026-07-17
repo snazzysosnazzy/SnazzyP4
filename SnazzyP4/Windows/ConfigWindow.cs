@@ -543,8 +543,8 @@ namespace SnazzyP4.Windows
             var modeChanged = false;
             modeChanged |= ImGui.RadioButton("Classic Mode", ref mode, (int)SolverMode.Classic);
             Tooltip("The full solver: a short and a long button for each Exdeath debuff, exactly as the plugin has always worked.");
-            modeChanged |= ImGui.RadioButton("Simple Mode (BETA)", ref mode, (int)SolverMode.Simple);
-            Tooltip("One Lightning, one Drop and one Acceleration button with no short/long split. A press locks in the latest Exdeath's real/fake, and your resolutions show in their own Debuffs panel. Yet to be broadly tested.");
+            modeChanged |= ImGui.RadioButton("Simple Mode", ref mode, (int)SolverMode.Simple);
+            Tooltip("One Lightning, one Drop and one Acceleration button with no short/long split. A press locks in the latest Exdeath's real/fake, and your resolutions show in their own Debuffs panel.");
 
             if (modeChanged && (SolverMode)mode != Configuration.SolverMode)
             {

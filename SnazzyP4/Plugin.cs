@@ -764,7 +764,8 @@ namespace SnazzyP4
             Configuration.Save();
 
             // Advance the seen version even when suppressed, so the notice does not queue up for a later boot.
-            if (Configuration.SuppressUpdateNotices)
+            // The 2.0.0.0 sign-off note is the one exception: it shows once for everyone, and the notice's own button turns future ones off again.
+            if (Configuration.SuppressUpdateNotices && Version != "2.0.0.0")
             {
                 return;
             }

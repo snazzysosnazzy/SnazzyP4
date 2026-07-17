@@ -12,10 +12,6 @@ You can criticize this plugin from the standpoint of it being a better UI, custo
 
 This ultimately is no different from using a tool like wtfdig.info's browser-based p4-helper, using in-game macros, or relying on another's manually inputed call-outs to resolve the mechanic. It's hard for me to justify that those are okay to use, but this plugin isn't, when they effectively achieve the same outcome through effectively the same means. 
 
-## Planned Updates
-
-1. Alternative mode: Combination macros. Cuts number of macros in half by doing "combination" button presses. Further cuts down buttons
-
 # Snazzy P4
 
 A robust custom macro system for the Kefka UMAD/DMU Phase 4 mechanics. You tap the
@@ -29,7 +25,7 @@ each debuff, so each set panel shows your exact personal resolution.
 
 ![Classic Mode](docs/Classic_Mode.png)
 
-**Simple Mode (BETA)** — one button per debuff, no short/long split. Your debuff resolutions
+**Simple Mode** — one button per debuff, no short/long split. Your debuff resolutions
 show in their own Debuffs panel with your own role's letter.
 
 ![Simple Mode](docs/Simple_Mode.png)
@@ -74,7 +70,7 @@ what to do. Everything is repositionable, rescalable and recolourable, and it ca
 as one window or as separate floating panels.
 
 - **Two Modes** — **Classic** (the full short/long debuff grid) and **Simple** (one button per
-                  debuff, BETA), selectable under **Settings → General**.
+                  debuff), selectable under **Settings → General**.
 - **Exdeath** — Real (`!`) or Fake (`?`) macros for Exdeath tell, 
                 Short/Long debuff (Lightning / Drop / Acceleration) macros, 
 				and respective Resolution text.
@@ -190,7 +186,7 @@ Open with the **Settings** button or `/snazzyp4 config`. Settings are grouped in
 - **Never show version update messages** — gold toggle; stops the changelog popup after each update.
 - **Mode** — how much of the fight the plugin solves:
   - **Classic Mode** (default) — the full short/long debuff grid, exactly as always.
-  - **Simple Mode (BETA)** — one Lightning, one Drop and one Acceleration button with no
+  - **Simple Mode** — one Lightning, one Drop and one Acceleration button with no
     short/long split. A press locks in the latest Exdeath's real/fake, and because the timing is
     unknown the resolutions live in their own **Debuffs** text panel (e.g. `Lightning - Spread on B`
     with your own role's letter) while the set panels keep the gaze and chaos lines.

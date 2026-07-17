@@ -50,6 +50,12 @@ namespace SnazzyP4.Windows
                     ImGui.TextDisabled($"- {entry.Date}");
                 }
 
+                if (!string.IsNullOrEmpty(entry.Letter))
+                {
+                    ImGui.TextWrapped(entry.Letter);
+                    ImGui.Spacing();
+                }
+
                 foreach (var change in entry.Changes)
                 {
                     ImGui.TextWrapped($"•  {change}");

@@ -4,9 +4,9 @@
     "Name": "Snazzy P4",
     "Punchline": "A robust custom macro system for the Kefka UMAD/DMU Phase 4 mechanics.",
     "Description": "A robust custom macro system for the Kefka UMAD/DMU Phase 4 mechanics. Press the buttons for what you see in the fight and it lays out clean, colour-coded callouts. Open with /snazzyp4.",
-    "Changelog": "New Chat tab toggle to include or drop the target letters in the default Lightning/Drop messages: \"Lightning - Spread on D/B\" versus just \"Lightning - Spread\". On by default. See CHANGELOG.md.",
+    "Changelog": "The final release. A sign-off note from snazz is in the plugin's changelog window and CHANGELOG.md. Simple Mode is out of beta; no further features are planned.",
     "InternalName": "SnazzyP4",
-    "AssemblyVersion": "1.1.4.0",
+    "AssemblyVersion": "2.0.0.0",
     "RepoUrl": "https://github.com/snazzysosnazzy/SnazzyP4",
     "ApplicableVersion": "any",
     "Tags": [
@@ -31,11 +31,11 @@
     "DalamudApiLevel": 15,
     "IconUrl": "https://raw.githubusercontent.com/snazzysosnazzy/SnazzyP4/main/SnazzyP4/images/icon.png",
     "ImageUrls": [],
-    "DownloadLinkInstall": "https://github.com/snazzysosnazzy/SnazzyP4/releases/download/v1.1.4.0/latest.zip",
+    "DownloadLinkInstall": "https://github.com/snazzysosnazzy/SnazzyP4/releases/download/v2.0.0.0/latest.zip",
     "IsHide": false,
     "IsTestingExclusive": false,
-    "DownloadLinkTesting": "https://github.com/snazzysosnazzy/SnazzyP4/releases/download/v1.1.4.0/latest.zip",
-    "DownloadLinkUpdate": "https://github.com/snazzysosnazzy/SnazzyP4/releases/download/v1.1.4.0/latest.zip",
+    "DownloadLinkTesting": "https://github.com/snazzysosnazzy/SnazzyP4/releases/download/v2.0.0.0/latest.zip",
+    "DownloadLinkUpdate": "https://github.com/snazzysosnazzy/SnazzyP4/releases/download/v2.0.0.0/latest.zip",
     "DownloadCount": 0,
     "LastUpdate": "1784268302"
   }
