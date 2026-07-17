@@ -19,6 +19,14 @@ namespace SnazzyP4
         /// </summary>
         public static readonly Entry[] Entries =
         {
+            new("1.1.0.0", "2026-07-16", new[]
+            {
+                "Three gameplay modes, selectable at the top of the General tab. Classic Mode is the plugin exactly as it has always worked and stays the default.",
+                "Simple Mode (BETA): one Lightning, one Drop and one Acceleration button with no short/long split. A press locks in the latest Exdeath's real/fake, and because the timing is unknown the resolution shows in both set panels, like \"Lightning - Spread on B\" with your own role's letter.",
+                "Giga Simple Mode (BETA): no Exdeath debuff buttons at all, just real/fake Exdeath, Inferno, Tsunami, Thunder and Blizzard. Each set panel lists every debuff's resolution with both roles' letters, like \"Lightning - Spread on D/B\", plus the gaze and chaos lines.",
+                "Each mode keeps the full layout, colour, text and chat-callout customisation. Settings, slash commands and text labels that don't apply to the active mode are hidden, the Controller tab lists only the active mode's commands, and switching modes resets the current pull.",
+                "New Simple Mode slash commands for controllers: \"/snazzyp4 Lightning\", \"/snazzyp4 Drop\" and \"/snazzyp4 Acceleration\". The Undo command now also appears in the Controller tab's copy list.",
+            }),
             new("1.0.13.1", "2026-07-16", new[]
             {
                 "The Acceleration announcement wording now depends on where the message goes: party-facing messages (Party Mode, or any Personal message sent to /p) say \"Acceleration - STILLNESS\" or \"Acceleration - MOTION\", while personal messages to other channels say \"Acceleration - STAND STILL\" or \"Acceleration - MOVE\" to match the on-screen text panel.",

@@ -64,6 +64,9 @@ You press a few buttons as the mechanics happen and it lays out clean, colour-co
 what to do. Everything is repositionable, rescalable and recolourable, and it can run
 as one window or as separate floating panels.
 
+- **Three Modes** — **Classic** (the full short/long debuff grid), **Simple** (one button per
+                    debuff, BETA) and **Giga Simple** (real/fake buttons only, BETA), selectable
+                    under **Settings → General**.
 - **Exdeath** — Real (`!`) or Fake (`?`) macros for Exdeath tell, 
                 Short/Long debuff (Lightning / Drop / Acceleration) macros, 
 				and respective Resolution text.
@@ -115,6 +118,10 @@ Snazzy P4 is distributed through my personal Dalamud plugin repository.
 
 That's it — the buttons grey out when they no longer apply, so you can't mis-enter.
 
+The steps above describe **Classic Mode**. The **Mode** setting under
+[Configuration Settings → General](#general) offers two simpler variants that drop the
+short/long split or the debuff buttons entirely.
+
 ### Moving things around
 
 - **Edit Layout** (toolbar or settings): the buttons lock and every panel fills with
@@ -138,6 +145,8 @@ command below.
 /snazzyp4 LightningShort     /snazzyp4 LightningLong
 /snazzyp4 DropShort          /snazzyp4 DropLong
 /snazzyp4 AccelerationShort  /snazzyp4 AccelerationLong
+/snazzyp4 Lightning          /snazzyp4 Drop
+/snazzyp4 Acceleration
 /snazzyp4 InfernoReal        /snazzyp4 InfernoFake
 /snazzyp4 TsunamiReal        /snazzyp4 TsunamiFake
 /snazzyp4 ThunderReal        /snazzyp4 ThunderFake
@@ -147,7 +156,10 @@ command below.
 ```
 
 The commands respect the same rules as the buttons — a pick that isn't valid yet (for example
-a short/long before its Exdeath) is simply ignored, exactly like a greyed-out button.
+a short/long before its Exdeath) is simply ignored, exactly like a greyed-out button. The
+Short/Long debuff commands belong to **Classic Mode** and the single `Lightning` / `Drop` /
+`Acceleration` commands to **Simple Mode**; commands for another mode are ignored, and the
+Controller tab only lists the ones your current mode uses.
 
 ## Configuration Settings
 
@@ -156,8 +168,20 @@ Open with the **Settings** button or `/snazzyp4 config`. Settings are grouped in
 ### General
 
 - **Never show version update messages** — gold toggle; stops the changelog popup after each update.
+- **Mode** — how much of the fight the plugin solves:
+  - **Classic Mode** (default) — the full short/long debuff grid, exactly as always.
+  - **Simple Mode (BETA)** — one Lightning, one Drop and one Acceleration button with no
+    short/long split. A press locks in the latest Exdeath's real/fake, and because the timing is
+    unknown the resolution shows in **both** set panels (e.g. `Lightning - Spread on B` with your
+    own role's letter).
+  - **Giga Simple Mode (BETA)** — no debuff buttons at all: just real/fake Exdeath, Inferno,
+    Tsunami, Thunder and Blizzard. Each set panel lists every debuff's resolution with **both
+    roles' letters** (e.g. `Lightning - Spread on D/B`).
+  - Settings, commands and text labels that don't apply to the active mode are hidden while it's
+    selected, and switching modes resets the current pull. Chat callouts work the same in every
+    mode.
 - **Role** — Support or DPS.
-- **Apply Marker on Macro Press** — pressing the spread macro also runs the `/mk` self-mark for
+- **Apply Marker on Macro Press** (Classic Mode) — pressing the spread macro also runs the `/mk` self-mark for
   that set, with a choice of head marker per role and set (attack / bind / ignore / shapes).
   Always placed on yourself, only when you press the button — the same as an in-game macro.
 - **Automation** — all off by default:
@@ -175,7 +199,7 @@ Open with the **Settings** button or `/snazzyp4 config`. Settings are grouped in
   windows, edit layout, Move All; floating
   **Hide** / **Reset** / **Undo** buttons; **Hide Resolved Buttons Until Reset** (each button
   group disappears once fully entered and returns on Reset); **Acceleration on the same line**
-  as Spread/Stack (`Spread on X and MOVE`); **combine the First and Second sets** into one panel
+  as Spread/Stack (`Spread on X and MOVE`, Classic Mode); **combine the First and Second sets** into one panel
   (stacked or side by side, with a pinnable divider); **bring all windows on-screen**.
 - **Settings profiles** — copy your whole setup to the clipboard, or paste one in.
 - **Reset** — **Reset layout to defaults** / **Restore ALL settings to defaults**.
@@ -228,8 +252,9 @@ Open with the **Settings** button or `/snazzyp4 config`. Settings are grouped in
 ### Text
 
 - Rename any panel label, section header, resolution callout (spread/stack, gaze, acceleration,
-  chaos, Thunder/Blizzard), the **A/B/C/D target letters**, or any button.
-- Leave a field blank to keep its default.
+  chaos, Thunder/Blizzard), the debuff names used by the Simple modes, the **A/B/C/D target
+  letters**, or any button.
+- Leave a field blank to keep its default. Only the labels the active Mode uses are listed.
 
 ### Controller
 

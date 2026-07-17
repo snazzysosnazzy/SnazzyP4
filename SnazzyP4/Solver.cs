@@ -364,9 +364,16 @@ namespace SnazzyP4
                 return true;
             }
 
+            // Giga Simple panels only ever show Exdeath and chaos resolutions, which the checks above cover.
+            if (configuration.SolverMode == SolverMode.GigaSimple)
+            {
+                return false;
+            }
+
             foreach (var selection in selections)
             {
-                if (selection.IsShort == isShort)
+                // Simple Mode picks are not tied to a set, so any pick fills both panels.
+                if (configuration.SolverMode == SolverMode.Simple || selection.IsShort == isShort)
                 {
                     return true;
                 }
@@ -376,7 +383,8 @@ namespace SnazzyP4
         }
 
         /// <summary>
-        /// Draws the Exdeath real/fake buttons and the short/long mechanic grid.
+        /// Draws the Exdeath real/fake buttons followed by the mode's debuff buttons:
+        /// the short/long grid in Classic Mode, a single debuff column in Simple Mode and nothing in Giga Simple Mode.
         /// </summary>
         /// <param name="scale">The pixel scale applied to the buttons.</param>
         public void DrawExdeath(float scale)
@@ -414,7 +422,18 @@ namespace SnazzyP4
                 OnExdeath(false);
             }
 
+            if (configuration.SolverMode == SolverMode.GigaSimple)
+            {
+                return;
+            }
+
             ImGuiHelpers.ScaledDummy(4f);
+
+            if (configuration.SolverMode == SolverMode.Simple)
+            {
+                DrawSimpleDebuffButtons(scale);
+                return;
+            }
 
             if (!labelsHidden)
             {
@@ -428,6 +447,29 @@ namespace SnazzyP4
             DrawShortLongRow("Lightning.png", MechanicKind.Lightning, scale);
             DrawShortLongRow("Drop.png", MechanicKind.Drop, scale);
             DrawShortLongRow("Acceleration.png", MechanicKind.Acceleration, scale);
+        }
+
+        /// <summary>
+        /// Draws the Simple Mode debuff column: one button each for Lightning, Drop and Acceleration.
+        /// A press is recorded like a short pick so the shared selection state, locking and undo apply unchanged.
+        /// </summary>
+        /// <param name="scale">The pixel scale applied to the buttons.</param>
+        private void DrawSimpleDebuffButtons(float scale)
+        {
+            if (IconButton("##SimpleLightning", "Lightning.png", ShortLongEnabled(MechanicKind.Lightning), scale))
+            {
+                OnShortLong(MechanicKind.Lightning, true);
+            }
+
+            if (IconButton("##SimpleDrop", "Drop.png", ShortLongEnabled(MechanicKind.Drop), scale))
+            {
+                OnShortLong(MechanicKind.Drop, true);
+            }
+
+            if (IconButton("##SimpleAcceleration", "Acceleration.png", ShortLongEnabled(MechanicKind.Acceleration), scale))
+            {
+                OnShortLong(MechanicKind.Acceleration, true);
+            }
         }
 
         /// <summary>
@@ -636,8 +678,8 @@ namespace SnazzyP4
         }
 
         /// <summary>
-        /// Builds the resolution lines for one set as coloured runs.
-        /// The body comes from the short/long picks in this set, while the gaze comes from the matching Exdeath press order, so the first press drives the First Set gaze and the second press drives the Second Set gaze.
+        /// Builds the resolution lines for one set as coloured runs, dispatching to the active mode's builder.
+        /// In Classic Mode the body comes from the short/long picks in this set, while the gaze comes from the matching Exdeath press order, so the first press drives the First Set gaze and the second press drives the Second Set gaze.
         /// </summary>
         /// <param name="isShort">Whether the short (first) set is built rather than the long one.</param>
         /// <param name="gazeKnown">Whether that set's gaze has been resolved.</param>
@@ -646,6 +688,16 @@ namespace SnazzyP4
         /// <returns>The set's resolution lines as coloured runs.</returns>
         private List<List<SetRun>> BuildSetLines(bool isShort, bool gazeKnown, bool gazeReal, int chaosIndex)
         {
+            if (configuration.SolverMode == SolverMode.Simple)
+            {
+                return BuildSimpleSetLines(gazeKnown, gazeReal, chaosIndex);
+            }
+
+            if (configuration.SolverMode == SolverMode.GigaSimple)
+            {
+                return BuildGigaSetLines(gazeKnown, gazeReal, chaosIndex);
+            }
+
             var lines = new List<List<SetRun>>();
 
             if (LayoutEditActive)
@@ -742,6 +794,234 @@ namespace SnazzyP4
         private (string Text, Vector4 Color)? ChaosForSet(int chaosIndex)
         {
             return chaosIndex == 0 ? firstSetChaos : secondSetChaos;
+        }
+
+        /// <summary>
+        /// Builds one set's resolution lines for Simple Mode.
+        /// The picked debuffs carry no short/long timing, so every pick shows in both panels: the body debuff first, then the Acceleration, followed by the set's gaze and chaos lines.
+        /// </summary>
+        /// <param name="gazeKnown">Whether that set's gaze has been resolved.</param>
+        /// <param name="gazeReal">Whether that set's gaze was real.</param>
+        /// <param name="chaosIndex">The set's chaos slot: 0 for Inferno, 1 for Tsunami.</param>
+        /// <returns>The set's resolution lines as coloured runs.</returns>
+        private List<List<SetRun>> BuildSimpleSetLines(bool gazeKnown, bool gazeReal, int chaosIndex)
+        {
+            var lines = new List<List<SetRun>>();
+
+            if (LayoutEditActive)
+            {
+                lines.Add(BuildSimpleBodyLine(MechanicKind.Lightning, true));
+                lines.Add(BuildSimpleAccelerationLine(true));
+                lines.Add(new List<SetRun> { ColorRun(configuration.GetText(TextLabels.GazeReal), GazeRealColor) });
+                lines.Add(chaosIndex == 0
+                    ? new List<SetRun> { ColorRun(configuration.GetText(TextLabels.InfernoReal), FireColor) }
+                    : new List<SetRun> { ColorRun(configuration.GetText(TextLabels.TsunamiReal), WaterColor) });
+                return lines;
+            }
+
+            Selection? body = null;
+            Selection? acceleration = null;
+            foreach (var selection in selections)
+            {
+                if (selection.Kind == MechanicKind.Acceleration)
+                {
+                    acceleration = selection;
+                }
+                else
+                {
+                    body = selection;
+                }
+            }
+
+            if (body.HasValue)
+            {
+                lines.Add(BuildSimpleBodyLine(body.Value.Kind, IsSpread(body.Value)));
+            }
+
+            if (acceleration.HasValue)
+            {
+                lines.Add(BuildSimpleAccelerationLine(acceleration.Value.IsReal));
+            }
+
+            if (gazeKnown)
+            {
+                lines.Add(new List<SetRun>
+                {
+                    ColorRun(gazeReal ? configuration.GetText(TextLabels.GazeReal) : configuration.GetText(TextLabels.GazeFake),
+                        gazeReal ? GazeRealColor : GazeFakeColor),
+                });
+            }
+
+            var chaos = ChaosForSet(chaosIndex);
+            if (chaos.HasValue)
+            {
+                lines.Add(new List<SetRun> { ColorRun(chaos.Value.Text, chaos.Value.Color) });
+            }
+
+            if (lines.Count == 0)
+            {
+                lines.Add(new List<SetRun> { DisabledRun("--") });
+            }
+
+            return lines;
+        }
+
+        /// <summary>
+        /// Builds one Simple Mode body line, naming the debuff and resolving it with the player's own role letter.
+        /// </summary>
+        /// <param name="kind">The picked body debuff, either Lightning or Drop.</param>
+        /// <param name="spread">Whether the debuff resolves to a spread rather than a stack.</param>
+        /// <returns>The composed line as coloured runs.</returns>
+        private List<SetRun> BuildSimpleBodyLine(MechanicKind kind, bool spread)
+        {
+            var name = configuration.GetText(kind == MechanicKind.Lightning ? TextLabels.LightningName : TextLabels.DropName);
+            var support = configuration.IsSupport;
+            string letter;
+            Vector4 color;
+            if (spread)
+            {
+                letter = configuration.GetText(support ? TextLabels.SpreadLetterSupport : TextLabels.SpreadLetterDps);
+                color = support ? configuration.ColorSpreadSupport : configuration.ColorSpreadDps;
+            }
+            else
+            {
+                letter = configuration.GetText(support ? TextLabels.StackLetterSupport : TextLabels.StackLetterDps);
+                color = support ? configuration.ColorStackSupport : configuration.ColorStackDps;
+            }
+
+            return new List<SetRun>
+            {
+                PlainRun($"{name} - {configuration.GetText(spread ? TextLabels.SpreadPrefix : TextLabels.StackPrefix)}"),
+                ColorRun(letter, color),
+            };
+        }
+
+        /// <summary>
+        /// Builds one Simple Mode Acceleration line using the on-screen stand-still and move labels.
+        /// </summary>
+        /// <param name="real">Whether the Acceleration resolved on the real branch.</param>
+        /// <returns>The composed line as coloured runs.</returns>
+        private List<SetRun> BuildSimpleAccelerationLine(bool real)
+        {
+            var word = configuration.GetText(real ? TextLabels.StandStill : TextLabels.Move);
+            return new List<SetRun>
+            {
+                PlainRun($"{configuration.GetText(TextLabels.AccelerationName)} - "),
+                ColorRun(word, AccelerationColor),
+            };
+        }
+
+        /// <summary>
+        /// Builds one set's resolution lines for Giga Simple Mode.
+        /// With no debuff buttons, the set's Exdeath press alone resolves every debuff, so the panel lists all three with both roles' letters, then the gaze and chaos lines.
+        /// </summary>
+        /// <param name="exdeathPressed">Whether that set's Exdeath has been pressed.</param>
+        /// <param name="exdeathReal">Whether that set's Exdeath was real.</param>
+        /// <param name="chaosIndex">The set's chaos slot: 0 for Inferno, 1 for Tsunami.</param>
+        /// <returns>The set's resolution lines as coloured runs.</returns>
+        private List<List<SetRun>> BuildGigaSetLines(bool exdeathPressed, bool exdeathReal, int chaosIndex)
+        {
+            var lines = new List<List<SetRun>>();
+
+            if (LayoutEditActive)
+            {
+                lines.AddRange(BuildGigaDebuffLines(true));
+                lines.Add(new List<SetRun> { ColorRun(configuration.GetText(TextLabels.GazeReal), GazeRealColor) });
+                lines.Add(chaosIndex == 0
+                    ? new List<SetRun> { ColorRun(configuration.GetText(TextLabels.InfernoReal), FireColor) }
+                    : new List<SetRun> { ColorRun(configuration.GetText(TextLabels.TsunamiReal), WaterColor) });
+                return lines;
+            }
+
+            if (exdeathPressed)
+            {
+                lines.AddRange(BuildGigaDebuffLines(exdeathReal));
+                lines.Add(new List<SetRun>
+                {
+                    ColorRun(exdeathReal ? configuration.GetText(TextLabels.GazeReal) : configuration.GetText(TextLabels.GazeFake),
+                        exdeathReal ? GazeRealColor : GazeFakeColor),
+                });
+            }
+
+            var chaos = ChaosForSet(chaosIndex);
+            if (chaos.HasValue)
+            {
+                lines.Add(new List<SetRun> { ColorRun(chaos.Value.Text, chaos.Value.Color) });
+            }
+
+            if (lines.Count == 0)
+            {
+                lines.Add(new List<SetRun> { DisabledRun("--") });
+            }
+
+            return lines;
+        }
+
+        /// <summary>
+        /// Builds the three Giga Simple debuff lines for one real/fake branch, in resolution order: Lightning, Drop, Acceleration.
+        /// </summary>
+        /// <param name="real">Whether the set's Exdeath was real.</param>
+        /// <returns>The three debuff lines as coloured runs.</returns>
+        private List<List<SetRun>> BuildGigaDebuffLines(bool real)
+        {
+            return new List<List<SetRun>>
+            {
+                BuildGigaBodyLine(TextLabels.LightningName, real),
+                BuildGigaBodyLine(TextLabels.DropName, !real),
+                BuildGigaAccelerationLine(real),
+            };
+        }
+
+        /// <summary>
+        /// Builds one Giga Simple body line, resolving the debuff with both roles' letters, each drawn in its role's colour.
+        /// </summary>
+        /// <param name="nameLabelId">The text label id of the debuff name.</param>
+        /// <param name="spread">Whether the debuff resolves to a spread rather than a stack.</param>
+        /// <returns>The composed line as coloured runs.</returns>
+        private List<SetRun> BuildGigaBodyLine(string nameLabelId, bool spread)
+        {
+            var name = configuration.GetText(nameLabelId);
+            string supportLetter;
+            string dpsLetter;
+            Vector4 supportColor;
+            Vector4 dpsColor;
+            if (spread)
+            {
+                supportLetter = configuration.GetText(TextLabels.SpreadLetterSupport);
+                dpsLetter = configuration.GetText(TextLabels.SpreadLetterDps);
+                supportColor = configuration.ColorSpreadSupport;
+                dpsColor = configuration.ColorSpreadDps;
+            }
+            else
+            {
+                supportLetter = configuration.GetText(TextLabels.StackLetterSupport);
+                dpsLetter = configuration.GetText(TextLabels.StackLetterDps);
+                supportColor = configuration.ColorStackSupport;
+                dpsColor = configuration.ColorStackDps;
+            }
+
+            return new List<SetRun>
+            {
+                PlainRun($"{name} - {configuration.GetText(spread ? TextLabels.SpreadPrefix : TextLabels.StackPrefix)}"),
+                ColorRun(supportLetter, supportColor),
+                PlainRun("/"),
+                ColorRun(dpsLetter, dpsColor),
+            };
+        }
+
+        /// <summary>
+        /// Builds one Giga Simple Acceleration line using the party-facing stillness and motion words.
+        /// </summary>
+        /// <param name="real">Whether the set's Exdeath was real.</param>
+        /// <returns>The composed line as coloured runs.</returns>
+        private List<SetRun> BuildGigaAccelerationLine(bool real)
+        {
+            var word = configuration.GetText(real ? TextLabels.AccelerationStillness : TextLabels.AccelerationMotion);
+            return new List<SetRun>
+            {
+                PlainRun($"{configuration.GetText(TextLabels.AccelerationName)} - "),
+                ColorRun(word, AccelerationColor),
+            };
         }
 
         /// <summary>
@@ -918,10 +1198,11 @@ namespace SnazzyP4
 
         /// <summary>
         /// Sends each set's marker command once, as soon as that set's spread is known.
+        /// Markers need the short/long timing to pick a set, so they only apply in Classic Mode.
         /// </summary>
         public void UpdateAutoMarkers()
         {
-            if (!configuration.AutoMarker)
+            if (!configuration.AutoMarker || configuration.SolverMode != SolverMode.Classic)
             {
                 return;
             }
@@ -1548,12 +1829,14 @@ namespace SnazzyP4
         /// <param name="real">Whether the real variant was pressed.</param>
         private void OnExdeath(bool real)
         {
+            // Giga Simple Mode has no debuff picks, so the sequence jumps straight from one Exdeath press to the next.
+            var gigaSimple = configuration.SolverMode == SolverMode.GigaSimple;
             if (phase == Phase.WaitFirstExdeath)
             {
                 PushUndo();
                 firstExdeathReal = real;
                 firstExdeathPressed = true;
-                phase = Phase.WaitFirstShortLong;
+                phase = gigaSimple ? Phase.WaitSecondExdeath : Phase.WaitFirstShortLong;
                 FireAnnouncements(ActiveExdeath, "exdeath", true, real, null);
             }
             else if (phase == Phase.WaitSecondExdeath)
@@ -1561,7 +1844,7 @@ namespace SnazzyP4
                 PushUndo();
                 secondExdeathReal = real;
                 secondExdeathPressed = true;
-                phase = Phase.WaitSecondShortLong;
+                phase = gigaSimple ? Phase.Done : Phase.WaitSecondShortLong;
                 FireAnnouncements(ActiveExdeath, "exdeath", false, real, null);
             }
         }
@@ -2034,7 +2317,7 @@ namespace SnazzyP4
 
             undoStack.Clear();
 
-            if (configuration.AutoMarker)
+            if (configuration.AutoMarker && configuration.SolverMode == SolverMode.Classic)
             {
                 Plugin.ExecuteGameCommand("/mk off <me>");
             }
@@ -2077,15 +2360,61 @@ namespace SnazzyP4
         }
 
         /// <summary>
-        /// Applies a short/long pick from a slash command only when the matching button would be enabled.
+        /// Applies a short/long pick from a slash command only in Classic Mode and when the matching button would be enabled.
         /// </summary>
         /// <param name="kind">The mechanic the command picks.</param>
         /// <param name="isShort">Whether the short column is pressed.</param>
         private void CommandShortLong(MechanicKind kind, bool isShort)
         {
+            if (configuration.SolverMode != SolverMode.Classic)
+            {
+                return;
+            }
+
             if (ShortLongEnabled(kind))
             {
                 OnShortLong(kind, isShort);
+            }
+        }
+
+        /// <summary>
+        /// Presses the Simple Mode Lightning button from a slash command, ignoring the press outside Simple Mode or while the button is locked.
+        /// </summary>
+        public void CommandLightning()
+        {
+            CommandSimplePick(MechanicKind.Lightning);
+        }
+
+        /// <summary>
+        /// Presses the Simple Mode Drop button from a slash command, ignoring the press outside Simple Mode or while the button is locked.
+        /// </summary>
+        public void CommandDrop()
+        {
+            CommandSimplePick(MechanicKind.Drop);
+        }
+
+        /// <summary>
+        /// Presses the Simple Mode Acceleration button from a slash command, ignoring the press outside Simple Mode or while the button is locked.
+        /// </summary>
+        public void CommandAcceleration()
+        {
+            CommandSimplePick(MechanicKind.Acceleration);
+        }
+
+        /// <summary>
+        /// Applies a Simple Mode debuff pick from a slash command only in Simple Mode and when the matching button would be enabled.
+        /// </summary>
+        /// <param name="kind">The mechanic the command picks.</param>
+        private void CommandSimplePick(MechanicKind kind)
+        {
+            if (configuration.SolverMode != SolverMode.Simple)
+            {
+                return;
+            }
+
+            if (ShortLongEnabled(kind))
+            {
+                OnShortLong(kind, true);
             }
         }
 

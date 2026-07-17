@@ -166,6 +166,8 @@ namespace SnazzyP4.Windows
         {
             DrawSuppressUpdateNotices();
             ImGui.Separator();
+            DrawModeSelector();
+            ImGui.Separator();
             DrawRole();
             ImGui.Separator();
             DrawAutomationSettings();
@@ -314,6 +316,12 @@ namespace SnazzyP4.Windows
                 {
                     profileStatus = "Clipboard did not contain valid settings.";
                     return;
+                }
+
+                // A profile can carry a different gameplay mode, so the pull resets under the old mode before the switch.
+                if (imported.SolverMode != Configuration.SolverMode)
+                {
+                    plugin.Solver.ResetAll();
                 }
 
                 Configuration.CopyFrom(imported);
@@ -517,7 +525,32 @@ namespace SnazzyP4.Windows
         }
 
         /// <summary>
-        /// Draws the role selection and the auto-marker option.
+        /// Draws the gameplay mode selection.
+        /// Switching modes resets the current pull, since the input sequences are not compatible mid-fight.
+        /// </summary>
+        private void DrawModeSelector()
+        {
+            ImGui.TextUnformatted("Mode");
+            var mode = (int)Configuration.SolverMode;
+            var modeChanged = false;
+            modeChanged |= ImGui.RadioButton("Classic Mode", ref mode, (int)SolverMode.Classic);
+            Tooltip("The full solver: a short and a long button for each Exdeath debuff, exactly as the plugin has always worked.");
+            modeChanged |= ImGui.RadioButton("Simple Mode (BETA)", ref mode, (int)SolverMode.Simple);
+            Tooltip("One Lightning, one Drop and one Acceleration button with no short/long split. A press locks in the latest Exdeath's real/fake, and because the timing is unknown the resolution shows in both set panels. Yet to be broadly tested.");
+            modeChanged |= ImGui.RadioButton("Giga Simple Mode (BETA)", ref mode, (int)SolverMode.GigaSimple);
+            Tooltip("No Exdeath debuff buttons at all: just real/fake Exdeath, Inferno, Tsunami, Thunder and Blizzard. Each set panel lists every debuff's resolution with both roles' letters. Yet to be broadly tested.");
+
+            if (modeChanged && (SolverMode)mode != Configuration.SolverMode)
+            {
+                // The reset runs before the switch so the old mode cleans up its own state, including any placed marker.
+                plugin.Solver.ResetAll();
+                Configuration.SolverMode = (SolverMode)mode;
+                Configuration.Save();
+            }
+        }
+
+        /// <summary>
+        /// Draws the role selection and, in Classic Mode, the auto-marker option.
         /// </summary>
         private void DrawRole()
         {
@@ -532,6 +565,12 @@ namespace SnazzyP4.Windows
             {
                 Configuration.IsSupport = role == 0;
                 Configuration.Save();
+            }
+
+            // Markers need the short/long timing to pick a set, so the option only exists in Classic Mode.
+            if (Configuration.SolverMode != SolverMode.Classic)
+            {
+                return;
             }
 
             var autoMarker = Configuration.AutoMarker;
@@ -1496,14 +1535,18 @@ namespace SnazzyP4.Windows
 
             Tooltip("Hides a button group once fully entered: Exdeath after both sets resolve, each chaos pair and each Kefka pair once pressed. Everything returns on Reset. Text panels and the Last Fake toggles are never affected.");
 
-            var accelerationSameLine = Configuration.AccelerationSameLine;
-            if (ImGui.Checkbox("Acceleration text on same line as Stack/Spread", ref accelerationSameLine))
+            // Only Classic Mode shares a line between the body and the Acceleration; the other modes give every debuff its own line.
+            if (Configuration.SolverMode == SolverMode.Classic)
             {
-                Configuration.AccelerationSameLine = accelerationSameLine;
-                Configuration.Save();
-            }
+                var accelerationSameLine = Configuration.AccelerationSameLine;
+                if (ImGui.Checkbox("Acceleration text on same line as Stack/Spread", ref accelerationSameLine))
+                {
+                    Configuration.AccelerationSameLine = accelerationSameLine;
+                    Configuration.Save();
+                }
 
-            Tooltip("Appends the movement word to the spread or stack line, for example \"Spread on X and MOVE\".");
+                Tooltip("Appends the movement word to the spread or stack line, for example \"Spread on X and MOVE\".");
+            }
 
             var combineSets = Configuration.CombineSets;
             if (ImGui.Checkbox("Combine First and Second set into one panel", ref combineSets))
@@ -1957,7 +2000,7 @@ namespace SnazzyP4.Windows
 
         /// <summary>
         /// Draws the collapsed-by-default controller section with the hide-macro-buttons option and the copyable command list.
-        /// The Last Fake commands are only listed when that hidden feature is unlocked.
+        /// Only the commands available in the active gameplay mode are listed, and the Last Fake commands only appear when that hidden feature is unlocked.
         /// </summary>
         private void DrawControllerSettings()
         {
@@ -1979,16 +2022,30 @@ namespace SnazzyP4.Windows
 
             ImGui.TextWrapped("Controller players cannot click the buttons. Put each command below into its own game macro and bind it, then hide the macro buttons above to keep only the resolution text.");
             ImGui.Spacing();
+            ImGui.TextDisabled("Commands for the active mode (change modes under General).");
+            ImGui.Spacing();
 
             DrawMacroRow("/snazzyp4 ExDeathReal");
             DrawMacroRow("/snazzyp4 ExDeathFake");
-            ImGui.Spacing();
-            DrawMacroRow("/snazzyp4 LightningShort");
-            DrawMacroRow("/snazzyp4 LightningLong");
-            DrawMacroRow("/snazzyp4 DropShort");
-            DrawMacroRow("/snazzyp4 DropLong");
-            DrawMacroRow("/snazzyp4 AccelerationShort");
-            DrawMacroRow("/snazzyp4 AccelerationLong");
+
+            if (Configuration.SolverMode == SolverMode.Classic)
+            {
+                ImGui.Spacing();
+                DrawMacroRow("/snazzyp4 LightningShort");
+                DrawMacroRow("/snazzyp4 LightningLong");
+                DrawMacroRow("/snazzyp4 DropShort");
+                DrawMacroRow("/snazzyp4 DropLong");
+                DrawMacroRow("/snazzyp4 AccelerationShort");
+                DrawMacroRow("/snazzyp4 AccelerationLong");
+            }
+            else if (Configuration.SolverMode == SolverMode.Simple)
+            {
+                ImGui.Spacing();
+                DrawMacroRow("/snazzyp4 Lightning");
+                DrawMacroRow("/snazzyp4 Drop");
+                DrawMacroRow("/snazzyp4 Acceleration");
+            }
+
             ImGui.Spacing();
             DrawMacroRow("/snazzyp4 InfernoReal");
             DrawMacroRow("/snazzyp4 InfernoFake");
@@ -2001,6 +2058,7 @@ namespace SnazzyP4.Windows
             DrawMacroRow("/snazzyp4 BlizzardFake");
             ImGui.Spacing();
             DrawMacroRow("/snazzyp4 Reset");
+            DrawMacroRow("/snazzyp4 Undo");
             DrawMacroRow("/snazzyp4 Hide");
 
             if (Configuration.ShowLastFake)
@@ -2046,6 +2104,11 @@ namespace SnazzyP4.Windows
             var group = string.Empty;
             foreach (var (id, defaultValue, label, entryGroup) in TextLabels.Entries)
             {
+                if (!TextEntryVisible(id))
+                {
+                    continue;
+                }
+
                 if (entryGroup != group)
                 {
                     group = entryGroup;
@@ -2065,6 +2128,33 @@ namespace SnazzyP4.Windows
                     Configuration.Save();
                 }
             }
+        }
+
+        /// <summary>
+        /// Determines whether a text label applies to the active gameplay mode, hiding entries the mode never renders.
+        /// The short/long headers and the Acceleration joiner belong to Classic Mode, the debuff names to the Simple modes, and the Acceleration words split between the personal and party variants.
+        /// </summary>
+        /// <param name="id">The text label id to test.</param>
+        /// <returns>True when that label is editable in the active mode.</returns>
+        private bool TextEntryVisible(string id)
+        {
+            if (Configuration.SolverMode == SolverMode.Classic)
+            {
+                return id is not (TextLabels.LightningName or TextLabels.DropName or TextLabels.AccelerationName
+                                  or TextLabels.AccelerationStillness or TextLabels.AccelerationMotion);
+            }
+
+            if (id is TextLabels.ShortColumnHeader or TextLabels.LongColumnHeader or TextLabels.AndJoiner)
+            {
+                return false;
+            }
+
+            if (Configuration.SolverMode == SolverMode.Simple)
+            {
+                return id is not (TextLabels.AccelerationStillness or TextLabels.AccelerationMotion);
+            }
+
+            return id is not (TextLabels.StandStill or TextLabels.Move);
         }
 
         /// <summary>

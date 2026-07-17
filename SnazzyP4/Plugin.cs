@@ -622,6 +622,15 @@ namespace SnazzyP4
                 case "accelerationlong":
                     Solver.CommandAcceleration(false);
                     break;
+                case "lightning":
+                    Solver.CommandLightning();
+                    break;
+                case "drop":
+                    Solver.CommandDrop();
+                    break;
+                case "acceleration":
+                    Solver.CommandAcceleration();
+                    break;
                 case "infernoreal":
                     Solver.CommandInferno(true);
                     break;
@@ -797,6 +806,12 @@ namespace SnazzyP4
         /// </summary>
         public void RestoreAllDefaults()
         {
+            // Defaults put the solver back into Classic Mode, so a pull made in another mode resets before the switch.
+            if (Configuration.SolverMode != SolverMode.Classic)
+            {
+                Solver.ResetAll();
+            }
+
             Configuration.RestoreDefaults();
             wasLayoutEditActive = false;
             DetachedPositionDirty.Clear();

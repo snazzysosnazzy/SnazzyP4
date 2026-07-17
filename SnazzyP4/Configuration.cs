@@ -71,6 +71,11 @@ namespace SnazzyP4
         public Vector2 TextPanelsOffset { get; set; }
 
         /// <summary>
+        /// The gameplay mode the solver runs in, deciding which macro buttons exist and how the set panels resolve.
+        /// </summary>
+        public SolverMode SolverMode { get; set; } = SolverMode.Classic;
+
+        /// <summary>
         /// Whether the player is playing a Support role.
         /// Support resolves to the Ignore1/Bind1 markers and the A (stack) and D (spread) target letters, while DPS uses Ignore2/Bind2 and the C and B letters.
         /// </summary>
