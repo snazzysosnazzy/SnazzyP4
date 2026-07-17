@@ -19,6 +19,11 @@ namespace SnazzyP4
         /// </summary>
         public static readonly Entry[] Entries =
         {
+            new("1.1.2.1", "2026-07-16", new[]
+            {
+                "The Lightning, Drop and Acceleration chat callouts do not yet account for each player's short/long debuff timing, so a party-wide callout could name the wrong resolution for some players. Until that is corrected they are Personal Mode only and are never sent to party chat, in either mode, regardless of the party override.",
+                "Giga Simple Mode's set panels share the same timing gap, so the mode is temporarily unavailable. A saved Giga Simple selection falls back to Classic Mode; it will return once the resolution logic is corrected.",
+            }),
             new("1.1.2.0", "2026-07-16", new[]
             {
                 "Simple Mode debuff resolutions now live in their own Debuffs text panel instead of repeating in both set panels; the First/Second Set panels keep their gaze and chaos lines. The new panel has the full per-section treatment: position, scale, opacity, label switches, its own detached window and a renamable panel label under the Text tab.",

@@ -3,6 +3,16 @@
 All notable changes to Snazzy P4 are listed here. Versions match the `vX.Y.Z.W`
 release tags.
 
+## v1.1.2.1 — 2026-07-16
+
+- **The Lightning/Drop/Acceleration chat callouts are no longer sent to party chat**, in either
+  mode, regardless of the party override. They do not yet account for each player's short/long
+  debuff timing, so a party-wide callout could name the wrong resolution for some players. They
+  remain available in Personal Mode on non-party channels until this is corrected.
+- **Giga Simple Mode is temporarily unavailable** — its set panels share the same timing gap. A
+  saved Giga Simple selection falls back to Classic Mode; the mode returns once the resolution
+  logic is corrected.
+
 ## v1.1.2.0 — 2026-07-16
 
 - **Simple Mode debuff resolutions moved into their own "Debuffs" text panel** instead of

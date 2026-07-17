@@ -210,6 +210,13 @@ namespace SnazzyP4
             Configuration.EditMode = false;
             Configuration.MoveAllActive = false;
 
+            // Giga Simple Mode is disabled while its resolution logic is corrected, so a stored selection falls back to Classic.
+            if (Configuration.SolverMode == SolverMode.GigaSimple)
+            {
+                Configuration.SolverMode = SolverMode.Classic;
+                Configuration.Save();
+            }
+
             Solver = new Solver(Configuration);
 
             // The buttons and their text outputs are separate sections so every text element can be positioned independently.

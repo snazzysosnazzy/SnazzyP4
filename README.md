@@ -35,7 +35,8 @@ show in their own Debuffs panel with your own role's letter.
 ![Simple Mode](docs/Simple_Mode.png)
 
 **Giga Simple Mode (BETA)** — real/fake buttons only. Each set panel lists every debuff's
-resolution with both roles' letters.
+resolution with both roles' letters. *Temporarily unavailable while its resolution logic is
+corrected to account for short/long debuff timing.*
 
 ![Giga Simple Mode](docs/Giga_Simple_Mode.png)
 
@@ -95,8 +96,8 @@ as one window or as separate floating panels.
                            4. Twister / Donut
 - **Chat Callouts** — Optional announcements sent to a chat channel of your choice (party,
                       linkshell, free company, echo for testing, and more). **Party Mode**
-                      (default) sends the mechanic callouts - debuff resolutions with target
-                      letters, gaze, chaos and Kefka; an advanced **Personal Mode** adds
+                      (default) sends the gaze, chaos and Kefka callouts; an advanced
+                      **Personal Mode** adds debuff resolutions on non-party channels plus
                       title/custom callouts and per-announcement channels.
 - **Self Marked Spreads** — Optional Self marking for spread markers based on role.
 
@@ -202,7 +203,9 @@ Open with the **Settings** button or `/snazzyp4 config`. Settings are grouped in
     with your own role's letter) while the set panels keep the gaze and chaos lines.
   - **Giga Simple Mode (BETA)** — no debuff buttons at all: just real/fake Exdeath, Inferno,
     Tsunami, Thunder and Blizzard. Each set panel lists every debuff's resolution with **both
-    roles' letters** (e.g. `Lightning - Spread on D/B`).
+    roles' letters** (e.g. `Lightning - Spread on D/B`). *Temporarily unavailable while its
+    resolution logic is corrected to account for short/long debuff timing; a saved selection
+    falls back to Classic.*
   - Settings, commands and text labels that don't apply to the active mode are hidden while it's
     selected, and switching modes resets the current pull. Chat callouts work the same in every
     mode.
@@ -237,13 +240,14 @@ Open with the **Settings** button or `/snazzyp4 config`. Settings are grouped in
 
 - **Enable chat announcements** — master switch, off by default; nothing is sent while it's off.
 - **Mode** (mutually exclusive):
-  - **Party Mode** (default) — sends the mechanic callouts: debuff resolutions with **both
-    roles' target letters** (e.g. `[1st] Lightning - Spread on D/B`), gaze, Inferno/Tsunami and
-    the Kefka Thunder/Blizzard callouts.
-  - **Personal Mode** (advanced, hidden until you reveal it) — adds titles and custom callouts
-    (kept out of `/p` party chat unless you flip the override), shows only **your own role's
-    letter** on messages that don't go to `/p`, and can route each announcement to its own
-    channel.
+  - **Party Mode** (default) — sends the gaze, Inferno/Tsunami and Kefka Thunder/Blizzard
+    callouts.
+  - **Personal Mode** (advanced, hidden until you reveal it) — adds the debuff resolution
+    callouts with **your own role's letter** (e.g. `[1st] Lightning - Spread on B`), titles and
+    custom callouts (kept out of `/p` party chat unless you flip the override), and can route
+    each announcement to its own channel.
+  - The Lightning/Drop/Acceleration callouts don't yet carry each player's short/long timing,
+    so they are **never sent to party chat**, in either mode, regardless of the override.
 - **Chronological summary** — hold the per-press announcements back and instead send the whole
   list, in fight order, once everything is pressed.
 - **Include [1st] / [2nd] prefix** in the default messages.

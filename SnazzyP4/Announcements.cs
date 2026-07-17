@@ -142,14 +142,26 @@ namespace SnazzyP4
         }
 
         /// <summary>
-        /// Whether a slot is safe to broadcast to party chat: every built-in mechanic callout.
+        /// Whether a slot is safe to broadcast to party chat: the gaze, chaos and Kefka callouts.
         /// Party Mode sends only these; Personal Mode blocks the titles and custom messages from party chat unless overridden.
+        /// The debuff callouts are excluded because they do not yet carry each player's short/long timing.
         /// </summary>
         /// <param name="slotId">The slot id to classify.</param>
         /// <returns>True when the slot may be broadcast to party chat.</returns>
         public static bool IsPartySafe(string slotId)
         {
-            return slotId is "gaze" or "spread" or "drop" or "accel" or "inferno" or "tsunami" or "thunder" or "blizzard";
+            return slotId is "gaze" or "inferno" or "tsunami" or "thunder" or "blizzard";
+        }
+
+        /// <summary>
+        /// Determines whether a slot is one of the Exdeath debuff callouts (Lightning, Drop or Acceleration).
+        /// These do not yet carry each player's short/long timing, so they are kept out of party chat entirely.
+        /// </summary>
+        /// <param name="slotId">The slot id to test.</param>
+        /// <returns>True when the slot is a debuff callout.</returns>
+        public static bool IsDebuffCallout(string slotId)
+        {
+            return slotId is "spread" or "drop" or "accel";
         }
 
         /// <summary>

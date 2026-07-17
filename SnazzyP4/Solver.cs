@@ -2336,6 +2336,12 @@ namespace SnazzyP4
         /// <returns>True when the current mode permits that slot on that channel.</returns>
         private bool SlotAllowed(string slotId, string channel)
         {
+            // A party callout that misses the short/long timing would misdirect the raid, so the debuff slots never reach party chat, override or not.
+            if (channel == "/p" && AnnouncementData.IsDebuffCallout(slotId))
+            {
+                return false;
+            }
+
             var partySafe = AnnouncementData.IsPartySafe(slotId);
             if (!configuration.IsPersonalMode)
             {
