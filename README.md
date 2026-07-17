@@ -89,9 +89,10 @@ as one window or as separate floating panels.
                            4. Twister / Donut
 - **Chat Callouts** — Optional announcements sent to a chat channel of your choice (party,
                       linkshell, free company, echo for testing, and more). **Party Mode**
-                      (default) sends the gaze, chaos and Kefka callouts; an advanced
-                      **Personal Mode** adds debuff resolutions on non-party channels plus
-                      title/custom callouts and per-announcement channels.
+                      (default) sends the gaze, chaos and Kefka callouts, plus (in Classic
+                      Mode) the Lightning/Drop callouts and an "ALL BOMBS" line when both
+                      Exdeath presses match; an advanced **Personal Mode** adds title/custom
+                      callouts and per-announcement channels.
 - **Self Marked Spreads** — Optional Self marking for spread markers based on role.
 
 ## Installation
@@ -228,21 +229,29 @@ Open with the **Settings** button or `/snazzyp4 config`. Settings are grouped in
 - **Enable chat announcements** — master switch, off by default; nothing is sent while it's off.
 - **Mode** (mutually exclusive):
   - **Party Mode** (default) — sends the gaze, Inferno/Tsunami and Kefka Thunder/Blizzard
-    callouts.
-  - **Personal Mode** (advanced, hidden until you reveal it) — adds the debuff resolution
-    callouts with **your own role's letter** (e.g. `[1st] Lightning - Spread on B`), titles and
-    custom callouts (kept out of `/p` party chat unless you flip the override), and can route
-    each announcement to its own channel.
+    callouts, plus (in Classic Mode) the Lightning/Drop callouts with **both roles' target
+    letters** (e.g. `[1st] Lightning - Spread on D/B`) and an `ALL BOMBS ARE STILLNESS` /
+    `ALL BOMBS ARE MOTION` line when both Exdeath presses match.
+  - **Personal Mode** (advanced, hidden until you reveal it) — shows **your own role's letter**
+    on messages that don't go to `/p`, adds titles and custom callouts (kept out of `/p` party
+    chat unless you flip the override), and can route each announcement to its own channel.
+  - The Lightning/Drop callouts follow the fight's timing rules: all of one Exdeath's waters and
+    lightnings share a timer, so your body debuff press pins which Exdeath owns which set and
+    each set's callout fires as soon as its resolution is actually known. They only exist in
+    Classic Mode, since the other modes never learn the short/long split. Bombs are never called
+    per set — on a mixed pull every player's bombs resolve differently, so the All Bombs line
+    only goes out when both presses match.
 - **Chronological summary** — hold the per-press announcements back and instead send the whole
   list, in fight order, once everything is pressed.
 - **Include [1st] / [2nd] prefix** in the default messages.
 - **Channel** — pick the active channel (Party, Say, Linkshells, Echo for testing, and more),
   **Copy settings to...** another channel, and **Quick toggles** to turn all announcements (or just
   the set titles) on/off for that channel.
-- **Announce Exdeath** (fires on an Exdeath Real/Fake press), **Announce Chaos** (fires on a
-  chaos press) and **Announce Kefka** (fires on a Thunder/Blizzard press; always per press,
-  never part of the chronological summary) — each split by set/mechanic and Real/Fake, and each
-  branch uses:
+- **Announce Exdeath** (titles and gaze fire on an Exdeath Real/Fake press; the Lightning/Drop
+  callouts fire once your body debuff press pins the sets, and the second set's **All Bombs**
+  line fires only when both presses match), **Announce Chaos** (fires on a chaos press) and
+  **Announce Kefka** (fires on a Thunder/Blizzard press; always per press, never part of the
+  chronological summary) — each split by set/mechanic and Real/Fake, and each branch uses:
   - **Ordered list** — reorderable per-mechanic toggles with custom, reorderable message lists, an
     optional **Announce Title** line, and a **+ Add custom message** button.
   - **Simple text box** — one chat line per message.

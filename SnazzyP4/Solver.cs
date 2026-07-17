@@ -2080,6 +2080,12 @@ namespace SnazzyP4
                 secondExdeathPressed = true;
                 phase = gigaSimple ? Phase.Done : Phase.WaitSecondShortLong;
                 FireAnnouncements(ActiveExdeath, "exdeath", false, real, null);
+
+                // A body picked in the first window leaves its opposite set waiting on this press's real/fake.
+                if (configuration.SolverMode == SolverMode.Classic && selections.Count == 1 && selections[0].Kind != MechanicKind.Acceleration)
+                {
+                    FireBodyAnnouncements(!selections[0].IsShort, real);
+                }
             }
         }
 
@@ -2174,6 +2180,117 @@ namespace SnazzyP4
             PushUndo();
             selections.Add(new Selection(kind, isShort, real));
             phase = phase == Phase.WaitFirstShortLong ? Phase.WaitSecondExdeath : Phase.Done;
+
+            // A body pick names the set its window owns, unlocking that set's callouts; made in the second window it unlocks both sets.
+            // An Acceleration pick reveals nothing about the body sets and must not refire callouts a body pick already sent.
+            if (kind != MechanicKind.Acceleration)
+            {
+                var (firstSetBodiesReal, secondSetBodiesReal) = BodySetReals();
+                if (firstSetBodiesReal.HasValue)
+                {
+                    FireBodyAnnouncements(true, firstSetBodiesReal.Value);
+                }
+
+                if (secondSetBodiesReal.HasValue)
+                {
+                    FireBodyAnnouncements(false, secondSetBodiesReal.Value);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Resolves the real/fake driving each set's water/lightning callouts from the Classic Mode body pick.
+        /// All of one Exdeath's waters and lightnings share a timer, so the pick's column names the set its own window applied and the other window applied the other set.
+        /// </summary>
+        /// <returns>The first and second set body reals, each null until its applying Exdeath press is known.</returns>
+        private (bool? FirstSetReal, bool? SecondSetReal) BodySetReals()
+        {
+            // Simple Mode picks carry no column, so they reveal nothing about the sets.
+            if (configuration.SolverMode != SolverMode.Classic)
+            {
+                return (null, null);
+            }
+
+            for (var index = 0; index < selections.Count; index++)
+            {
+                var selection = selections[index];
+                if (selection.Kind == MechanicKind.Acceleration)
+                {
+                    continue;
+                }
+
+                // One pick happens per window, so the pick's position tells which window made it.
+                var pressedInFirstWindow = index == 0;
+                bool? otherWindowReal;
+                if (pressedInFirstWindow)
+                {
+                    otherWindowReal = secondExdeathPressed ? secondExdeathReal : null;
+                }
+                else
+                {
+                    otherWindowReal = firstExdeathReal;
+                }
+
+                if (selection.IsShort)
+                {
+                    return (selection.IsReal, otherWindowReal);
+                }
+
+                return (otherWindowReal, selection.IsReal);
+            }
+
+            return (null, null);
+        }
+
+        /// <summary>
+        /// Fires the water/lightning body callouts for one set once the real/fake driving that set is known.
+        /// The body pick, not the Exdeath press order, decides which set each Exdeath's debuffs resolve in, so these fire separately from the other Exdeath slots.
+        /// Only the ordered list carries per-mechanic slots; the simple text box still fires whole with its Exdeath press.
+        /// </summary>
+        /// <param name="isFirst">Whether the first set's callouts fire rather than the second's.</param>
+        /// <param name="isReal">The real/fake driving that set's water/lightning resolutions.</param>
+        private void FireBodyAnnouncements(bool isFirst, bool isReal)
+        {
+            if (!configuration.AnnouncementsEnabled || configuration.AnnouncementChronological)
+            {
+                return;
+            }
+
+            var category = ActiveExdeath;
+            if (!category.Ordered)
+            {
+                return;
+            }
+
+            var globalChannel = configuration.AnnouncementChannel;
+            var leaf = category.GetLeaf(isFirst, isReal);
+            foreach (var slot in leaf.Slots)
+            {
+                if (!slot.Enabled || !AnnouncementData.IsBodyCallout(slot.Id))
+                {
+                    continue;
+                }
+
+                var channel = SlotChannel(slot, globalChannel);
+                if (!SlotAllowed(slot.Id, channel))
+                {
+                    continue;
+                }
+
+                if (slot.UseCustomMessage)
+                {
+                    foreach (var message in slot.Messages)
+                    {
+                        SendAnnouncement(channel, message);
+                    }
+                }
+                else
+                {
+                    var bothRoles = !configuration.IsPersonalMode || channel == "/p";
+                    SendAnnouncement(channel, AnnouncementData.DefaultMessage("exdeath", slot.Id, isFirst, isReal, configuration.AnnouncementShowSetNumber,
+                                                                              configuration.SpreadLetters(bothRoles), configuration.StackLetters(bothRoles)));
+                }
+            }
         }
 
         /// <summary>
@@ -2259,6 +2376,18 @@ namespace SnazzyP4
                         continue;
                     }
 
+                    // The body callouts fire from the body debuff press that pins each set's owner, not from the Exdeath press itself.
+                    if (categoryId == "exdeath" && AnnouncementData.IsBodyCallout(slot.Id))
+                    {
+                        continue;
+                    }
+
+                    // Mixed pulls resolve the bombs per player, so the all-bombs callout only fires when both Exdeath presses match.
+                    if (slot.Id == "bombs" && firstExdeathReal != isReal)
+                    {
+                        continue;
+                    }
+
                     var channel = SlotChannel(slot, globalChannel);
                     if (!SlotAllowed(slot.Id, channel))
                     {
@@ -2276,7 +2405,7 @@ namespace SnazzyP4
                     {
                         var bothRoles = !configuration.IsPersonalMode || channel == "/p";
                         SendAnnouncement(channel, AnnouncementData.DefaultMessage(categoryId, slot.Id, isFirst, isReal, configuration.AnnouncementShowSetNumber,
-                                                                                  configuration.SpreadLetters(bothRoles), configuration.StackLetters(bothRoles), bothRoles));
+                                                                                  configuration.SpreadLetters(bothRoles), configuration.StackLetters(bothRoles)));
                     }
                 }
 
@@ -2336,12 +2465,6 @@ namespace SnazzyP4
         /// <returns>True when the current mode permits that slot on that channel.</returns>
         private bool SlotAllowed(string slotId, string channel)
         {
-            // A party callout that misses the short/long timing would misdirect the raid, so the debuff slots never reach party chat, override or not.
-            if (channel == "/p" && AnnouncementData.IsDebuffCallout(slotId))
-            {
-                return false;
-            }
-
             var partySafe = AnnouncementData.IsPartySafe(slotId);
             if (!configuration.IsPersonalMode)
             {
@@ -2401,8 +2524,8 @@ namespace SnazzyP4
 
         /// <summary>
         /// Builds and sends the chronological announcement list, in resolution order, to the currently selected channel:
-        /// first-set debuffs, 1st gaze, Inferno, second-set debuffs, 2nd gaze, Tsunami.
-        /// It reads the selected channel's configured announcement messages.
+        /// first-set bodies, 1st gaze, Inferno, second-set bodies, 2nd gaze, the all-bombs line when both presses match, Tsunami.
+        /// Each set's body callouts read the leaf of the real/fake that actually drives them, per the body pick.
         /// </summary>
         private void SendChronological()
         {
@@ -2413,19 +2536,38 @@ namespace SnazzyP4
 
             var messages = new List<string>();
             var showSet = configuration.AnnouncementShowSetNumber;
+            var (firstSetBodiesReal, secondSetBodiesReal) = BodySetReals();
 
-            // 1. First set Exdeath debuffs (everything enabled except the gaze).
-            CollectLeafMessages(messages, exdeath, "exdeath", true, firstExdeathReal, includeGaze: false, includeNonGaze: true, showSet, channel);
+            // 1. First set title and custom lines, then its body callouts under the real/fake that actually drives them.
+            CollectLeafMessages(messages, exdeath, "exdeath", true, firstExdeathReal, slot => slot.Id == "title" || slot.IsCustom, includeSimpleText: true, showSet, channel);
+            if (firstSetBodiesReal.HasValue)
+            {
+                CollectLeafMessages(messages, exdeath, "exdeath", true, firstSetBodiesReal.Value, slot => AnnouncementData.IsBodyCallout(slot.Id), includeSimpleText: false, showSet, channel);
+            }
+
             // 2. First gaze.
-            CollectLeafMessages(messages, exdeath, "exdeath", true, firstExdeathReal, includeGaze: true, includeNonGaze: false, showSet, channel);
+            CollectLeafMessages(messages, exdeath, "exdeath", true, firstExdeathReal, slot => slot.Id == "gaze", includeSimpleText: false, showSet, channel);
             // 3. Inferno (first set chaos).
-            CollectLeafMessages(messages, chaos, "chaos", true, infernoReal, includeGaze: false, includeNonGaze: true, showSet, channel);
-            // 4. Second set Exdeath debuffs (everything enabled except the gaze).
-            CollectLeafMessages(messages, exdeath, "exdeath", false, secondExdeathReal, includeGaze: false, includeNonGaze: true, showSet, channel);
+            CollectLeafMessages(messages, chaos, "chaos", true, infernoReal, slot => true, includeSimpleText: true, showSet, channel);
+
+            // 4. Second set title, custom lines and body callouts.
+            CollectLeafMessages(messages, exdeath, "exdeath", false, secondExdeathReal, slot => slot.Id == "title" || slot.IsCustom, includeSimpleText: true, showSet, channel);
+            if (secondSetBodiesReal.HasValue)
+            {
+                CollectLeafMessages(messages, exdeath, "exdeath", false, secondSetBodiesReal.Value, slot => AnnouncementData.IsBodyCallout(slot.Id), includeSimpleText: false, showSet, channel);
+            }
+
             // 5. Second gaze.
-            CollectLeafMessages(messages, exdeath, "exdeath", false, secondExdeathReal, includeGaze: true, includeNonGaze: false, showSet, channel);
-            // 6. Tsunami (second set chaos).
-            CollectLeafMessages(messages, chaos, "chaos", false, tsunamiReal, includeGaze: false, includeNonGaze: true, showSet, channel);
+            CollectLeafMessages(messages, exdeath, "exdeath", false, secondExdeathReal, slot => slot.Id == "gaze", includeSimpleText: false, showSet, channel);
+
+            // 6. The all-bombs line, only when both Exdeath presses match; mixed pulls resolve the bombs per player.
+            if (firstExdeathReal == secondExdeathReal)
+            {
+                CollectLeafMessages(messages, exdeath, "exdeath", false, secondExdeathReal, slot => slot.Id == "bombs", includeSimpleText: false, showSet, channel);
+            }
+
+            // 7. Tsunami (second set chaos).
+            CollectLeafMessages(messages, chaos, "chaos", false, tsunamiReal, slot => true, includeSimpleText: true, showSet, channel);
 
             foreach (var message in messages)
             {
@@ -2435,25 +2577,25 @@ namespace SnazzyP4
 
         /// <summary>
         /// Appends one leaf's enabled announcement messages to the chronological list.
-        /// The gaze slot is separated out via <paramref name="includeGaze"/>/<paramref name="includeNonGaze"/> so it can be placed after the other debuffs.
-        /// Simple-mode leaves have no per-mechanic split, so their text is added only on the non-gaze pass.
+        /// Each pass names the slots it collects via <paramref name="slotFilter"/> so the chronological order can interleave leaves.
+        /// Simple-mode leaves have no per-mechanic split, so their text is added only on a pass that includes it.
         /// </summary>
         /// <param name="output">The list the collected messages are appended to.</param>
         /// <param name="category">The announcement configuration the leaf belongs to.</param>
         /// <param name="categoryId">The category id, either "exdeath" or "chaos".</param>
         /// <param name="isFirst">Whether the first set's leaf is read rather than the second's.</param>
         /// <param name="isReal">Whether the real branch is read rather than the fake one.</param>
-        /// <param name="includeGaze">Whether the gaze slot is collected on this pass.</param>
-        /// <param name="includeNonGaze">Whether the non-gaze slots are collected on this pass.</param>
+        /// <param name="slotFilter">Selects which of the leaf's slots this pass collects.</param>
+        /// <param name="includeSimpleText">Whether a simple-mode leaf's whole text is collected on this pass.</param>
         /// <param name="includeSetNumber">Whether generated defaults carry the "[1st]"/"[2nd]" prefix.</param>
         /// <param name="channel">The channel the list will be sent to, used for the mode filter.</param>
-        private void CollectLeafMessages(List<string> output, AnnouncementCategory category, string categoryId, bool isFirst, bool isReal, bool includeGaze, bool includeNonGaze, bool includeSetNumber, string channel)
+        private void CollectLeafMessages(List<string> output, AnnouncementCategory category, string categoryId, bool isFirst, bool isReal, Func<AnnouncementSlot, bool> slotFilter, bool includeSimpleText, bool includeSetNumber, string channel)
         {
             var leaf = category.GetLeaf(isFirst, isReal);
             if (!category.Ordered)
             {
-                // Simple mode has no per-mechanic split, so the leaf is classified by a representative slot on the non-gaze pass.
-                if (!includeNonGaze || !SlotAllowed(RepresentativeSlot(categoryId), channel))
+                // Simple mode has no per-mechanic split, so the leaf is classified by a representative slot.
+                if (!includeSimpleText || !SlotAllowed(RepresentativeSlot(categoryId), channel))
                 {
                     return;
                 }
@@ -2471,13 +2613,7 @@ namespace SnazzyP4
 
             foreach (var slot in leaf.Slots)
             {
-                if (!slot.Enabled)
-                {
-                    continue;
-                }
-
-                var isGaze = slot.Id == "gaze";
-                if (isGaze ? !includeGaze : !includeNonGaze)
+                if (!slot.Enabled || !slotFilter(slot))
                 {
                     continue;
                 }
@@ -2501,7 +2637,7 @@ namespace SnazzyP4
                 {
                     var bothRoles = !configuration.IsPersonalMode || channel == "/p";
                     var message = AnnouncementData.DefaultMessage(categoryId, slot.Id, isFirst, isReal, includeSetNumber,
-                                                                  configuration.SpreadLetters(bothRoles), configuration.StackLetters(bothRoles), bothRoles);
+                                                                  configuration.SpreadLetters(bothRoles), configuration.StackLetters(bothRoles));
                     if (!string.IsNullOrWhiteSpace(message))
                     {
                         output.Add(message);

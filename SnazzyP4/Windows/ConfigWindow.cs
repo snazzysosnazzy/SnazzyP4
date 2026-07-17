@@ -978,8 +978,8 @@ namespace SnazzyP4.Windows
             }
             else
             {
-                DrawSetSection("First set", category, true, categoryId, AnnouncementData.ExdeathSlots);
-                DrawSetSection("Second set", category, false, categoryId, AnnouncementData.ExdeathSlots);
+                DrawSetSection("First set", category, true, categoryId, AnnouncementData.ExdeathFirstSlots);
+                DrawSetSection("Second set", category, false, categoryId, AnnouncementData.ExdeathSecondSlots);
             }
 
             ImGui.Unindent();
@@ -1083,8 +1083,14 @@ namespace SnazzyP4.Windows
             {
                 var slot = leaf.Slots[index];
 
-                // Party Mode only shows the party-safe slots (gaze, Inferno, Tsunami); the rest are Personal Mode only.
+                // Party Mode only shows the party-safe slots; the titles and custom messages are Personal Mode only.
                 if (!Configuration.IsPersonalMode && !AnnouncementData.IsPartySafe(slot.Id))
+                {
+                    continue;
+                }
+
+                // Only Classic Mode's body pick pins each set's owner, so the body callouts are hidden in the other modes.
+                if (Configuration.SolverMode != SolverMode.Classic && AnnouncementData.IsBodyCallout(slot.Id))
                 {
                     continue;
                 }
@@ -1113,7 +1119,18 @@ namespace SnazzyP4.Windows
                         Configuration.Save();
                     }
 
-                    Tooltip("Sends this line to chat when the matching macro button for this set is pressed. The list order is the send order.");
+                    if (slot.Id == "bombs")
+                    {
+                        Tooltip("Sends the all-bombs line after the 2nd Exdeath press, but only when both presses match; on a mixed pull every player's bombs resolve differently, so nothing is sent.");
+                    }
+                    else if (AnnouncementData.IsBodyCallout(slot.Id))
+                    {
+                        Tooltip("Sends this line once your body debuff press pins which Exdeath owns this set: your pick's set fires right away and the other set fires as soon as its Exdeath real/fake is known. The list order is the send order.");
+                    }
+                    else
+                    {
+                        Tooltip("Sends this line to chat when the matching macro button for this set is pressed. The list order is the send order.");
+                    }
 
                     if (slot.IsCustom)
                     {
@@ -1145,7 +1162,7 @@ namespace SnazzyP4.Windows
                             slot.UseCustomMessage = custom;
                             if (custom && slot.Messages.Count == 0)
                             {
-                                slot.Messages.Add(AnnouncementData.DefaultMessage(categoryId, slot.Id, isFirst, isReal, Configuration.AnnouncementShowSetNumber, spreadLetters, stackLetters, bothRoles));
+                                slot.Messages.Add(AnnouncementData.DefaultMessage(categoryId, slot.Id, isFirst, isReal, Configuration.AnnouncementShowSetNumber, spreadLetters, stackLetters));
                             }
 
                             Configuration.Save();
@@ -1159,7 +1176,7 @@ namespace SnazzyP4.Windows
                         }
                         else
                         {
-                            ImGui.TextDisabled($"Default: {AnnouncementData.DefaultMessage(categoryId, slot.Id, isFirst, isReal, Configuration.AnnouncementShowSetNumber, spreadLetters, stackLetters, bothRoles)}");
+                            ImGui.TextDisabled($"Default: {AnnouncementData.DefaultMessage(categoryId, slot.Id, isFirst, isReal, Configuration.AnnouncementShowSetNumber, spreadLetters, stackLetters)}");
                         }
                     }
 

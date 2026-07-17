@@ -19,6 +19,13 @@ namespace SnazzyP4
         /// </summary>
         public static readonly Entry[] Entries =
         {
+            new("1.1.3.0", "2026-07-16", new[]
+            {
+                "The Lightning and Drop callouts are back for party chat in Classic Mode, now following the fight's timing rules. All of one Exdeath's waters and lightnings share a timer, so your body debuff press pins which Exdeath owns which set: your pick's set is called right away and the other set is called as soon as its Exdeath real/fake is known. The chronological summary uses the same attribution.",
+                "New \"All Bombs\" callout on the second set: \"ALL BOMBS ARE STILLNESS\" or \"ALL BOMBS ARE MOTION\", sent after the 2nd Exdeath press only when both presses match. On a mixed pull every player's bombs resolve differently, so nothing is sent and bombs are left to personal echo macros.",
+                "The per-set Acceleration announcement is removed: a set's bombs can come from either Exdeath, so a per-set bomb callout was wrong on mixed pulls. Existing configurations migrate automatically.",
+                "The Lightning/Drop callouts only exist in Classic Mode, since the other modes never learn the short/long split. Gaze, chaos and Kefka callouts are unchanged; the gaze was always attributed correctly.",
+            }),
             new("1.1.2.1", "2026-07-16", new[]
             {
                 "The Lightning, Drop and Acceleration chat callouts do not yet account for each player's short/long debuff timing, so a party-wide callout could name the wrong resolution for some players. Until that is corrected they are Personal Mode only and are never sent to party chat, in either mode, regardless of the party override.",

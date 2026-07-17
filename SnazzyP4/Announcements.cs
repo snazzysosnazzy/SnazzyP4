@@ -105,8 +105,14 @@ namespace SnazzyP4
     /// </summary>
     public static class AnnouncementData
     {
-        /// <summary>The ordered Exdeath announcement slot ids (the built-in title plus the four mechanics).</summary>
-        public static readonly string[] ExdeathSlots = { "title", "gaze", "spread", "drop", "accel" };
+        /// <summary>The ordered Exdeath announcement slot ids for the first set: the title, the gaze and the two body callouts.</summary>
+        public static readonly string[] ExdeathFirstSlots = { "title", "gaze", "spread", "drop" };
+
+        /// <summary>
+        /// The ordered Exdeath announcement slot ids for the second set.
+        /// The all-bombs callout lives here because it can only be judged once both Exdeath presses are in.
+        /// </summary>
+        public static readonly string[] ExdeathSecondSlots = { "title", "gaze", "spread", "drop", "bombs" };
 
         /// <summary>The ordered Chaos announcement slot ids for the first set, which always resolves Inferno.</summary>
         public static readonly string[] ChaosFirstSlots = { "title", "inferno" };
@@ -138,30 +144,29 @@ namespace SnazzyP4
                 return isFirst ? KefkaFirstSlots : KefkaSecondSlots;
             }
 
-            return ExdeathSlots;
+            return isFirst ? ExdeathFirstSlots : ExdeathSecondSlots;
         }
 
         /// <summary>
-        /// Whether a slot is safe to broadcast to party chat: the gaze, chaos and Kefka callouts.
+        /// Whether a slot is safe to broadcast to party chat: every built-in mechanic callout.
         /// Party Mode sends only these; Personal Mode blocks the titles and custom messages from party chat unless overridden.
-        /// The debuff callouts are excluded because they do not yet carry each player's short/long timing.
         /// </summary>
         /// <param name="slotId">The slot id to classify.</param>
         /// <returns>True when the slot may be broadcast to party chat.</returns>
         public static bool IsPartySafe(string slotId)
         {
-            return slotId is "gaze" or "inferno" or "tsunami" or "thunder" or "blizzard";
+            return slotId is "gaze" or "spread" or "drop" or "bombs" or "inferno" or "tsunami" or "thunder" or "blizzard";
         }
 
         /// <summary>
-        /// Determines whether a slot is one of the Exdeath debuff callouts (Lightning, Drop or Acceleration).
-        /// These do not yet carry each player's short/long timing, so they are kept out of party chat entirely.
+        /// Determines whether a slot is one of the water/lightning body callouts.
+        /// These fire from the body debuff press that pins each set's owner rather than from the Exdeath presses themselves.
         /// </summary>
         /// <param name="slotId">The slot id to test.</param>
-        /// <returns>True when the slot is a debuff callout.</returns>
-        public static bool IsDebuffCallout(string slotId)
+        /// <returns>True when the slot is a body callout.</returns>
+        public static bool IsBodyCallout(string slotId)
         {
-            return slotId is "spread" or "drop" or "accel";
+            return slotId is "spread" or "drop";
         }
 
         /// <summary>
@@ -177,7 +182,7 @@ namespace SnazzyP4
                 "gaze" => "Gaze",
                 "spread" => "Spread",
                 "drop" => "Water Drop",
-                "accel" => "Acceleration",
+                "bombs" => "All Bombs",
                 "inferno" => "Inferno",
                 "tsunami" => "Tsunami",
                 "thunder" => "Thunder",
@@ -212,9 +217,8 @@ namespace SnazzyP4
         /// <param name="includeSetNumber">Whether Exdeath debuff messages carry the "[1st]"/"[2nd]" prefix.</param>
         /// <param name="spreadLetters">The target letters appended to a spread resolution.</param>
         /// <param name="stackLetters">The target letters appended to a stack resolution.</param>
-        /// <param name="partyFacing">Whether the message goes to the party rather than being a personal callout.</param>
         /// <returns>The generated chat message, or an empty string for an unknown slot.</returns>
-        public static string DefaultMessage(string categoryId, string slotId, bool isFirst, bool isReal, bool includeSetNumber = true, string spreadLetters = "", string stackLetters = "", bool partyFacing = true)
+        public static string DefaultMessage(string categoryId, string slotId, bool isFirst, bool isReal, bool includeSetNumber = true, string spreadLetters = "", string stackLetters = "")
         {
             var set = isFirst ? "1st" : "2nd";
             if (slotId == "title")
@@ -234,6 +238,7 @@ namespace SnazzyP4
             }
 
             // Format: "[set] Debuff - Resolvement", for example "[1st] Lightning - Spread on D/B". The set prefix is optional.
+            // The all-bombs callout covers the whole pull, so it carries no set prefix.
             if (categoryId == "exdeath")
             {
                 var prefix = includeSetNumber ? $"[{set}] " : string.Empty;
@@ -242,7 +247,7 @@ namespace SnazzyP4
                     "gaze" => isReal ? $"{prefix}Gaze - Look Away" : $"{prefix}Gaze - Look",
                     "spread" => isReal ? $"{prefix}Lightning - Spread on {spreadLetters}" : $"{prefix}Lightning - Stack on {stackLetters}",
                     "drop" => isReal ? $"{prefix}Drop - Stack on {stackLetters}" : $"{prefix}Drop - Spread on {spreadLetters}",
-                    "accel" => AccelerationMessage(prefix, isReal, partyFacing),
+                    "bombs" => isReal ? "ALL BOMBS ARE STILLNESS" : "ALL BOMBS ARE MOTION",
                     _ => string.Empty,
                 };
             }
@@ -263,24 +268,6 @@ namespace SnazzyP4
                 "tsunami" => isReal ? "Tsunami - Donut (STAY)" : "Tsunami - Twister (MOVE)",
                 _ => string.Empty,
             };
-        }
-
-        /// <summary>
-        /// Builds the Acceleration resolution announcement.
-        /// Party-facing messages use the STILLNESS/MOTION callout wording while personal ones match the on-screen STAND STILL/MOVE labels.
-        /// </summary>
-        /// <param name="prefix">The optional set-number prefix.</param>
-        /// <param name="isReal">Whether the debuff resolved on the real branch.</param>
-        /// <param name="partyFacing">Whether the message goes to the party rather than being a personal callout.</param>
-        /// <returns>The Acceleration announcement text.</returns>
-        private static string AccelerationMessage(string prefix, bool isReal, bool partyFacing)
-        {
-            if (partyFacing)
-            {
-                return isReal ? $"{prefix}Acceleration - STILLNESS" : $"{prefix}Acceleration - MOTION";
-            }
-
-            return isReal ? $"{prefix}Acceleration - STAND STILL" : $"{prefix}Acceleration - MOVE";
         }
 
         /// <summary>
