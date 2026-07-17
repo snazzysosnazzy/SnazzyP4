@@ -199,7 +199,10 @@ Open with the **Settings** button or `/snazzyp4 config`. Settings are grouped in
   windows, edit layout, Move All; floating
   **Hide** / **Reset** / **Undo** buttons; **Hide Resolved Buttons Until Reset** (each button
   group disappears once fully entered and returns on Reset); **Acceleration on the same line**
-  as Spread/Stack (`Spread on X and MOVE`, Classic Mode); **combine the First and Second sets** into one panel
+  as Spread/Stack (`Spread on X and MOVE`, Classic Mode); **Undock debuff buttons from Exdeath**
+  (the Lightning/Drop/Acceleration buttons become their own movable panel, with a further option
+  to split the SHORT and LONG columns into separate panels); **Split Chaos into Inferno and
+  Tsunami panels**; **combine the First and Second sets** into one panel
   (stacked or side by side, with a pinnable divider); **bring all windows on-screen**.
 - **Settings profiles** — copy your whole setup to the clipboard, or paste one in.
 - **Reset** — **Reset layout to defaults** / **Restore ALL settings to defaults**.
@@ -241,7 +244,10 @@ Open with the **Settings** button or `/snazzyp4 config`. Settings are grouped in
     **Text Panels**.
 - **Sections** — fine-tune per section: position, scale, background opacity, hide title bar /
   labels, and button or text opacity for the current mode (windowed and detached keep separate
-  values).
+  values). The macro button panels also get a **Button layout** (Default keeps the usual grid,
+  Vertical stacks every button in one column, Horizontal lays them out in one row) and, where a
+  panel has real/fake or short/long pairs, a **Reverse button order** option that swaps the two
+  buttons in every pair.
 
 ### Colors
 

@@ -19,6 +19,14 @@ namespace SnazzyP4
         /// </summary>
         public static readonly Entry[] Entries =
         {
+            new("1.1.1.0", "2026-07-16", new[]
+            {
+                "The Exdeath debuff buttons can be undocked into their own movable panel (General tab, off by default). With that on, a further option splits the SHORT and LONG columns into two separate panels in Classic Mode.",
+                "The Chaos panel can be split into separate Inferno and Tsunami panels. Every undocked panel gets the full per-section treatment: position, scale, opacity, labels and its own detached window.",
+                "Every macro button panel now has a Button layout option under Layout > Sections: Default keeps the usual grid, Vertical stacks every button in one column and Horizontal lays them all out in one row. The column headers only show on the Default layout.",
+                "Panels with real/fake or short/long pairs also get a Reverse button order option that swaps the two buttons in every pair, putting Fake before Real and LONG before SHORT. The header row follows the swap.",
+                "Everything new defaults to the current look, so nothing moves or changes until a setting is turned on.",
+            }),
             new("1.1.0.0", "2026-07-16", new[]
             {
                 "Three gameplay modes, selectable at the top of the General tab. Classic Mode is the plugin exactly as it has always worked and stays the default.",

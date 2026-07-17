@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Numerics;
 using Dalamud.Bindings.ImGui;
 using Dalamud.Interface;
@@ -1548,6 +1549,42 @@ namespace SnazzyP4.Windows
                 Tooltip("Appends the movement word to the spread or stack line, for example \"Spread on X and MOVE\".");
             }
 
+            // Giga Simple Mode has no debuff buttons, so there is nothing to undock there.
+            if (Configuration.SolverMode != SolverMode.GigaSimple)
+            {
+                var splitExdeath = Configuration.SplitExdeathButtons;
+                if (ImGui.Checkbox("Undock debuff buttons from Exdeath", ref splitExdeath))
+                {
+                    Configuration.SplitExdeathButtons = splitExdeath;
+                    Configuration.Save();
+                }
+
+                Tooltip("Moves the Lightning/Drop/Acceleration buttons into their own repositionable panel instead of sitting under the real/fake Exdeath pair.");
+
+                if (Configuration.SplitExdeathButtons && Configuration.SolverMode == SolverMode.Classic)
+                {
+                    ImGui.Indent();
+                    var splitColumns = Configuration.SplitDebuffColumns;
+                    if (ImGui.Checkbox("Split SHORT and LONG columns into separate panels", ref splitColumns))
+                    {
+                        Configuration.SplitDebuffColumns = splitColumns;
+                        Configuration.Save();
+                    }
+
+                    Tooltip("Further splits the undocked debuff grid into a SHORT panel and a LONG panel that move independently.");
+                    ImGui.Unindent();
+                }
+            }
+
+            var splitChaos = Configuration.SplitChaosButtons;
+            if (ImGui.Checkbox("Split Chaos into Inferno and Tsunami panels", ref splitChaos))
+            {
+                Configuration.SplitChaosButtons = splitChaos;
+                Configuration.Save();
+            }
+
+            Tooltip("Gives the Inferno and Tsunami pairs their own repositionable panels instead of one Chaos panel.");
+
             var combineSets = Configuration.CombineSets;
             if (ImGui.Checkbox("Combine First and Second set into one panel", ref combineSets))
             {
@@ -1666,6 +1703,11 @@ namespace SnazzyP4.Windows
                     Configuration.Save();
                 }
 
+                if (OrientationSectionIds.Contains(id))
+                {
+                    DrawOrientationControls(id);
+                }
+
                 DrawAppearanceControls(() => Configuration.GetSectionBackgroundAlpha(id), value => Configuration.SetSectionBackgroundAlpha(id, value),
                                        () => Configuration.GetSectionNoTitleBar(id), value => Configuration.SetSectionNoTitleBar(id, value),
                                        () => Configuration.GetSectionHideLabels(id), value => Configuration.SetSectionHideLabels(id, value),
@@ -1674,6 +1716,86 @@ namespace SnazzyP4.Windows
 
                 ImGui.Unindent();
             }
+        }
+
+        /// <summary>
+        /// The macro button panels that offer the button layout and reverse-order options.
+        /// </summary>
+        private static readonly HashSet<string> OrientationSectionIds = new()
+        {
+            "Exdeath",
+            "Debuffs",
+            "ShortDebuffs",
+            "LongDebuffs",
+            "FireWaterButtons",
+            "Inferno",
+            "Tsunami",
+            "ThunderButtons",
+        };
+
+        /// <summary>
+        /// The names shown in the button layout dropdown, indexed by the <see cref="PanelOrientation"/> value.
+        /// </summary>
+        private static readonly string[] OrientationLabels = { "Default", "Vertical", "Horizontal" };
+
+        /// <summary>
+        /// Draws the button layout dropdown and, for panels with button pairs, the reverse-order checkbox.
+        /// </summary>
+        /// <param name="sectionId">The section the controls belong to.</param>
+        private void DrawOrientationControls(string sectionId)
+        {
+            var orientation = Configuration.GetSectionOrientation(sectionId);
+            ImGui.SetNextItemWidth(150f);
+            using (var combo = ImRaii.Combo($"Button layout##orient_{sectionId}", OrientationLabels[(int)orientation]))
+            {
+                Tooltip("Default keeps the panel's usual grid. Vertical stacks every button in one column and Horizontal lays them out in one row; the column headers only show on the default layout.");
+                if (combo)
+                {
+                    for (var optionIndex = 0; optionIndex < OrientationLabels.Length; optionIndex++)
+                    {
+                        if (ImGui.Selectable(OrientationLabels[optionIndex], (int)orientation == optionIndex))
+                        {
+                            Configuration.SetSectionOrientation(sectionId, (PanelOrientation)optionIndex);
+                            Configuration.Save();
+                        }
+                    }
+                }
+            }
+
+            if (!SectionHasPairs(sectionId))
+            {
+                return;
+            }
+
+            var reversedButtons = Configuration.GetSectionReversed(sectionId);
+            if (ImGui.Checkbox($"Reverse button order##rev_{sectionId}", ref reversedButtons))
+            {
+                Configuration.SetSectionReversed(sectionId, reversedButtons);
+                Configuration.Save();
+            }
+
+            Tooltip("Swaps the two buttons inside every pair, putting Fake before Real and LONG before SHORT.");
+        }
+
+        /// <summary>
+        /// Determines whether a panel currently holds button pairs the reverse option can swap.
+        /// The single-column debuff panels never do, and the Debuffs panel only pairs up in Classic Mode.
+        /// </summary>
+        /// <param name="sectionId">The section to test.</param>
+        /// <returns>True when the panel draws real/fake or short/long pairs.</returns>
+        private bool SectionHasPairs(string sectionId)
+        {
+            if (sectionId is "ShortDebuffs" or "LongDebuffs")
+            {
+                return false;
+            }
+
+            if (sectionId == "Debuffs")
+            {
+                return Configuration.SolverMode == SolverMode.Classic;
+            }
+
+            return true;
         }
 
         /// <summary>
@@ -2154,7 +2276,7 @@ namespace SnazzyP4.Windows
                 return id is not (TextLabels.AccelerationStillness or TextLabels.AccelerationMotion);
             }
 
-            return id is not (TextLabels.StandStill or TextLabels.Move);
+            return id is not (TextLabels.StandStill or TextLabels.Move or TextLabels.DebuffsHeader);
         }
 
         /// <summary>

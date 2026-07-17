@@ -3,6 +3,22 @@
 All notable changes to Snazzy P4 are listed here. Versions match the `vX.Y.Z.W`
 release tags.
 
+## v1.1.1.0 — 2026-07-16
+
+- **Undock debuff buttons from Exdeath** (General tab, off by default) — the
+  Lightning/Drop/Acceleration buttons become their own movable panel. With that on, a further
+  option splits the **SHORT and LONG columns** into two separate panels (Classic Mode).
+- **Split Chaos into Inferno and Tsunami panels** — each pair gets its own movable panel. Every
+  undocked panel has the full per-section treatment: position, scale, opacity, labels and its
+  own detached window.
+- **Button layout** per macro button panel (Layout → Sections): **Default** keeps the usual
+  grid, **Vertical** stacks every button in one column, **Horizontal** lays them all out in one
+  row. Column headers only show on the Default layout.
+- **Reverse button order** for panels with real/fake or short/long pairs — swaps the two buttons
+  in every pair (Fake before Real, LONG before SHORT); the header row follows the swap.
+- Everything new defaults to the current look, so nothing moves or changes until a setting is
+  turned on.
+
 ## v1.1.0.0 — 2026-07-16
 
 - **Three gameplay modes**, selectable at the top of the General tab. **Classic Mode** is the

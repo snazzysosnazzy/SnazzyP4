@@ -216,10 +216,15 @@ namespace SnazzyP4
             Sections = new List<SectionDef>
             {
                 new("Exdeath", "Exdeath", new Vector2(8, 52), Solver.DrawExdeath, HasButtons: true),
+                new("Debuffs", "Debuffs", new Vector2(8, 190), Solver.DrawDebuffButtons, HasButtons: true),
+                new("ShortDebuffs", "Debuffs (Short)", new Vector2(8, 190), Solver.DrawShortDebuffButtons, HasButtons: true),
+                new("LongDebuffs", "Debuffs (Long)", new Vector2(120, 190), Solver.DrawLongDebuffButtons, HasButtons: true),
                 new("FirstSet", "First Set (text)", new Vector2(8, 330), Solver.DrawFirstSet),
                 new("SecondSet", "Second Set (text)", new Vector2(210, 330), Solver.DrawSecondSet),
                 new("CombinedSets", "First + Second Set (combined text)", new Vector2(8, 330), Solver.DrawCombinedSets),
                 new("FireWaterButtons", "Chaos", new Vector2(340, 52), Solver.DrawFireWaterButtons, HasButtons: true),
+                new("Inferno", "Chaos (Inferno)", new Vector2(340, 52), Solver.DrawInfernoButtons, HasButtons: true),
+                new("Tsunami", "Chaos (Tsunami)", new Vector2(340, 190), Solver.DrawTsunamiButtons, HasButtons: true),
                 new("ThunderButtons", "Kefka", new Vector2(560, 52), Solver.DrawThunderButtons, HasButtons: true),
                 new("ThunderText", "Kefka (text)", new Vector2(560, 240), Solver.DrawThunderText),
                 new("LastFakeToggles", "Last Fake toggles", new Vector2(560, 360), Solver.DrawLastFakeToggles, HasButtons: true),
@@ -871,6 +876,12 @@ namespace SnazzyP4
                                      && !Configuration.LastFakeAnnounceDocked,
                 "FirstSet" or "SecondSet" => !Configuration.CombineSets,
                 "CombinedSets" => Configuration.CombineSets,
+                "Debuffs" => Configuration.SplitExdeathButtons && Configuration.SolverMode != SolverMode.GigaSimple
+                                     && !(Configuration.SolverMode == SolverMode.Classic && Configuration.SplitDebuffColumns),
+                "ShortDebuffs" or "LongDebuffs" => Configuration.SplitExdeathButtons && Configuration.SplitDebuffColumns
+                                     && Configuration.SolverMode == SolverMode.Classic,
+                "Inferno" or "Tsunami" => Configuration.SplitChaosButtons,
+                "FireWaterButtons" => !Configuration.SplitChaosButtons,
                 _ => true,
             };
         }

@@ -320,7 +320,10 @@ namespace SnazzyP4
             return sectionId switch
             {
                 "Exdeath" => phase == Phase.Done,
+                "Debuffs" or "ShortDebuffs" or "LongDebuffs" => phase == Phase.Done,
                 "FireWaterButtons" => firstSetChaos.HasValue && secondSetChaos.HasValue,
+                "Inferno" => firstSetChaos.HasValue,
+                "Tsunami" => secondSetChaos.HasValue,
                 "ThunderButtons" => thunderPressed && blizzardPressed,
                 _ => false,
             };
@@ -383,114 +386,291 @@ namespace SnazzyP4
         }
 
         /// <summary>
-        /// Draws the Exdeath real/fake buttons followed by the mode's debuff buttons:
-        /// the short/long grid in Classic Mode, a single debuff column in Simple Mode and nothing in Giga Simple Mode.
+        /// A single icon button inside a macro button panel group.
+        /// </summary>
+        /// <param name="Id">The ImGui id of the button.</param>
+        /// <param name="Icon">The icon file drawn on the button.</param>
+        /// <param name="Enabled">Whether the button is currently pressable.</param>
+        /// <param name="Press">The action run when the button is pressed.</param>
+        private readonly record struct PanelButton(string Id, string Icon, bool Enabled, Action Press);
+
+        /// <summary>
+        /// One group of a macro button panel, drawn as its own row in the standard layout.
+        /// A hidden group keeps its footprint so the remaining buttons do not shift.
+        /// </summary>
+        /// <param name="Buttons">The group's buttons in their unreversed order.</param>
+        /// <param name="Hidden">Whether the group is hidden by the hide-resolved-buttons option.</param>
+        private readonly record struct PanelGroup(List<PanelButton> Buttons, bool Hidden);
+
+        /// <summary>
+        /// Identifies which debuff buttons a panel hosts.
+        /// </summary>
+        private enum DebuffColumn
+        {
+            /// <summary>
+            /// The full Classic Mode short/long grid.
+            /// </summary>
+            Grid,
+
+            /// <summary>
+            /// Only the short (first set) column.
+            /// </summary>
+            ShortOnly,
+
+            /// <summary>
+            /// Only the long (second set) column.
+            /// </summary>
+            LongOnly,
+
+            /// <summary>
+            /// The Simple Mode single column.
+            /// </summary>
+            Single,
+        }
+
+        /// <summary>
+        /// The debuff mechanics in their display order.
+        /// </summary>
+        private static readonly MechanicKind[] DebuffOrder = { MechanicKind.Lightning, MechanicKind.Drop, MechanicKind.Acceleration };
+
+        /// <summary>
+        /// Draws the Exdeath real/fake buttons and, while they are docked, the mode's debuff buttons below them.
+        /// The debuff buttons move to their own panel when the undock setting is on, and Giga Simple Mode has none at all.
         /// </summary>
         /// <param name="scale">The pixel scale applied to the buttons.</param>
         public void DrawExdeath(float scale)
         {
-            var style = ImGui.GetStyle();
-            var columnStride = IconButtonSize * scale + style.FramePadding.X * 2 + style.ItemSpacing.X;
             var exdeathEnabled = phase is Phase.WaitFirstExdeath or Phase.WaitSecondExdeath;
             var labelsHidden = configuration.EffectiveHideLabels(CurrentSection);
+            var standard = configuration.GetSectionOrientation(CurrentSection) == PanelOrientation.Standard;
 
             if (!labelsHidden)
             {
                 ImGui.TextUnformatted(configuration.GetText(OnSecondExdeath ? TextLabels.ExdeathSecondHeader : TextLabels.ExdeathFirstHeader));
             }
 
-            if (!labelsHidden)
+            if (!labelsHidden && standard)
             {
-                // SameLine's offset parameter re-adds the group offset, so SetCursorPosX places the second column,
-                // keeping it aligned when the section draws inside a positioned group in windowed mode.
-                var headerStartX = ImGui.GetCursorPosX();
-                ImGui.TextUnformatted(configuration.GetText(TextLabels.RealColumnHeader));
-                ImGui.SameLine();
-                ImGui.SetCursorPosX(headerStartX + columnStride);
-                ImGui.TextUnformatted(configuration.GetText(TextLabels.FakeColumnHeader));
+                DrawColumnHeaders(TextLabels.RealColumnHeader, TextLabels.FakeColumnHeader, scale);
             }
 
-            if (IconButton("##RealExdeath", "RealExdeath.png", exdeathEnabled, scale))
+            var groups = new List<PanelGroup>
             {
-                OnExdeath(true);
+                new(new List<PanelButton>
+                {
+                    new("##RealExdeath", "RealExdeath.png", exdeathEnabled, () => OnExdeath(true)),
+                    new("##FakeExdeath", "FakeExdeath.png", exdeathEnabled, () => OnExdeath(false)),
+                }, false),
+            };
+
+            var debuffsDocked = !configuration.SplitExdeathButtons && configuration.SolverMode != SolverMode.GigaSimple;
+            var dockedColumn = configuration.SolverMode == SolverMode.Classic ? DebuffColumn.Grid : DebuffColumn.Single;
+
+            // Outside the standard layout the docked debuff buttons join the same single column or row as the pair.
+            if (debuffsDocked && !standard)
+            {
+                groups.AddRange(DebuffGroups(dockedColumn));
+                DrawButtonGroups(groups, scale);
+                return;
             }
 
-            ImGui.SameLine();
-
-            if (IconButton("##FakeExdeath", "FakeExdeath.png", exdeathEnabled, scale))
-            {
-                OnExdeath(false);
-            }
-
-            if (configuration.SolverMode == SolverMode.GigaSimple)
+            DrawButtonGroups(groups, scale);
+            if (!debuffsDocked)
             {
                 return;
             }
 
             ImGuiHelpers.ScaledDummy(4f);
 
-            if (configuration.SolverMode == SolverMode.Simple)
+            if (!labelsHidden && configuration.SolverMode == SolverMode.Classic)
             {
-                DrawSimpleDebuffButtons(scale);
+                DrawColumnHeaders(TextLabels.ShortColumnHeader, TextLabels.LongColumnHeader, scale);
+            }
+
+            DrawButtonGroups(DebuffGroups(dockedColumn), scale);
+        }
+
+        /// <summary>
+        /// Draws the undocked debuff buttons panel: the short/long grid in Classic Mode or the single debuff column in Simple Mode.
+        /// </summary>
+        /// <param name="scale">The pixel scale applied to the buttons.</param>
+        public void DrawDebuffButtons(float scale)
+        {
+            var labelsHidden = configuration.EffectiveHideLabels(CurrentSection);
+            if (!labelsHidden)
+            {
+                ImGui.TextUnformatted(configuration.GetText(TextLabels.DebuffsHeader));
+            }
+
+            if (configuration.SolverMode != SolverMode.Classic)
+            {
+                DrawButtonGroups(DebuffGroups(DebuffColumn.Single), scale);
                 return;
             }
 
-            if (!labelsHidden)
+            if (!labelsHidden && configuration.GetSectionOrientation(CurrentSection) == PanelOrientation.Standard)
             {
-                var headerStartX = ImGui.GetCursorPosX();
+                DrawColumnHeaders(TextLabels.ShortColumnHeader, TextLabels.LongColumnHeader, scale);
+            }
+
+            DrawButtonGroups(DebuffGroups(DebuffColumn.Grid), scale);
+        }
+
+        /// <summary>
+        /// Draws the SHORT column panel used when the undocked debuff grid is split into separate columns.
+        /// </summary>
+        /// <param name="scale">The pixel scale applied to the buttons.</param>
+        public void DrawShortDebuffButtons(float scale)
+        {
+            if (!configuration.EffectiveHideLabels(CurrentSection))
+            {
                 ImGui.TextUnformatted(configuration.GetText(TextLabels.ShortColumnHeader));
-                ImGui.SameLine();
-                ImGui.SetCursorPosX(headerStartX + columnStride);
+            }
+
+            DrawButtonGroups(DebuffGroups(DebuffColumn.ShortOnly), scale);
+        }
+
+        /// <summary>
+        /// Draws the LONG column panel used when the undocked debuff grid is split into separate columns.
+        /// </summary>
+        /// <param name="scale">The pixel scale applied to the buttons.</param>
+        public void DrawLongDebuffButtons(float scale)
+        {
+            if (!configuration.EffectiveHideLabels(CurrentSection))
+            {
                 ImGui.TextUnformatted(configuration.GetText(TextLabels.LongColumnHeader));
             }
 
-            DrawShortLongRow("Lightning.png", MechanicKind.Lightning, scale);
-            DrawShortLongRow("Drop.png", MechanicKind.Drop, scale);
-            DrawShortLongRow("Acceleration.png", MechanicKind.Acceleration, scale);
+            DrawButtonGroups(DebuffGroups(DebuffColumn.LongOnly), scale);
         }
 
         /// <summary>
-        /// Draws the Simple Mode debuff column: one button each for Lightning, Drop and Acceleration.
-        /// A press is recorded like a short pick so the shared selection state, locking and undo apply unchanged.
+        /// Builds the debuff button groups for a panel, one group per mechanic.
         /// </summary>
-        /// <param name="scale">The pixel scale applied to the buttons.</param>
-        private void DrawSimpleDebuffButtons(float scale)
+        /// <param name="column">Which debuff buttons the panel hosts.</param>
+        /// <returns>The debuff groups in display order.</returns>
+        private List<PanelGroup> DebuffGroups(DebuffColumn column)
         {
-            if (IconButton("##SimpleLightning", "Lightning.png", ShortLongEnabled(MechanicKind.Lightning), scale))
+            var groups = new List<PanelGroup>();
+            foreach (var kind in DebuffOrder)
             {
-                OnShortLong(MechanicKind.Lightning, true);
+                groups.Add(new PanelGroup(DebuffButtons(kind, column), false));
             }
 
-            if (IconButton("##SimpleDrop", "Drop.png", ShortLongEnabled(MechanicKind.Drop), scale))
-            {
-                OnShortLong(MechanicKind.Drop, true);
-            }
-
-            if (IconButton("##SimpleAcceleration", "Acceleration.png", ShortLongEnabled(MechanicKind.Acceleration), scale))
-            {
-                OnShortLong(MechanicKind.Acceleration, true);
-            }
+            return groups;
         }
 
         /// <summary>
-        /// Draws one row of the short/long grid for a single mechanic.
+        /// Builds one mechanic's buttons for a panel, keeping the ImGui ids the docked grid has always used.
         /// </summary>
-        /// <param name="iconFile">The icon file shown on both buttons of the row.</param>
-        /// <param name="kind">The mechanic the row picks.</param>
-        /// <param name="scale">The pixel scale applied to the buttons.</param>
-        private void DrawShortLongRow(string iconFile, MechanicKind kind, float scale)
+        /// <param name="kind">The mechanic the buttons pick.</param>
+        /// <param name="column">Which debuff buttons the panel hosts.</param>
+        /// <returns>The mechanic's buttons in their unreversed order.</returns>
+        private List<PanelButton> DebuffButtons(MechanicKind kind, DebuffColumn column)
         {
-            if (IconButton($"##Short{kind}", iconFile, ShortLongEnabled(kind), scale))
+            var icon = $"{kind}.png";
+            var enabled = ShortLongEnabled(kind);
+            return column switch
             {
-                OnShortLong(kind, true);
+                DebuffColumn.Grid => new List<PanelButton>
+                {
+                    new($"##Short{kind}", icon, enabled, () => OnShortLong(kind, true)),
+                    new($"##Long{kind}", icon, enabled, () => OnShortLong(kind, false)),
+                },
+                DebuffColumn.ShortOnly => new List<PanelButton> { new($"##Short{kind}", icon, enabled, () => OnShortLong(kind, true)) },
+                DebuffColumn.LongOnly => new List<PanelButton> { new($"##Long{kind}", icon, enabled, () => OnShortLong(kind, false)) },
+                _ => new List<PanelButton> { new($"##Simple{kind}", icon, enabled, () => OnShortLong(kind, true)) },
+            };
+        }
+
+        /// <summary>
+        /// Draws a two-column header row above a pair grid, swapping the sides when the panel's button order is reversed.
+        /// </summary>
+        /// <param name="firstLabelId">The text label id of the left column header.</param>
+        /// <param name="secondLabelId">The text label id of the right column header.</param>
+        /// <param name="scale">The pixel scale applied to the buttons the headers sit above.</param>
+        private void DrawColumnHeaders(string firstLabelId, string secondLabelId, float scale)
+        {
+            var style = ImGui.GetStyle();
+            var columnStride = IconButtonSize * scale + style.FramePadding.X * 2 + style.ItemSpacing.X;
+            var first = configuration.GetText(firstLabelId);
+            var second = configuration.GetText(secondLabelId);
+            if (configuration.GetSectionReversed(CurrentSection))
+            {
+                (first, second) = (second, first);
             }
 
+            // SameLine's offset parameter re-adds the group offset, so SetCursorPosX places the second column,
+            // keeping it aligned when the section draws inside a positioned group in windowed mode.
+            var headerStartX = ImGui.GetCursorPosX();
+            ImGui.TextUnformatted(first);
             ImGui.SameLine();
+            ImGui.SetCursorPosX(headerStartX + columnStride);
+            ImGui.TextUnformatted(second);
+        }
 
-            if (IconButton($"##Long{kind}", iconFile, ShortLongEnabled(kind), scale))
+        /// <summary>
+        /// Draws a macro button panel's groups using the section's configured layout.
+        /// The standard layout gives each group its own row, while the vertical and horizontal layouts flatten every button into one column or one row.
+        /// Hidden groups keep their footprint in every layout so the remaining buttons do not shift.
+        /// </summary>
+        /// <param name="groups">The panel's button groups.</param>
+        /// <param name="scale">The pixel scale applied to the buttons.</param>
+        private void DrawButtonGroups(List<PanelGroup> groups, float scale)
+        {
+            var orientation = configuration.GetSectionOrientation(CurrentSection);
+            var first = true;
+            foreach (var group in groups)
             {
-                OnShortLong(kind, false);
+                if (orientation == PanelOrientation.Standard)
+                {
+                    first = true;
+                }
+
+                if (group.Hidden)
+                {
+                    if (!first && orientation == PanelOrientation.Horizontal)
+                    {
+                        ImGui.SameLine();
+                    }
+
+                    DrawHiddenGroupPlaceholder(group.Buttons.Count, orientation, scale);
+                    first = false;
+                    continue;
+                }
+
+                foreach (var button in OrderedButtons(group))
+                {
+                    if (!first && orientation != PanelOrientation.Vertical)
+                    {
+                        ImGui.SameLine();
+                    }
+
+                    if (IconButton(button.Id, button.Icon, button.Enabled, scale))
+                    {
+                        button.Press();
+                    }
+
+                    first = false;
+                }
             }
+        }
+
+        /// <summary>
+        /// Returns a group's buttons in draw order, swapping them when the section's button order is reversed.
+        /// </summary>
+        /// <param name="group">The group whose buttons are ordered.</param>
+        /// <returns>The buttons in the order they are drawn.</returns>
+        private List<PanelButton> OrderedButtons(PanelGroup group)
+        {
+            if (!configuration.GetSectionReversed(CurrentSection))
+            {
+                return group.Buttons;
+            }
+
+            var reversedButtons = new List<PanelButton>(group.Buttons);
+            reversedButtons.Reverse();
+            return reversedButtons;
         }
 
         /// <summary>
@@ -1319,48 +1499,65 @@ namespace SnazzyP4
                 ImGui.TextUnformatted(configuration.GetText(TextLabels.ChaosHeader));
             }
 
-            // Inferno and Tsunami each resolve once per pull, so each pair disables after it is pressed until the next reset.
+            DrawButtonGroups(new List<PanelGroup> { InfernoGroup(), TsunamiGroup() }, scale);
+        }
+
+        /// <summary>
+        /// Draws the Inferno pair as its own panel when the Chaos panel is split.
+        /// </summary>
+        /// <param name="scale">The pixel scale applied to the buttons.</param>
+        public void DrawInfernoButtons(float scale)
+        {
+            if (!configuration.EffectiveHideLabels(CurrentSection))
+            {
+                ImGui.TextUnformatted(configuration.GetText(TextLabels.InfernoHeader));
+            }
+
+            DrawButtonGroups(new List<PanelGroup> { InfernoGroup() }, scale);
+        }
+
+        /// <summary>
+        /// Draws the Tsunami pair as its own panel when the Chaos panel is split.
+        /// </summary>
+        /// <param name="scale">The pixel scale applied to the buttons.</param>
+        public void DrawTsunamiButtons(float scale)
+        {
+            if (!configuration.EffectiveHideLabels(CurrentSection))
+            {
+                ImGui.TextUnformatted(configuration.GetText(TextLabels.TsunamiHeader));
+            }
+
+            DrawButtonGroups(new List<PanelGroup> { TsunamiGroup() }, scale);
+        }
+
+        /// <summary>
+        /// Builds the Inferno pair group.
+        /// Inferno resolves once per pull, so the pair disables after its press until the next reset.
+        /// </summary>
+        /// <returns>The Inferno real/fake pair.</returns>
+        private PanelGroup InfernoGroup()
+        {
             var infernoEnabled = !firstSetChaos.HasValue;
+            return new PanelGroup(new List<PanelButton>
+            {
+                new("##Inferno", "Inferno.png", infernoEnabled, () => OnChaos(configuration.GetText(TextLabels.InfernoReal), FireColor, "inferno", true)),
+                new("##FakeInferno", "FakeInferno.png", infernoEnabled, () => OnChaos(configuration.GetText(TextLabels.InfernoFake), FireColor, "inferno", false)),
+            }, HideResolvedActive && !infernoEnabled);
+        }
+
+        /// <summary>
+        /// Builds the Tsunami pair group.
+        /// Tsunami resolves once per pull, so the pair disables after its press until the next reset.
+        /// </summary>
+        /// <returns>The Tsunami real/fake pair.</returns>
+        private PanelGroup TsunamiGroup()
+        {
             var tsunamiEnabled = !secondSetChaos.HasValue;
-
-            if (!HideResolvedActive || infernoEnabled)
+            return new PanelGroup(new List<PanelButton>
             {
-                if (IconButton("##Inferno", "Inferno.png", infernoEnabled, scale))
-                {
-                    OnChaos(configuration.GetText(TextLabels.InfernoReal), FireColor, "inferno", true);
-                }
-
-                ImGui.SameLine();
-
-                if (IconButton("##FakeInferno", "FakeInferno.png", infernoEnabled, scale))
-                {
-                    OnChaos(configuration.GetText(TextLabels.InfernoFake), FireColor, "inferno", false);
-                }
-            }
-            else
-            {
-                // A hidden pair keeps its footprint so the remaining buttons do not shift.
-                DrawHiddenPairPlaceholder(scale);
-            }
-
-            if (!HideResolvedActive || tsunamiEnabled)
-            {
-                if (IconButton("##Tsunami", "Tsunami.png", tsunamiEnabled, scale))
-                {
-                    OnChaos(configuration.GetText(TextLabels.TsunamiReal), WaterColor, "tsunami", true);
-                }
-
-                ImGui.SameLine();
-
-                if (IconButton("##FakeTsunami", "FakeTsunami.png", tsunamiEnabled, scale))
-                {
-                    OnChaos(configuration.GetText(TextLabels.TsunamiFake), WaterColor, "tsunami", false);
-                }
-            }
-            else
-            {
-                DrawHiddenPairPlaceholder(scale);
-            }
+                new("##Tsunami", "Tsunami.png", tsunamiEnabled, () => OnChaos(configuration.GetText(TextLabels.TsunamiReal), WaterColor, "tsunami", true)),
+                new("##FakeTsunami", "FakeTsunami.png", tsunamiEnabled, () => OnChaos(configuration.GetText(TextLabels.TsunamiFake), WaterColor, "tsunami", false)),
+            }, HideResolvedActive && !tsunamiEnabled);
         }
 
         /// <summary>
@@ -1374,57 +1571,55 @@ namespace SnazzyP4
                 ImGui.TextUnformatted(configuration.GetText(TextLabels.KefkaButtonsHeader));
             }
 
-            // Thunder and Blizzard each lock after their press until the next reset, like the chaos pairs.
-            // The Last Fake toggles are a separate control and stay usable regardless.
-            if (!HideResolvedActive || !thunderPressed)
-            {
-                if (IconButton("##Thunder", "Thunder.png", !thunderPressed, scale))
-                {
-                    OnThunder(true);
-                }
-
-                ImGui.SameLine();
-
-                if (IconButton("##FakeThunder", "FakeThunder.png", !thunderPressed, scale))
-                {
-                    OnThunder(false);
-                }
-            }
-            else
-            {
-                DrawHiddenPairPlaceholder(scale);
-            }
-
-            if (!HideResolvedActive || !blizzardPressed)
-            {
-                if (IconButton("##Blizzard", "Blizzard.png", !blizzardPressed, scale))
-                {
-                    OnBlizzard(true);
-                }
-
-                ImGui.SameLine();
-
-                if (IconButton("##FakeBlizzard", "FakeBlizzard.png", !blizzardPressed, scale))
-                {
-                    OnBlizzard(false);
-                }
-            }
-            else
-            {
-                DrawHiddenPairPlaceholder(scale);
-            }
+            DrawButtonGroups(new List<PanelGroup> { ThunderGroup(), BlizzardGroup() }, scale);
         }
 
         /// <summary>
-        /// Reserves the exact footprint of a hidden button pair so the remaining buttons keep their positions.
+        /// Builds the Thunder pair group.
+        /// Thunder locks after its press until the next reset; the Last Fake toggles are a separate control and stay usable regardless.
         /// </summary>
-        /// <param name="scale">The pixel scale the hidden pair would have been drawn at.</param>
-        private static void DrawHiddenPairPlaceholder(float scale)
+        /// <returns>The Thunder real/fake pair.</returns>
+        private PanelGroup ThunderGroup()
+        {
+            return new PanelGroup(new List<PanelButton>
+            {
+                new("##Thunder", "Thunder.png", !thunderPressed, () => OnThunder(true)),
+                new("##FakeThunder", "FakeThunder.png", !thunderPressed, () => OnThunder(false)),
+            }, HideResolvedActive && thunderPressed);
+        }
+
+        /// <summary>
+        /// Builds the Blizzard pair group.
+        /// Blizzard locks after its press until the next reset; the Last Fake toggles are a separate control and stay usable regardless.
+        /// </summary>
+        /// <returns>The Blizzard real/fake pair.</returns>
+        private PanelGroup BlizzardGroup()
+        {
+            return new PanelGroup(new List<PanelButton>
+            {
+                new("##Blizzard", "Blizzard.png", !blizzardPressed, () => OnBlizzard(true)),
+                new("##FakeBlizzard", "FakeBlizzard.png", !blizzardPressed, () => OnBlizzard(false)),
+            }, HideResolvedActive && blizzardPressed);
+        }
+
+        /// <summary>
+        /// Reserves the exact footprint of a hidden button group so the remaining buttons keep their positions.
+        /// </summary>
+        /// <param name="buttonCount">How many buttons the hidden group holds.</param>
+        /// <param name="orientation">The layout the group would have been drawn in.</param>
+        /// <param name="scale">The pixel scale the hidden group would have been drawn at.</param>
+        private static void DrawHiddenGroupPlaceholder(int buttonCount, PanelOrientation orientation, float scale)
         {
             var style = ImGui.GetStyle();
             var buttonWidth = IconButtonSize * scale + style.FramePadding.X * 2f;
             var buttonHeight = IconButtonSize * scale + style.FramePadding.Y * 2f;
-            ImGui.Dummy(new Vector2(buttonWidth * 2f + style.ItemSpacing.X, buttonHeight));
+            if (orientation == PanelOrientation.Vertical)
+            {
+                ImGui.Dummy(new Vector2(buttonWidth, buttonHeight * buttonCount + style.ItemSpacing.Y * (buttonCount - 1)));
+                return;
+            }
+
+            ImGui.Dummy(new Vector2(buttonWidth * buttonCount + style.ItemSpacing.X * (buttonCount - 1), buttonHeight));
         }
 
         /// <summary>

@@ -83,6 +83,15 @@ namespace SnazzyP4
         /// <summary>The long column header.</summary>
         public const string LongColumnHeader = "LongColumnHeader";
 
+        /// <summary>The undocked debuff buttons section header.</summary>
+        public const string DebuffsHeader = "DebuffsHeader";
+
+        /// <summary>The undocked Inferno buttons section header.</summary>
+        public const string InfernoHeader = "InfernoHeader";
+
+        /// <summary>The undocked Tsunami buttons section header.</summary>
+        public const string TsunamiHeader = "TsunamiHeader";
+
         /// <summary>The Chaos section header.</summary>
         public const string ChaosHeader = "ChaosHeader";
 
@@ -163,6 +172,9 @@ namespace SnazzyP4
             (ShortColumnHeader, "SHORT", "\"SHORT\" column", "Headers"),
             (LongColumnHeader, "LONG", "\"LONG\" column", "Headers"),
             (ChaosHeader, "Chaos", "Chaos section header", "Headers"),
+            (DebuffsHeader, "Debuffs", "Debuffs section header", "Headers"),
+            (InfernoHeader, "Inferno", "Inferno section header", "Headers"),
+            (TsunamiHeader, "Tsunami", "Tsunami section header", "Headers"),
             (KefkaButtonsHeader, "Kefka", "Kefka buttons header", "Headers"),
 
             (ResetButton, "RESET", "Reset button", "Buttons"),

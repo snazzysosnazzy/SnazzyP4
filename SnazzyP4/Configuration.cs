@@ -76,6 +76,34 @@ namespace SnazzyP4
         public SolverMode SolverMode { get; set; } = SolverMode.Classic;
 
         /// <summary>
+        /// Whether the Exdeath debuff buttons live in their own panel instead of sitting under the real/fake pair.
+        /// </summary>
+        public bool SplitExdeathButtons { get; set; }
+
+        /// <summary>
+        /// Whether the undocked debuff grid is further split into separate SHORT and LONG column panels.
+        /// Only applies in Classic Mode while <see cref="SplitExdeathButtons"/> is on.
+        /// </summary>
+        public bool SplitDebuffColumns { get; set; }
+
+        /// <summary>
+        /// Whether the Chaos panel is split into separate Inferno and Tsunami panels.
+        /// </summary>
+        public bool SplitChaosButtons { get; set; }
+
+        /// <summary>
+        /// The button layout for each macro button panel, keyed by section id and stored as the enum's integer value.
+        /// A panel's layout is deliberately shared between the windowed and detached display modes.
+        /// </summary>
+        public Dictionary<string, int> SectionOrientations { get; set; } = new();
+
+        /// <summary>
+        /// Whether each macro button panel swaps the two buttons inside every pair, keyed by section id.
+        /// Shared between the windowed and detached display modes like the orientation.
+        /// </summary>
+        public Dictionary<string, bool> SectionReversedButtons { get; set; } = new();
+
+        /// <summary>
         /// Whether the player is playing a Support role.
         /// Support resolves to the Ignore1/Bind1 markers and the A (stack) and D (spread) target letters, while DPS uses Ignore2/Bind2 and the C and B letters.
         /// </summary>
@@ -891,6 +919,46 @@ namespace SnazzyP4
         public void SetSectionButtonAlpha(string sectionId, float alpha)
         {
             SectionButtonAlpha[ModeKey(sectionId)] = alpha;
+        }
+
+        /// <summary>
+        /// Gets the button layout for a macro button panel, defaulting to the standard layout.
+        /// </summary>
+        /// <param name="sectionId">The section whose layout is looked up.</param>
+        /// <returns>The stored layout, or the standard layout when unset.</returns>
+        public PanelOrientation GetSectionOrientation(string sectionId)
+        {
+            return SectionOrientations.TryGetValue(sectionId, out var orientation) ? (PanelOrientation)orientation : PanelOrientation.Standard;
+        }
+
+        /// <summary>
+        /// Stores the button layout for a macro button panel.
+        /// </summary>
+        /// <param name="sectionId">The section whose layout is stored.</param>
+        /// <param name="orientation">The new button layout.</param>
+        public void SetSectionOrientation(string sectionId, PanelOrientation orientation)
+        {
+            SectionOrientations[sectionId] = (int)orientation;
+        }
+
+        /// <summary>
+        /// Gets whether a macro button panel swaps the two buttons inside every pair.
+        /// </summary>
+        /// <param name="sectionId">The section whose swap flag is looked up.</param>
+        /// <returns>True when the panel draws each pair in reversed order.</returns>
+        public bool GetSectionReversed(string sectionId)
+        {
+            return SectionReversedButtons.TryGetValue(sectionId, out var reversed) && reversed;
+        }
+
+        /// <summary>
+        /// Stores whether a macro button panel swaps the two buttons inside every pair.
+        /// </summary>
+        /// <param name="sectionId">The section whose swap flag is stored.</param>
+        /// <param name="reversed">Whether the panel draws each pair in reversed order.</param>
+        public void SetSectionReversed(string sectionId, bool reversed)
+        {
+            SectionReversedButtons[sectionId] = reversed;
         }
 
         /// <summary>
