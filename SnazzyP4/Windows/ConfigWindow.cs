@@ -1100,7 +1100,7 @@ namespace SnazzyP4.Windows
                             slot.UseCustomMessage = custom;
                             if (custom && slot.Messages.Count == 0)
                             {
-                                slot.Messages.Add(AnnouncementData.DefaultMessage(categoryId, slot.Id, isFirst, isReal, Configuration.AnnouncementShowSetNumber, spreadLetters, stackLetters));
+                                slot.Messages.Add(AnnouncementData.DefaultMessage(categoryId, slot.Id, isFirst, isReal, Configuration.AnnouncementShowSetNumber, spreadLetters, stackLetters, bothRoles));
                             }
 
                             Configuration.Save();
@@ -1114,7 +1114,7 @@ namespace SnazzyP4.Windows
                         }
                         else
                         {
-                            ImGui.TextDisabled($"Default: {AnnouncementData.DefaultMessage(categoryId, slot.Id, isFirst, isReal, Configuration.AnnouncementShowSetNumber, spreadLetters, stackLetters)}");
+                            ImGui.TextDisabled($"Default: {AnnouncementData.DefaultMessage(categoryId, slot.Id, isFirst, isReal, Configuration.AnnouncementShowSetNumber, spreadLetters, stackLetters, bothRoles)}");
                         }
                     }
 

@@ -1759,7 +1759,7 @@ namespace SnazzyP4
                     {
                         var bothRoles = !configuration.IsPersonalMode || channel == "/p";
                         SendAnnouncement(channel, AnnouncementData.DefaultMessage(categoryId, slot.Id, isFirst, isReal, configuration.AnnouncementShowSetNumber,
-                                                                                  configuration.SpreadLetters(bothRoles), configuration.StackLetters(bothRoles)));
+                                                                                  configuration.SpreadLetters(bothRoles), configuration.StackLetters(bothRoles), bothRoles));
                     }
                 }
 
@@ -1978,7 +1978,7 @@ namespace SnazzyP4
                 {
                     var bothRoles = !configuration.IsPersonalMode || channel == "/p";
                     var message = AnnouncementData.DefaultMessage(categoryId, slot.Id, isFirst, isReal, includeSetNumber,
-                                                                  configuration.SpreadLetters(bothRoles), configuration.StackLetters(bothRoles));
+                                                                  configuration.SpreadLetters(bothRoles), configuration.StackLetters(bothRoles), bothRoles);
                     if (!string.IsNullOrWhiteSpace(message))
                     {
                         output.Add(message);

@@ -19,6 +19,10 @@ namespace SnazzyP4
         /// </summary>
         public static readonly Entry[] Entries =
         {
+            new("1.0.13.1", "2026-07-16", new[]
+            {
+                "The Acceleration announcement wording now depends on where the message goes: party-facing messages (Party Mode, or any Personal message sent to /p) say \"Acceleration - STILLNESS\" or \"Acceleration - MOTION\", while personal messages to other channels say \"Acceleration - STAND STILL\" or \"Acceleration - MOVE\" to match the on-screen text panel.",
+            }),
             new("1.0.13.0", "2026-07-13", new[]
             {
                 "The debuff resolution announcements (Lightning, Drop, Acceleration) are now available in BOTH Party and Personal modes, and their defaults spell out the resolution with target letters: \"[1st] Lightning - Spread on D/B\", \"[1st] Drop - Stack on A/C\", \"[1st] Acceleration - STILLNESS/MOTION\". In Party Mode (or any Personal message sent to /p) both roles' letters show, like \"D/B\"; Personal messages to other channels show only your own role's letter. The letters follow your Text-tab customisations.",

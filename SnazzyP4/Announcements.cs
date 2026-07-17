@@ -200,8 +200,9 @@ namespace SnazzyP4
         /// <param name="includeSetNumber">Whether Exdeath debuff messages carry the "[1st]"/"[2nd]" prefix.</param>
         /// <param name="spreadLetters">The target letters appended to a spread resolution.</param>
         /// <param name="stackLetters">The target letters appended to a stack resolution.</param>
+        /// <param name="partyFacing">Whether the message goes to the party rather than being a personal callout.</param>
         /// <returns>The generated chat message, or an empty string for an unknown slot.</returns>
-        public static string DefaultMessage(string categoryId, string slotId, bool isFirst, bool isReal, bool includeSetNumber = true, string spreadLetters = "", string stackLetters = "")
+        public static string DefaultMessage(string categoryId, string slotId, bool isFirst, bool isReal, bool includeSetNumber = true, string spreadLetters = "", string stackLetters = "", bool partyFacing = true)
         {
             var set = isFirst ? "1st" : "2nd";
             if (slotId == "title")
@@ -229,7 +230,7 @@ namespace SnazzyP4
                     "gaze" => isReal ? $"{prefix}Gaze - Look Away" : $"{prefix}Gaze - Look",
                     "spread" => isReal ? $"{prefix}Lightning - Spread on {spreadLetters}" : $"{prefix}Lightning - Stack on {stackLetters}",
                     "drop" => isReal ? $"{prefix}Drop - Stack on {stackLetters}" : $"{prefix}Drop - Spread on {spreadLetters}",
-                    "accel" => isReal ? $"{prefix}Acceleration - STILLNESS" : $"{prefix}Acceleration - MOTION",
+                    "accel" => AccelerationMessage(prefix, isReal, partyFacing),
                     _ => string.Empty,
                 };
             }
@@ -250,6 +251,24 @@ namespace SnazzyP4
                 "tsunami" => isReal ? "Tsunami - Donut (STAY)" : "Tsunami - Twister (MOVE)",
                 _ => string.Empty,
             };
+        }
+
+        /// <summary>
+        /// Builds the Acceleration resolution announcement.
+        /// Party-facing messages use the STILLNESS/MOTION callout wording while personal ones match the on-screen STAND STILL/MOVE labels.
+        /// </summary>
+        /// <param name="prefix">The optional set-number prefix.</param>
+        /// <param name="isReal">Whether the debuff resolved on the real branch.</param>
+        /// <param name="partyFacing">Whether the message goes to the party rather than being a personal callout.</param>
+        /// <returns>The Acceleration announcement text.</returns>
+        private static string AccelerationMessage(string prefix, bool isReal, bool partyFacing)
+        {
+            if (partyFacing)
+            {
+                return isReal ? $"{prefix}Acceleration - STILLNESS" : $"{prefix}Acceleration - MOTION";
+            }
+
+            return isReal ? $"{prefix}Acceleration - STAND STILL" : $"{prefix}Acceleration - MOVE";
         }
 
         /// <summary>

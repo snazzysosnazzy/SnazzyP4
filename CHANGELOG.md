@@ -3,6 +3,13 @@
 All notable changes to Snazzy P4 are listed here. Versions match the `vX.Y.Z.W`
 release tags.
 
+## v1.0.13.1 — 2026-07-16
+
+- The Acceleration announcement wording now depends on where the message goes: party-facing
+  messages (Party Mode, or any Personal message sent to `/p`) say `Acceleration - STILLNESS` /
+  `Acceleration - MOTION`, while personal messages to other channels say
+  `Acceleration - STAND STILL` / `Acceleration - MOVE` to match the on-screen text panel.
+
 ## v1.0.13.0 — 2026-07-13
 
 - **Debuff resolution announcements in both modes** — Lightning, Drop and Acceleration are now
