@@ -22,7 +22,7 @@ A robust custom macro system for the Kefka UMAD/DMU Phase 4 mechanics. You tap t
 buttons for what you see in the fight, and the plugin turns them into short, readable
 callouts (spread/stack targets, gaze, chaos and Kefka) so you can cut the macro bloat.
 
-Snazzy P4 offers three modes, selectable under **Settings → General**:
+Snazzy P4 offers two modes, selectable under **Settings → General**:
 
 **Classic Mode** (default) — the full solver: real/fake Exdeath plus a short/long button for
 each debuff, so each set panel shows your exact personal resolution.
@@ -33,12 +33,6 @@ each debuff, so each set panel shows your exact personal resolution.
 show in their own Debuffs panel with your own role's letter.
 
 ![Simple Mode](docs/Simple_Mode.png)
-
-**Giga Simple Mode (BETA)** — real/fake buttons only. Each set panel lists every debuff's
-resolution with both roles' letters. *Temporarily unavailable while its resolution logic is
-corrected to account for short/long debuff timing.*
-
-![Giga Simple Mode](docs/Giga_Simple_Mode.png)
 
 ## Preface
 
@@ -79,9 +73,8 @@ You press a few buttons as the mechanics happen and it lays out clean, colour-co
 what to do. Everything is repositionable, rescalable and recolourable, and it can run
 as one window or as separate floating panels.
 
-- **Three Modes** — **Classic** (the full short/long debuff grid), **Simple** (one button per
-                    debuff, BETA) and **Giga Simple** (real/fake buttons only, BETA), selectable
-                    under **Settings → General**.
+- **Two Modes** — **Classic** (the full short/long debuff grid) and **Simple** (one button per
+                  debuff, BETA), selectable under **Settings → General**.
 - **Exdeath** — Real (`!`) or Fake (`?`) macros for Exdeath tell, 
                 Short/Long debuff (Lightning / Drop / Acceleration) macros, 
 				and respective Resolution text.
@@ -182,11 +175,10 @@ command below.
 /snazzyp4 Acceleration
 ```
 
-Giga Simple Mode has no debuff buttons, so it uses only the every-mode set. The commands
-respect the same rules as the buttons — a pick that isn't valid yet (for example a short/long
-before its Exdeath) is simply ignored, exactly like a greyed-out button. Commands belonging to
-another mode are ignored the same way, and the Controller tab only lists the ones your current
-mode uses.
+The commands respect the same rules as the buttons — a pick that isn't valid yet (for example
+a short/long before its Exdeath) is simply ignored, exactly like a greyed-out button. Commands
+belonging to another mode are ignored the same way, and the Controller tab only lists the ones
+your current mode uses.
 
 ## Configuration Settings
 
@@ -201,11 +193,6 @@ Open with the **Settings** button or `/snazzyp4 config`. Settings are grouped in
     short/long split. A press locks in the latest Exdeath's real/fake, and because the timing is
     unknown the resolutions live in their own **Debuffs** text panel (e.g. `Lightning - Spread on B`
     with your own role's letter) while the set panels keep the gaze and chaos lines.
-  - **Giga Simple Mode (BETA)** — no debuff buttons at all: just real/fake Exdeath, Inferno,
-    Tsunami, Thunder and Blizzard. Each set panel lists every debuff's resolution with **both
-    roles' letters** (e.g. `Lightning - Spread on D/B`). *Temporarily unavailable while its
-    resolution logic is corrected to account for short/long debuff timing; a saved selection
-    falls back to Classic.*
   - Settings, commands and text labels that don't apply to the active mode are hidden while it's
     selected, and switching modes resets the current pull. Chat callouts work the same in every
     mode.
@@ -246,8 +233,6 @@ Open with the **Settings** button or `/snazzyp4 config`. Settings are grouped in
     callouts with **your own role's letter** (e.g. `[1st] Lightning - Spread on B`), titles and
     custom callouts (kept out of `/p` party chat unless you flip the override), and can route
     each announcement to its own channel.
-  - The Lightning/Drop/Acceleration callouts don't yet carry each player's short/long timing,
-    so they are **never sent to party chat**, in either mode, regardless of the override.
 - **Chronological summary** — hold the per-press announcements back and instead send the whole
   list, in fight order, once everything is pressed.
 - **Include [1st] / [2nd] prefix** in the default messages.
